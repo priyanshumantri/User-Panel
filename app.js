@@ -9,9 +9,6 @@ const MongoStore = require("connect-mongo")
 // View Engine And Directory Set
 app.set("view engine", "ejs")
 app.use(express.static(__dirname + "/public"))
-// Create subdomain-specific Express apps
-const client1App = express();
-const client2App = express()
 
 
 const clientChecker = require("./configs/client")
@@ -614,23 +611,10 @@ app.get("/change-branch", async (req, res) => {
 
 
 
-app.use(subdomain('client1', client1App));
-app.use(subdomain('user', client2App));
 
-
-const fs = require("fs");
-const https = require("https");
-
-
-const options = {
-  key: fs.readFileSync(__dirname + '/key.pem', "utf8"),
-  cert: fs.readFileSync(__dirname + '/cert.pem', "utf8")
-};
-
-const server = https.createServer(options, app);
 
 // Your Express app setup and routes go here
-const port = 4000; // Define the port variable
+const port = 5000; // Define the port variable
 server.listen(port, (err) => {
   if (err) {
     console.error(err);
