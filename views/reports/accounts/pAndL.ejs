@@ -1,0 +1,260 @@
+<%- include("../../includes/header", {pageName : "profitAndLoss" }) %>
+    <%- include("../../includes/sidebar", {pageName : "profitAndLoss" }) %>
+
+
+
+
+    <form id="ledgerForm">
+
+        <div id="kt_app_content_container" class="app-container  container-xxl "
+            style="margin-bottom: 30px; margin-top: 30px;">
+
+            <div style="padding: 30px;" class="card card-p-0 card-flush">
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label class="form-label">Select Date</label>
+                                    <input class="form-control form-control-solid" placeholder="Pick date range"
+                                        id="kt_daterangepicker_4" name="date" />
+                                </div>
+                                
+                                <div class="col-lg-3">
+                                    <label class="form-label" for="" style="visibility: hidden;">.</label> <br>                                    
+                                    <button type="button" class="btn btn-primary me-10" onclick="getPAndL()" id="previewBTN">
+                                        <span class="indicator-label">
+                                            Preview
+                                        </span>
+                                        <span class="indicator-progress">
+                                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+
+        </div>
+
+
+        </form>
+
+        <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+            <div id="kt_app_content_container" class="app-container  container-xxl ">
+
+                <div style="padding: 30px;" class="card card-p-0 card-flush">
+                    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                        <div class="card-title">
+                            <!--begin::Search-->
+                            <div class="d-flex align-items-center position-relative my-1">
+                                <span class="svg-icon fs-1 position-absolute ms-4">
+                                    <i class="ki-duotone ki-magnifier fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <input type="text" data-kt-filter="search"
+                                    class="form-control form-control-solid w-250px ps-14"
+                                    placeholder="Search Entry" />
+                            </div>
+                            <!--end::Search-->
+                            <!--begin::Export buttons-->
+                            <div id="kt_datatable_example_1_export" class="d-none"></div>
+                            <!--end::Export buttons-->
+                        </div>
+                        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                            <!--begin::Export dropdown-->
+                            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
+                                data-kt-menu-placement="bottom-end">
+                                <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
+                                        class="path2"></span></i>
+                                Export Report
+                            </button>
+                            <!--begin::Menu-->
+                            <div id="kt_datatable_example_export_menu"
+                                class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                                data-kt-menu="true">
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                        Copy to clipboard
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#excel" class="menu-link px-3" data-kt-export="excel">
+                                        Export as Excel
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                        Export as CSV
+                                    </a>
+                                </div>
+                                <div class="menu-item px-3">
+                                    <a id="pdf" class="menu-link px-3" data-kt-export="pdf">
+                                        Export as PDF
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+
+                                <!--end::Menu item-->
+                            </div>
+                            <!--end::Menu-->
+                            <!--end::Export dropdown-->
+
+                            <!--begin::Hide default export buttons-->
+                            <div id="kt_datatable_example_buttons" class="d-none"></div>
+                            <!--end::Hide default export buttons-->
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <style>
+                           [data-bs-theme = "dark"] .table-bordered {
+                                border: 1px solid wheat;
+                            }
+                            [data-bs-theme = "dark"] .border-right {
+                                border-right: 3px solid wheat;
+                            }
+                            [data-bs-theme = "dark"] .sum {
+                                border-top: 2px solid #dfecf1;
+                                border-bottom: 2px solid #dfecf1;
+                            }
+                            [data-bs-theme = "light"] .table-bordered {
+                                border: 1px solid #353839;
+                            }
+                            [data-bs-theme = "light"] .table-bordered, [data-bs-theme = "light"] tr{
+                                border: 1px solid #353839
+                            }
+                            [data-bs-theme = "light"] .table-bordered tbody tr td {
+                               color: black;
+                               font-weight: 600;
+                            }
+                            [data-bs-theme = "light"] .sum {
+                                border-top: 3px solid #475c6c;
+                                border-bottom: 3px solid #475c6c;
+                            }
+                            [data-bs-theme = "light"] .bold {
+                                color: black !important;
+                                font-weight: 900 !important;
+                            }
+                            .table-bordered {
+                                border-radius: 10px;
+                            }
+                        </style>
+                        <div class="container">
+                            <div id="pAndL" class="row" style="display: none;">
+                                <div class="col-md-6"  style="padding-right: 0 !important; padding-left: 0 !important;">
+                                    <table class="table table-bordered" >
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 80%" class="bold">Particulars</th>
+                                                <th style="width: 20%;" class="border-right bold" >Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Purchase Account</td>
+                                                <td id="purchase" class="border-right">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Direct Expenses</td>
+                                                <td id="directExpenses" class="border-right">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td id="grossProfitText" style="visibility: hidden;">Gross Profit c/o</td>
+                                                <td id="grossProfitAmt" class="border-right" ></td>
+                                            </tr>
+                                            <tr>
+                                                <td id="grossTotalRightText"></td>
+                                                <td id="grossTotalRight" class="border-right sum">0
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bold" id="grossLossBFText" style="visibility: hidden;">Gross Loss b/f</td>
+                                                <td id="grossLossBFAmt" class="border-right"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Indirect Expenses</td>
+                                                <td id="indirectExpenses" class="border-right">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bold" id="netProfitText">Net Profit</td>
+                                                <td id="netProfitAmt" class="border-right"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bold">Total</td>
+                                                <td id="totalLeft" class="border-right sum">
+                                            </td>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 0 !important; padding-left: 0 !important;">
+                                    <table class="table table-bordered" >
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 80%" class="bold">Particulars</th>
+                                                <th style="width: 20%" class="bold">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Sales Account</td>
+                                                <td id="sales">0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Direct Income</td>
+                                                <td id="directIncome" >0</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="visibility: hidden;" id="grossLossText">Gross Loss c/o</td>
+                                                <td  id="grossLossAmt"></td>
+                                            </tr>
+                                            <tr>
+                                                <td id="grossTotalLeftText">
+
+                                                </td>
+                                                <td id="grossTotalLeft" class=" sum">
+                                                    0
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bold" id="grossProfitBFText" style="visibility: hidden;">Gross Profit b/f</td>
+                                                <td id="grossProfitBFAmt"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Indirect Income</td>
+                                                <td id="indirectIncome" >0</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bold" style="visibility: hidden;" id="netLossText">Net Loss</td>
+                                                <td id="netLossAmt"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="bold">Total</td>
+                                                <td id="totalRight" class="sum">
+                                            </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <%- include("../../includes/footer", {pageName : "profitAndLoss" }) %>

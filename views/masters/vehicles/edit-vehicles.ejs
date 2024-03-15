@@ -1,0 +1,233 @@
+<%- include("../../includes/header", {pageName : "clients" }) %>
+    <%- include("../../includes/sidebar", {pageName : "vehicles" }) %>
+    <%- include("../../includes/toolbar", { pageName: "Edit Vehicle Number - " + vehicleData.number, pageHead: "Masters" }) %>
+
+
+
+
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                    <div class="card" style="padding: 30px;">
+                        <form id = "editVehicleForm">
+                            <div class="card-header border-0 pt-6">
+                               
+
+                                <input type="hidden" name="id" value="<%=vehicleData.id%>">
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label for="owner" class="required fw-semibold fs-6 mb-2 form-label">
+                                            Select Vehicle Owner
+                                        </label>
+                                            <select name="owner" class="form-control form-control-solid mb-3 mb-lg-0" data-control="select2" data-placeholder="Select an option">
+                                        <option></option>
+                                        <% ownerData.forEach((data) => { %>
+                                            <option value="<%=data.id%>" <%if(data.id == vehicleData.owner){%> selected<%}%>>
+                                                <%=data.name%>
+                                            </option>
+                                        <% }) %>
+                                        </select>
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <input type="hidden" name="oldDriver" value="<%=vehicleData.driver%>">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label for="driver" class="required fw-semibold fs-6 mb-2 form-label">
+                                            Select Vehicle Driver
+                                        </label>
+                                            <select name="driver" class="form-control form-control-solid mb-3 mb-lg-0"
+                                            data-control="select2" data-placeholder="Select an option">
+                                        <option></option>
+                                        <% driverData.forEach((data) => { %>
+                                            <option value="<%=data.id%>" <%if(data.id == vehicleData.driver){%> selected<%}%>>
+                                                <%=data.name%>
+                                            </option>
+                                        <% }) %>
+                                      </select>
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="hidden" name="oldOwner" value="<%=vehicleData.owner%>">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2"> Vehicle Number </label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                        <input placeholder="Enter New Vehicle Number" type="text"
+                                        name="vehicleNumber" id="vehicleNumber"
+                                        class="form-control form-control-solid mb-3 mb-lg-0"
+                                        data-inputmask="'mask': 'AA-99-AA-9999'" value="<%=vehicleData.number%>">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                               
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2"> Vehicle Type </label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+
+                                        <input placeholder="Enter New Vehicle Type" type="text"
+                                            name="vehicleType"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" value="<%=vehicleData.type%>">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="fw-semibold fs-6 mb-2"> Engine Number </label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+
+                                        <input placeholder="Enter Vehicle Engine Number" type="text"
+                                            name="engineNumber"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" value="<%=vehicleData.engineNumber%>">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="fs-6 mb-2">Chassis Number</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+
+                                        <input placeholder="Enter Chassis Number" type="text"
+                                            name="chassisNumber"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" value="<%=vehicleData.chassisNumber%>">
+
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="fw-semibold fs-6 mb-2"> Permit Number </label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+
+                                        <input placeholder="Enter Permit Number" type="text"
+                                            name="permitNumber"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" value="<%=vehicleData.permitNumber%>">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2"> Permit Validity </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input name="permitValidity" class="form-control form-control-solid" placeholder="Pick a date" id="permitValidity" value="<%=vehicleData.permitValidity%>"/>
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2"> Insuarance Validity </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input name="insuranceValidity" class="form-control form-control-solid" placeholder="Pick a date" id="insuranceValidity" value="<%=vehicleData.insuranceValidity%>"/>
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="fw-semibold fs-6 mb-2"> Insuarance Number </label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+
+                                        <input placeholder="Enter Insuarance Number" type="text"
+                                            name="insuaranceNumber"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" value="<%=vehicleData.insuranceNumber%>">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="fw-semibold fs-6 mb-2"> Insuarance Provider</label>
+                                        <select name="insuranceProvider" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Insurance provider">
+                                            <option></option>
+                                            <option value="Bajaj Allianz General Insurance Company" <%= (vehicleData.insuranceProvider === "Bajaj Allianz General Insurance Company") ? 'selected' : '' %>>Bajaj Allianz General Insurance Company</option>
+                                            <option value="Bharti AXA General Insurance Company" <%= (vehicleData.insuranceProvider === "Bharti AXA General Insurance Company") ? 'selected' : '' %>>Bharti AXA General Insurance Company</option>
+                                            <option value="Cholamandalam MS General Insurance Company" <%= (vehicleData.insuranceProvider === "Cholamandalam MS General Insurance Company") ? 'selected' : '' %>>Cholamandalam MS General Insurance Company</option>
+                                            <option value="Edelweiss General Insurance Company" <%= (vehicleData.insuranceProvider === "Edelweiss General Insurance Company") ? 'selected' : '' %>>Edelweiss General Insurance Company</option>
+                                            <option value="Future Generali India Insurance Company" <%= (vehicleData.insuranceProvider === "Future Generali India Insurance Company") ? 'selected' : '' %>>Future Generali India Insurance Company</option>
+                                            <option value="HDFC ERGO General Insurance Company" <%= (vehicleData.insuranceProvider === "HDFC ERGO General Insurance Company") ? 'selected' : '' %>>HDFC ERGO General Insurance Company</option>
+                                            <option value="ICICI Lombard General Insurance Company" <%= (vehicleData.insuranceProvider === "ICICI Lombard General Insurance Company") ? 'selected' : '' %>>ICICI Lombard General Insurance Company</option>
+                                            <option value="IFFCO Tokio General Insurance Company" <%= (vehicleData.insuranceProvider === "IFFCO Tokio General Insurance Company") ? 'selected' : '' %>>IFFCO Tokio General Insurance Company</option>
+                                            <option value="Kotak Mahindra General Insurance Company" <%= (vehicleData.insuranceProvider === "Kotak Mahindra General Insurance Company") ? 'selected' : '' %>>Kotak Mahindra General Insurance Company</option>
+                                            <option value="Liberty General Insurance Company" <%= (vehicleData.insuranceProvider === "Liberty General Insurance Company") ? 'selected' : '' %>>Liberty General Insurance Company</option>
+                                            <option value="Magma HDI General Insurance Company" <%= (vehicleData.insuranceProvider === "Magma HDI General Insurance Company") ? 'selected' : '' %>>Magma HDI General Insurance Company</option>
+                                            <option value="Navi General Insurance Company" <%= (vehicleData.insuranceProvider === "Navi General Insurance Company") ? 'selected' : '' %>>Navi General Insurance Company</option>
+                                            <option value="Raheja QBE General Insurance Company" <%= (vehicleData.insuranceProvider === "Raheja QBE General Insurance Company") ? 'selected' : '' %>>Raheja QBE General Insurance Company</option>
+                                            <option value="Reliance General Insurance Company" <%= (vehicleData.insuranceProvider === "Reliance General Insurance Company") ? 'selected' : '' %>>Reliance General Insurance Company</option>
+                                            <option value="Royal Sundaram General Insurance Company" <%= (vehicleData.insuranceProvider === "Royal Sundaram General Insurance Company") ? 'selected' : '' %>>Royal Sundaram General Insurance Company</option>
+                                            <option value="SBI General Insurance Company" <%= (vehicleData.insuranceProvider === "SBI General Insurance Company") ? 'selected' : '' %>>SBI General Insurance Company</option>
+                                            <option value="Shriram General Insurance Company" <%= (vehicleData.insuranceProvider === "Shriram General Insurance Company") ? 'selected' : '' %>>Shriram General Insurance Company</option>
+                                            <option value="TATA AIG General Insurance Company" <%= (vehicleData.insuranceProvider === "TATA AIG General Insurance Company") ? 'selected' : '' %>>TATA AIG General Insurance Company</option>
+                                            <option value="Universal Sompo General Insurance Company" <%= (vehicleData.insuranceProvider === "Universal Sompo General Insurance Company") ? 'selected' : '' %>>Universal Sompo General Insurance Company</option>
+                                            <option value="ACKO General Insurance" <%= (vehicleData.insuranceProvider === "ACKO General Insurance") ? 'selected' : '' %>>ACKO General Insurance</option>
+                                            <option value="Digit Insurance" <%= (vehicleData.insuranceProvider === "Digit Insurance") ? 'selected' : '' %>>Digit Insurance</option>
+                                            <option value="Go Digit General Insurance" <%= (vehicleData.insuranceProvider === "Go Digit General Insurance") ? 'selected' : '' %>>Go Digit General Insurance</option>
+                                        </select>
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="editVehicle()" type="button" class="btn btn-primary">Update Vehicle</button>
+                        </form>
+                        <!--end::Card-->
+                    </div>
+                </div>
+                <!--end::Content container-->
+            </div>
+
+          
+
+            <%- include("../../includes/footer", {pageName : "vehicles" }) %>

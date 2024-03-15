@@ -1,0 +1,51 @@
+<% if(pageName==="owners" ) {%>
+
+    <script src="../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+    <script src="../../../assets/js/custom/masters/vehicles/owners/owners.js"></script>
+    <script src="../../../assets/js/custom/masters/vehicles/owners/edit-owners.js"></script>
+
+    <script>
+        function editVehicleOwner(name, mobile, address, PAN, id, gst, city, state, email) {
+            const editModal = document.getElementById('kt_modal_update_permission');
+
+
+
+            $('#kt_modal_update_permission input[name="name"]').val(name)
+            $('#kt_modal_update_permission input[name="address"]').val(address)
+            $('#kt_modal_update_permission input[name="mobile"]').val(mobile)
+            $('#kt_modal_update_permission input[name="PAN"]').val(PAN)
+            $('#kt_modal_update_permission input[name="id"]').val(id)
+            $('#kt_modal_update_permission input[name="gst"]').val(gst)
+            $('#kt_modal_update_permission input[name="email"]').val(email)
+            $('#kt_modal_update_permission select[name="state"]').val(state).select2()
+            $('#kt_modal_update_permission select[name="city"]').val(city).select2()
+
+            $(editModal).modal('show');
+        }
+
+        function deleteVehicleOwner(name, id) {
+            Swal.fire({
+                text: "Are You Sure You Want To Delete Vehicle Owner: " + name ,
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = new URLSearchParams()
+                    data.append("id", id) // Define the data to send in the request body
+                    fetchPostRequest("/masters/vehicles/owners/delete", data, "Vehicle Owner Deleted Successfully")
+                   
+                } else {
+                    // Handle the cancel action here
+                }
+            });
+        }
+    </script>
+
+    <% }%>

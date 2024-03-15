@@ -1,0 +1,51 @@
+<% if(pageName==="security" ) { %>
+
+    <script src="../../../assets/js/custom/account/settings/signin-methods.js"></script>
+    <script
+        src="../../../assets/js/custom/utilities/modals/two-factor-authentication.js"></script>
+
+    <script>
+
+        const myButton = document.getElementById('googleswitch');
+
+
+        myButton.addEventListener('click', function () {
+            fetch("/profile/security/googleAuth", {
+                method: "POST"
+            }).then((data) => {
+                if (data.status === 500) {
+                    Swal.fire({
+                        text: "Something Went Wrong",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    })
+                } else if (data.status === 200) {
+                    return data.json()
+                }
+            }).then((data) => {
+                if (data && data.message) {
+                    Swal.fire({
+                        text: data.message,
+                        icon: "success",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((data) => {
+                        if (data.isConfirmed) {
+                            location.reload()
+                        }
+                    })
+                }
+            })
+
+        });
+    </script>
+
+
+    <%} %>

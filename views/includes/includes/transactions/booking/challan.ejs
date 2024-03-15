@@ -1,0 +1,1058 @@
+<% if(pageName==="challan" ) {%>
+
+
+    <script>
+    
+    $("#kt_modal_2").on('shown.bs.modal', function () {
+        $("#challanDate").flatpickr({
+                dateFormat: "d-m-Y",
+                minDate: new Date(new Date().getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+                maxDate: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000), // 1 day in the future
+            });
+});
+            
+
+     
+
+    </script>
+ <script>
+    var start = moment().subtract(29, "days");
+    var end = moment();
+
+    function cb(start, end) {
+        $("#searchRange").html(start.format("D, M, Y") + " - " + end.format("D, M, Y"));
+    }
+
+    $("#searchRange").daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            "Today": [moment(), moment()],
+            "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
+            "Last 7 Days": [moment().subtract(6, "days"), moment()],
+            "Last 30 Days": [moment().subtract(29, "days"), moment()],
+            "This Month": [moment().startOf("month"), moment().endOf("month")],
+            "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+        },
+        locale: {
+            format: "D-M-Y"
+        }
+    }, cb);
+
+    cb(start, end);
+
+    if (storedDateRange) {
+        // If a stored date range is found, parse it and set it as the default value
+        const parsedDateRange = JSON.parse(storedDateRange);
+        $("#searchRange").val(parsedDateRange.join(' to '))
+    }
+</script>
+<script>
+    // Function to initialize DataTable
+    function initializeDataTable() {
+        // Set date data order
+        const tableRows = table.querySelectorAll('tbody tr');
+
+        tableRows.forEach(row => {
+            const dateRow = row.querySelectorAll('td');
+            const realDate = moment(dateRow[3].innerHTML, "DD MMM YYYY, LT").format(); // select date from 4th column in table
+            dateRow[3].setAttribute('data-order', realDate);
+        });
+
+        // Init datatable --- more info on datatables: https://datatables.net/manual/
+        datatable = $(table).DataTable({
+            "info": false,
+            'order': [],
+            'pageLength': 10,
+            'scrollX': true, // Set the height of the scrollable area (adjust as needed)
+            'fixedColumns': {
+                leftColumns: 2, // Number of columns to freeze on the left
+            },
+        });
+
+        // Hook export buttons
+        const documentTitle = 'Challan Report';
+        var buttons = new $.fn.dataTable.Buttons(table, {
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    title: documentTitle
+                },
+                {
+                    extend: 'excelHtml5',
+                    title: documentTitle
+                },
+                {
+                    extend: 'csvHtml5',
+                    title: documentTitle
+                }
+            ]
+        }).container().appendTo($('#kt_datatable_example_buttons'));
+
+        // Hook dropdown menu click event to datatable export buttons
+        const exportButtons = document.querySelectorAll('#kt_datatable_example_export_menu [data-kt-export]');
+        exportButtons.forEach(exportButton => {
+            exportButton.addEventListener('click', e => {
+                e.preventDefault();
+
+                // Get clicked export value
+                const exportValue = e.target.getAttribute('data-kt-export');
+                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                // Trigger click event on hidden datatable export buttons
+                target.click();
+            });
+        });
+
+        // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
+        const filterSearch = document.querySelector('[data-kt-filter="search"]');
+        filterSearch.addEventListener('keyup', function (e) {
+            datatable.search(e.target.value).draw();
+        });
+    }
+
+    // Initialize DataTable on document ready
+    KTUtil.onDOMContentLoaded(function () {
+        table = document.querySelector('#kt_datatable_example');
+        if (table) {
+            initializeDataTable();
+        }
+    });
+</script>
+
+
+    <script>
+        function addRow(newData, maxData) {
+            const itemTableBody = document.getElementById("itemTableBody");
+            const newRow = document.createElement("tr");
+
+            for (i = 0; i < newData.material.length; i++) {
+                let newRow = document.createElement("tr"); // Create a new row for each item
+                newRow.className = "border-bottom border-bottom-dashed";
+                newRow.setAttribute("data-kt-elements", "item");
+                newRow.setAttribute("data-rowid", i);
+                newRow.innerHTML = ` 
+                                                        <tr class="border-bottom border-bottom-dashed"
+                                                            data-kt-element="item" data-rowid="${i}">
+                                                            <td class="pe-7">
+                                                                <input type="hidden" name="type" value="OLD">
+                                                                ${i + 1}
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <select disabled class="form-select form-select-solid" data-placeholder="Select LR" name="lrNumber" id="lrNumber${i}">
+                                                                    
+                                                           
+                                                                    <option value="${newData.material[i].lrNumber._id}">${newData.material[i].lrNumber.lrNumber}</option>    
+                                                           
+                                                        
+                                                                </select>
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <input type="hidden" value="${maxData[i].maxNOP}" id="maxNOP${i}">
+                                                                <input oninput="validateWholeNumber(this)" value="${newData.material[i].qty}" id="NOP${i}" type="text" class="NOP-input form-control form-control-solid" name="NOP">
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <select class="handling-branch form-select form-select-solid" data-control="select2" data-placeholder="Select Handling Branch" name="handlingBranch" id="handlingBranch${i}">
+                                                                    <option> </option>
+                                                                    <% branchData.forEach(data=> {%> 
+
+                                                                    <option value="<%=data._id%>"> <%=data.name%> </option>
+                                                                    
+                                                                <%}) %>
+                                                        
+                                                                </select>
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <input type="hidden" value="${maxData[i].maxActualWeight}" id="maxActualWeight${i}">
+                                                                <input oninput="validateWholeNumber(this)" value="${newData.material[i].actualWeight}" id="actualWeight${i}" disabled type="text" class="actual-weight-input form-control form-control-solid" name="actualWeight">
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <input type="hidden" value="${maxData[i].maxChargedWeight}" id="maxChargedWeight${i}">
+                                                                <input oninput="validateWholeNumber(this)" value="${newData.material[i].chargedWeight}" id="chargedWeight${i}" type="text" class="charged-weight-input form-control form-control-solid" name="chargedWeight">
+                                                            </td>
+                                                            <td class="pe-7">
+                                                                <button onclick="deletePackage(${i})" type="button" class="btn btn-sm btn-icon btn-danger btn-active-color-grey remove-item" data-kt-element="remove-item">
+                                                                    <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                                                  </button>
+                                                            </td>
+                                                        </tr>
+                                                      `
+
+                itemTableBody.appendChild(newRow);
+                calculateTotalActualWeight();
+                calculateTotalChargedWeight()
+                calculateTotalNOP()
+
+
+                if (newData.for === "multiBranch") {
+                    //Selecting Handling Branch by defualt
+                    const selectHandlingBranch = newRow.querySelector(`#handlingBranch${i}`)
+                    selectHandlingBranch.options.forEach((data) => {
+                        if (data.value === newData.material[i].handlingBranch) {
+                            data.selected = true
+                        }
+                    })
+                    $(`#handlingBranch${i}`).prop("disabled", false)
+
+                } else {
+                    $(`#handlingBranch${i}`).prop("disabled", true)
+                }
+                $(`#handlingBranch${i}`).select2()
+
+
+                //removing lr to prevent user from adding same LR multiple times with diff packages
+                newData.material.forEach((item, i) => {
+                    // Find the option to remove based on its value
+                    var optionToRemove = selectLRElement.find(`option[value="${item.lrNumber._id}"]`);
+
+                    if (optionToRemove.length > 0) {
+                        // Remove the option from Select2
+                        optionToRemove.remove();
+
+                        // Trigger the change event to reflect the changes in the Select2 dropdown
+                        selectLRElement.select2()
+                    }
+                });
+
+
+            }
+
+            $("#selectChallanNew").prop("disabled", true)
+            $("selectChallanNew").select2()
+        }
+    </script>
+
+    <script>
+        //handling challan for event change
+        const challanForElement = $("#challanFor")
+        const handlingBranchLabel = $("#handlingBranchLabel")
+        challanForElement.on("change", function () {
+            if (challanForElement.val() === "branch") {
+
+                $("#to").prop("disabled", false)
+                const elements = $(".handling-branch")
+                elements.each(function () {
+                    $(this).prop("disabled", true)
+                    $(this).val(null).select2()
+                })
+                $("#handlingBranch").prop("disabled", true)
+                $("#handlingBranch").val(null).select2()
+                handlingBranchLabel.removeClass("required")
+            } else {
+                $("#to").prop("disabled", true)
+                $("#to").val(null).select2()
+
+                const elements = $(".handling-branch")
+                elements.each(function () {
+                    $(this).prop("disabled", false)
+                })
+
+                $("#handlingBranch").prop("disabled", false)
+                handlingBranchLabel.addClass("required")
+            }
+        })
+    </script>
+
+    <script>
+        const selectLRElement = $("#selectLR")
+        const NOPElement = $("#NOP")
+        const originalNOP = $("#originalNOP")
+        const originalActualWeight = $("#originalActualWeight")
+        const actualWeightElement = $("#actualWeight")
+        const chargedWeightElement = $("#chargedWeight")
+        const originalChargedWeight = $("#originalChargedWeight")
+        selectLRElement.on("change", function () {
+            const lrID = selectLRElement.val()
+            fetch(`/transactions/booking/challan/get-package-details?lrID=${lrID}`, {
+                method: "GET"
+            }).then((response) => {
+                if (response.status === 400) {
+                    return response.json().then((data) => {
+                        
+                        showError(data.message)
+                    })
+                } else if (response.status === 200) {
+                    return response.json().then((data) => {
+                        NOPElement.val(data.NOP)
+                        originalNOP.val(data.NOP)
+                        actualWeightElement.val(data.actualWeight)
+                        originalActualWeight.val(data.actualWeight)
+                        originalChargedWeight.val(data.chargedWeight)
+                        chargedWeightElement.prop("disabled", false)
+                        chargedWeightElement.val(data.chargedWeight)
+                        NOPElement.prop("disabled", false)
+                        if (challanForElement.val() === "multiBranch") {
+                            $("#handlingBranch").prop("disabled", false)
+                        } else {
+                            $("#handlingBranch").prop("disabled", true)
+
+                        }
+
+                    })
+                }
+            })
+        })
+    </script>
+
+    <script>
+        $("#chargedWeight").on("keydown", function(){
+            if(event.key === "Tab" && !event.shiftKey) {
+               addPackages()
+            } 
+        })
+    </script>
+
+    <script>
+
+        function addPackages() {
+
+            const trElements = $("tr[data-rowid]");
+            const rowCounter = trElements.length
+            const handlingBranchElement = $("#handlingBranch")
+            const challanForSelect = $("#challanFor")
+             if(challanForElement.val() === "") {
+                showError("Please Select Challan For")
+            } else if(challanForElement.val() === "branch" && $("#to").val() === "") {
+                showError("Please Select To")
+            } else if (NOPElement.val() === "" || NOPElement.val() < 1) {
+                showError("Please Add Atleast 1 Package")
+            } else if (handlingBranchElement.val() === "" && challanForSelect.val() === "multiBranch") {
+                showError("Please Select Handling Branch")
+            } else if (actualWeightElement.val() === "") {
+                showError("Please Provide a appropriate Actual Weight")
+            } else if (chargedWeightElement.val() === "") {
+                showError("Please Provide a Proper Charged Weight")
+            } else {
+
+                const itemTableBody = document.getElementById("itemTableBody");
+                const newRow = document.createElement("tr");
+                newRow.className = "border-bottom border-bottom-dashed"
+                newRow.setAttribute("data-kt-elements", "item")
+                newRow.setAttribute("data-rowid", rowCounter)
+                const selectedLR = $("#selectLR option:selected").text();
+                const selectedHB = $("#handlingBranch option:selected").text();
+                newRow.innerHTML = ` 
+                                                    <tr class="border-bottom border-bottom-dashed"
+                                                        data-kt-element="item" data-rowid="">
+                                                        <td class="pe-7">
+                                                            <input type="hidden" name="type" value="NEW">
+                                                            ${rowCounter}
+                                                        </td>
+
+                                                        <td class="pe-7">
+                                                            <select disabled class="form-select form-select-solid" data-placeholder="Select LR" name="lrNumber" id="lrNumber${rowCounter}">
+                                                            <option value="${selectLRElement.val()}">${selectedLR}</option>
+                                                    
+                                                            </select>
+                                                        </td>
+
+                                                        <td class="pe-7">
+                                                            <input value="${NOPElement.val()}" disabled type="text" class="NOP-input form-control form-control-solid" name="NOP">
+                                                        </td>
+
+                                                        <td class="pe-7">
+                                                                <select disabled class="handling-branch form-select form-select-solid" data-control="select2" data-placeholder="Select Handling Branch" name="handlingBranch" id="handlingBranch${rowCounter}">
+                                                                <option></option>
+                                                                
+                                                                <option selected value="${handlingBranchElement.val()}">${selectedHB}</option>
+                                                            </select>
+                                                        </td>
+
+                                                        <td class="pe-7">
+                                                            <input value="${actualWeightElement.val()}" disabled type="text" class="actual-weight-input form-control form-control-solid" name="actualWeight">
+                                                        </td>
+
+                                                        <td class="pe-7">
+                                                            <input value="${chargedWeightElement.val()}" disabled type="text" class="charged-weight-input form-control form-control-solid" name="chargedWeight">
+                                                        </td>
+                                                        <td class="pe-7">
+                                                            <button onclick="deletePackage(${rowCounter})" type="button" class="btn btn-sm btn-icon btn-danger btn-active-color-grey remove-item" data-kt-element="remove-item">
+                                                                <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                                              </button>
+                                                        </td>
+                                                    </tr>
+                                                  `
+
+                //Deleting LR From options after been added once
+                const selectedOption = $("#selectLR").val(); // Get the selected option value.
+                const selectedOptionText = $("#selectLR option:selected").text(); // Get the selected option text.
+
+                if (selectedOption) {
+                    // Remove the selected option from the Select2 dropdown.
+                    $("#selectLR option:selected").remove();
+
+
+                    // Destroy the current Select2 instance.
+                    $("#selectLR").select2('destroy');
+
+                    // Reinitialize the Select2 dropdown.
+                    $("#selectLR").select2();
+
+                }
+
+
+
+
+                itemTableBody.appendChild(newRow);
+                //resetting form after adding LR
+                $(`#handlingBranch${rowCounter}`).select2()
+                selectLRElement.val(null).trigger('change.select2');
+                handlingBranchElement.val(null).trigger('change.select2');
+                NOPElement.val(0)
+                actualWeightElement.val(0)
+                originalActualWeight.val(0)
+                chargedWeightElement.val(0)
+                originalChargedWeight.val(0)
+                calculateTotalActualWeight();
+                calculateTotalChargedWeight()
+                calculateTotalNOP()
+                challanForSelect.prop("disabled", true)
+                chargedWeightElement.prop("disabled", true)
+                NOPElement.prop("disabled", true)
+                setTimeout(function(){
+                    $("#selectLR").focus()
+                }, 200)
+            }
+        }
+    </script>
+
+    <script>
+        function showError(message) {
+            Swal.fire({
+                text: message,
+                icon: "error",
+                buttonsStyling: !1,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            })
+        }
+    </script>
+
+    <script>
+        function calculateTotalActualWeight() {
+            const actualWeightInputs = document.querySelectorAll(".actual-weight-input");
+            let total = 0;
+
+            actualWeightInputs.forEach(function (input) {
+                const value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    total += value;
+                }
+            });
+
+            // Update the value of the "totalActualWeight" input.
+            const totalActualWeightElement = document.getElementById("totalActualWeight");
+            if (totalActualWeightElement) {
+                totalActualWeightElement.value = total.toFixed(2); // Round to two decimal places.
+            }
+        }
+
+        function calculateTotalChargedWeight() {
+            const chargedWeightInputs = document.querySelectorAll(".charged-weight-input");
+            let totalChargedWeight = 0;
+
+            chargedWeightInputs.forEach(function (input) {
+                const value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    totalChargedWeight += value;
+                }
+            });
+
+            const totalChargedWeightElement = document.getElementById("totalChargedWeight");
+            if (totalChargedWeightElement) {
+                totalChargedWeightElement.value = totalChargedWeight.toFixed(2);
+            }
+        }
+
+        function calculateTotalNOP() {
+            const NOPInputs = document.querySelectorAll(".NOP-input");
+            let totalNOP = 0;
+
+            NOPInputs.forEach(function (input) {
+                const value = parseInt(input.value);
+                if (!isNaN(value)) {
+                    totalNOP += value;
+                }
+            });
+
+            const totalNOPEelement = document.getElementById("totalNOP");
+            if (totalNOPEelement) {
+                totalNOPEelement.value = totalNOP;
+            }
+        }
+
+
+
+    </script>
+
+    <!--Manages that NOP is not more than available packages-->
+    <script>
+        NOPElement.on("input", function () {
+            const NOPElementValue = parseInt(NOPElement.val());
+            const originalNOPValue = parseInt(originalNOP.val());
+
+            if (NOPElementValue > originalNOPValue) {
+                NOPElement.val(originalNOPValue);
+                actualWeightElement.val(originalActualWeight.val());
+            } else {
+                const originalActualWeightValue = parseFloat(originalActualWeight.val()); // Use parseFloat for decimal values
+
+                if (!isNaN(originalActualWeightValue) && !isNaN(NOPElementValue) && NOPElementValue !== 0) {
+                    const calculatedActualWeight = (originalActualWeightValue / originalNOPValue) * NOPElementValue;
+                    actualWeightElement.val(calculatedActualWeight.toFixed(2));
+                } else {
+                    actualWeightElement.val(0)
+                }
+            }
+        });
+
+
+    </script>
+    <!-- manages that charged weight is not more than balance charged Weight in lr-->
+    <script>
+        chargedWeightElement.on("input", function () {
+            if (parseFloat(chargedWeightElement.val()) > parseFloat(originalChargedWeight.val())) {
+                chargedWeightElement.val(originalChargedWeight.val())
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+
+        $(document).on("input", ".NOP-input, .charged-weight-input", function () {
+            const rowId = $(this).closest('tr').attr('data-rowid');
+
+            const NOPCheck = $(`#NOP${rowId}`)
+            const actualCheck = $(`#actualWeight${rowId}`)
+            const chargeCheck = $(`#chargedWeight${rowId}`)
+
+            const maxNOP = $(`#maxNOP${rowId}`)
+            const maxActual = $(`#maxActualWeight${rowId}`)
+            const maxCharged = $(`#maxChargedWeight${rowId}`)
+
+            if (parseInt(NOPCheck.val()) > parseInt(maxNOP.val())) {
+                NOPCheck.val(maxNOP.val())
+            }
+
+            const calculatedActual = (parseInt(maxActual.val()) / parseInt(maxNOP.val())) * parseInt(NOPCheck.val())
+            actualCheck.val(customRound(calculatedActual))
+
+            if (parseInt(chargeCheck.val()) > parseInt(maxCharged.val())) {
+                chargeCheck.val(maxCharged.val())
+            }
+            calculateTotalActualWeight();
+            calculateTotalChargedWeight()
+            calculateTotalNOP()
+        })
+
+    </script>
+
+
+    <script>
+       function deletePackage(id) {
+            // Find the specific row with the given data-rowid.
+            var rowToDelete = document.querySelector(`tr[data-rowid="${id}"]`);
+
+            if (rowToDelete) {
+                // Find the "lrNumber" select element within the row.
+                var selectedOption = $(rowToDelete).find(`#lrNumber${id} option:selected`);
+                var selectedValue = selectedOption.val();
+                var selectedText = selectedOption.text();
+               
+                // Append the selected option to the "selectLR" Select2 element.
+                $("#selectLR").append(new Option(selectedText, selectedValue, false, false));
+
+                // Destroy and reinitialize the Select2 instance for "selectLR".
+                $("#selectLR").select2();
+
+                // Remove the row.
+                rowToDelete.remove();
+
+                // Calculate totals.
+                calculateTotalActualWeight();
+                calculateTotalChargedWeight();
+                calculateTotalNOP();
+            } else {
+                showError("ROW NOT FOUND");
+            }
+        }
+    </script>
+
+    <script>
+        function updateChallan() {
+
+            var tbody = document.getElementById("itemTableBody");
+            var rowCount = tbody.getElementsByTagName("tr").length;
+            var challanNumber = $("index#selectChallanNew")
+            var challanDate = $("#challanDate")
+            const vehicle = $("#vehicle")
+            vehicle.select2()
+            var from = $("from")
+
+            if (rowCount < 1) {
+                showError("Please Add At Least 1 LR");
+            } else if (challanForElement.val() === "") {
+                showError("Please Select Challan For");
+            } else if (challanDate.val() === "") {
+                showError("Please Select A Valid Date");
+            } else if (challanNumber.val() === "") {
+                showError("Please Enter a Valid Challan Number");
+            } else if (from.val() === "") {
+                showError("Please Select Proper Branch");
+            } else if (vehicle.val() === "") {
+                showError("Please Select a Vehicle Number")
+            } else {
+
+
+                const form = document.getElementById("challanForm");
+
+                // Enable disabled inputs and selects
+                const disabledInputs = form.querySelectorAll("input[disabled], select[disabled]");
+                for (const input of disabledInputs) {
+                    input.removeAttribute("disabled");
+                }
+
+                // Serialize the form data
+                const formData = new FormData(form);
+
+                // Re-disable previously disabled inputs and selects
+                for (const input of disabledInputs) {
+                    input.setAttribute("disabled", "disabled");
+                }
+
+                // Create a URLSearchParams object and add form data to it
+                const data = new URLSearchParams();
+                for (const pair of formData) {
+                    data.append(pair[0], pair[1]);
+                }
+
+                $("#challanUpdate").attr("data-kt-indicator", "on").prop("disabled", true)
+                $("#modalCloseBTN").prop("disabled", true)
+                // Send the form data to the server
+                fetch("/transactions/booking/challan/update", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: data
+                }).then((data) => {
+                    if (data.status === 400) {
+
+                        return data.json().then((message) => {
+                            Swal.fire({
+                                text: message.message,
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    $("#challanUpdate").attr("data-kt-indicator", "off").prop("disabled", false)
+                                    $("#modalCloseBTN").prop("disabled", false)
+                                }
+                            })
+                        })
+
+                    } else if (data.status === 200) {
+                        Swal.fire({
+                            text: "Challan Updated Successfully",
+                            icon: "success",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((response) => {
+                            if (response.isConfirmed) {
+                                location.reload()
+                            }
+                        })
+                    } else if (data.status === 401) {
+                        Swal.fire({
+                            text: "You are not authorized to perform this action",
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((data) => {
+                            if (data.isConfirmed) {
+                                i.setAttribute("data-kt-indicator", "off")
+                                i.disabled = 0
+                                n.hide()
+                                e.reset()
+                            }
+                        })
+                    } else if(data.status === 500) {
+                        return data.json().then((message) => {
+                            Swal.fire({
+                                text: message.message,
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                             location.reload()
+                                }
+                            })
+                        })
+                    }
+                })
+            }
+
+        }
+    </script>
+
+
+<script>
+    function deleteChallan(id) {
+        Swal.fire({
+            text: "Are you sure you want to delete this Challan?",
+            icon: "warning",
+            showCancelButton: !0,
+            buttonsStyling: !1,
+            confirmButtonText: "Yes, delete!",
+            cancelButtonText: "No, cancel",
+            customClass: {
+                confirmButton: "btn fw-bold btn-danger",
+                cancelButton: "btn fw-bold btn-active-light-primary"
+            }
+        }).then(response => {
+            if (response.isConfirmed) {
+                // Send the form data to the server
+
+                fetch(`/transactions/booking/challan/delete?id=${id}`, {
+                    method: "GET"
+                }).then((data) => {
+                    if (data.status === 400) {
+
+                        return data.json().then((message) => {
+                            Swal.fire({
+                                text: message.message,
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            })
+                        })
+
+                    } else if (data.status === 200) {
+                        Swal.fire({
+                            text: "Challan Deleted Successfully",
+                            icon: "success",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((response) => {
+                            if (response.isConfirmed) {
+                                location.reload()
+                            }
+                        })
+                    } else if (data.status === 401) {
+                        Swal.fire({
+                            text: "You are not authorized to perform this action",
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((data) => {
+                            if (data.isConfirmed) {
+                                i.setAttribute("data-kt-indicator", "off")
+                                i.disabled = 0
+                                n.hide()
+                                e.reset()
+                            }
+                        })
+                    }
+                })
+            }
+        })
+
+    }
+</script>
+
+<script>
+    function createChallan() {
+        var tbody = document.getElementById("itemTableBody");
+        var rowCount = tbody.getElementsByTagName("tr").length;
+        var challanNumber = $("#challanNumber")
+        var challanDate = $("#challanDate")
+        const vehicle = $("#vehicle")
+        vehicle.select2()
+        var from = $("from")
+
+        if (rowCount < 1) {
+            showError("Please Add At Least 1 LR");
+        } else if (challanForElement.val() === "") {
+            showError("Please Select Challan For");
+        } else if (challanDate.val() === "") {
+            showError("Please Select A Valid Date");
+        } else if (challanNumber.val() === "") {
+            showError("Please Enter a Valid Challan Number");
+        } else if (from.val() === "") {
+            showError("Please Select Proper Branch");
+        } else if (vehicle.val() === "") {
+            showError("Please Select a Vehicle Number")
+        } else {
+
+
+
+            const form = document.getElementById("challanForm");
+
+            // Enable disabled inputs and selects
+            const disabledInputs = form.querySelectorAll("input[disabled], select[disabled]");
+            for (const input of disabledInputs) {
+                input.removeAttribute("disabled");
+            }
+
+            // Serialize the form data
+            const formData = new FormData(form);
+
+            // Re-disable previously disabled inputs and selects
+            for (const input of disabledInputs) {
+                input.setAttribute("disabled", "disabled");
+            }
+
+            // Create a URLSearchParams object and add form data to it
+            const data = new URLSearchParams();
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]);
+            }
+
+            $("#challanSubmit").attr("data-kt-indicator", "on").prop("disabled", true)
+            $("#modalCloseBTN").prop("disabled", true)
+            // Send the form data to the server
+            fetch("/transactions/booking/challan/new", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: data
+            }).then((data) => {
+                if (data.status === 400) {
+
+                    return data.json().then((message) => {
+                        Swal.fire({
+                            text: message.message,
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((data) => {
+                            if (data.isConfirmed) {
+                                $("#challanSubmit").attr("data-kt-indicator", "off").prop("disabled", false)
+                                $("#modalCloseBTN").prop("disabled", false)
+                            }
+                        })
+                    })
+
+                } else if (data.status === 200) {
+                    Swal.fire({
+                        text: "New Challan Create Successfully",
+                        icon: "success",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((response) => {
+                        if (response.isConfirmed) {
+                            location.reload()
+                        }
+                    })
+                } else if (data.status === 401) {
+                    Swal.fire({
+                        text: "You are not authorized to perform this action",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((data) => {
+                        if (data.isConfirmed) {
+                        $("#challanSubmit").attr("data-kt-indicator", "off").prop("disabled", false)
+                        $("#modalCloseBTN").prop("disabled", false)
+                        }
+                    })
+                } else if(data.status === 500) {
+                    return data.json().then((message) => {
+                        Swal.fire({
+                            text: message.message,
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((data) => {
+                            if (data.isConfirmed) {
+                         location.reload()
+                            }
+                        })
+                    })
+                }
+            })
+        }
+
+    }
+</script>
+<script>
+    function addChallan() {
+        $("#challanContent tbody tr").remove();
+        $("#selectChallanNew").prop("disabled", true)
+        $("#challanForm").trigger("reset")
+        selectLRElement.prop("disabled", false)
+        challanForElement.prop("disabled", false)
+        $("#challanSubmit").show()
+        $("#challanUpdate").hide()
+        $("#addChallanNumberDiv").css("display", "block")
+        $("#editChallanNumberDiv").css("display", "none")
+
+        const today = new Date();
+            const day = today.getDate().toString().padStart(2, '0');
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const year = today.getFullYear();
+
+            const formattedDate = `${day}-${month}-${year}`;
+            $("#challanDate").val(formattedDate);
+
+        setTimeout(function(){
+            $("#challanNumberNew").focus()
+        }, 200)
+        $("#title").html("Add New Challan")
+
+    }
+</script>
+
+<script>
+    function editChallan(challanNumber) {
+        $("#challanContent tbody tr").remove();
+        $("#challanSubmit").hide()
+        $("#challanUpdate").show()
+        $("#addChallanNumberDiv").css("display", "none")
+        $("#editChallanNumberDiv").css("display", "block")
+        $("#title").html("Edit Challan")
+        fetch(`/transactions/booking/challan/get-challan-detail?id=${challanNumber}`, {
+                method: "GET"
+            }).then(response => {
+                if (response.status === 200) {
+                    return response.json().then(newData => {
+                        data = newData.challanDATA
+                        maxData = newData.maxDATA
+                        $('input, select, button').prop('disabled', false);
+
+                        //setting challan DATE
+                        $("#challanDate").val(data.date)
+
+                        //for setting for
+                        var optionToSelect2 = $(`#challanFor option[value="${data.for}"]`);
+                        optionToSelect2.attr('selected', 'selected');
+                        $("#challanFor").select2()
+
+                        //for setting to
+                        if (data.for === "branch") {
+
+                            var optionToSelect2 = $(`#to option[value="${data.to}"]`);
+                            optionToSelect2.attr('selected', 'selected');
+                            $("#to").select2()
+
+                        } else {
+                            $("#to").prop("disabled", true)
+                            $("#to").val(null).select2()
+                        }
+
+                        //for setting vehcile details
+                        var optionToSelect2 = $(`#vehicle option[value="${data.vehicle}"]`);
+                        optionToSelect2.attr('selected', 'selected');
+                        $("#vehicle").select2()
+
+                        //adding Rows For Material
+
+                        $("#actualWeight").prop("disabled", true)
+                        $("#NOP").prop("disabled", true)
+                        $("#chargedWeight").prop("disabled", true)
+                        $("#handlingBranch").prop("disabled", true)
+                        addRow(data, maxData)
+
+                        const option = `<option selected value="${data._id}">${data.number}</option>`
+                        $("#selectChallanNew").append(option)
+                        $("#selectChallanNew").select2()
+
+                        $("#kt_modal_2").modal("show")
+
+
+                    })
+                } else if(response.status === 400) {
+                    return response.json().then(data=> {
+                        showError(data.message)
+                    })
+                } else if(response.status === 401) {
+                    return response.json().then(data=> {
+                        showError(data.message)
+                    })
+                }
+            })
+    }
+</script>
+<script>
+    $("#vehicle").on("change", function(){
+        const vehicle = $("#vehicle").val()
+        fetch(`/transactions/booking/challan/get-vehicle-details?vehicle=${vehicle}`, {
+            method: "GET"
+        }).then(response => {
+            if(response.status === 200) {
+                return response.json().then(data=> {
+                   $("#ownerName").val(data.owner.name)
+                   $("#ownerContact").val(data.owner.mobile)
+                    $("#brokerName").val(data.broker.name)
+                    $("#brokerContact").val(data.broker.mobile)
+                    $("#driverName").val(data.driver.name)
+                    $("#driverContact").val(data.driver.mobile)
+                    $("#engineNumber").val(data.engineNumber)
+                    $("#chassisNumber").val(data.chassisNumber)
+                    $("#insuranceNumber").val(data.insuranceNumber)
+                    $("#insuranceValidity").val(data.insuranceValidity)
+                    $("#insuranceProvider").val(data.insuranceProvider)
+                    $("#permitNumber").val(data.permitNumber)
+                    $("#permitValidity").val(data.permitValidity)
+                    
+
+                })
+            } else if(response.status === 400) {
+                return response.json().then(data=> {
+                    showError(data.message)
+                })
+            } else if(response.status === 401) {
+                return response.json().then(data=> {
+                    showError(data.message)
+                })
+            }
+        })
+    })
+</script>
+    <%} %>

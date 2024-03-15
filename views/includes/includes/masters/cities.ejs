@@ -1,0 +1,77 @@
+<% if(pageName==="cities" ){%>
+    <script>
+
+
+        // Function to populate the modal with data
+        function editCity(stateID, cityName, cityID, pinCode) {
+            // Get a reference to the modal and the input fields
+            const editModal = document.getElementById('kt_modal_update_permission');
+            const cityNameInput = document.querySelector('#kt_modal_update_permission input[name="cityName"]');
+            const idInput = document.getElementById("cityID");
+            const pinCodeInput = document.getElementById("editPinCode")
+            pinCodeInput.value = pinCode
+            // Set the values of the input fields
+            cityNameInput.value = cityName;
+            idInput.value = cityID;
+
+            const stateDropdown = document.querySelector('#kt_modal_update_permission select[name="state"]');
+           
+
+            // Loop through each option in the dropdown
+            for (let i = 0; i < stateDropdown.options.length; i++) {
+                const option = stateDropdown.options[i];
+
+                // Check if the option's value is equal to the desired stateID
+                if (option.value === stateID) {
+                    // Set the option as selected
+                    option.selected = true;
+
+                    // Initialize select2 for the dropdown
+                    $(stateDropdown).select2();
+
+                    // Trigger the change event to update the placeholder dynamically
+                    $(stateDropdown).trigger('change');
+
+                    // Show the modal
+                    $(editModal).modal('show');
+                    break; // Exit the loop since we found the desired option
+                }
+            }
+        }
+
+
+
+
+
+
+        function deleteCity(cityID, cityName) {
+            Swal.fire({
+                text: "Are You Sure You Want To Delete " + cityName + " State",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = new URLSearchParams()
+                    data.append("id", cityID) // Define the data to send in the request body
+                    fetchPostRequest("/masters/cities/delete", data, "City Deleted Successfully")
+                   
+                } else {
+                    // Handle the cancel action here
+                }
+            });
+        }
+
+
+
+    </script>
+    <script src="../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+    <script src="../../../assets/js/custom/masters/cities/city.js"></script>
+    <script src="../../../assets/js/custom/masters/cities/edit-city.js"></script>
+    <%} %>

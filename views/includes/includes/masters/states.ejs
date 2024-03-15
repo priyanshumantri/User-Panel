@@ -1,0 +1,130 @@
+<% if(pageName==="states" ){%>
+    <script>
+        
+        // Function to populate the modal with data
+        function editState(stateName, GST, idNumber, country, zone, ut) {
+           fetch(`/masters/locations/get-zones?id=${country}`).then((response)=> {
+            if(response.status) {
+                return response.json().then(data=> {
+                    $("#editUT").val(ut).select2()
+                     // Get a reference to the modal and the input fields
+                    const editModal = document.getElementById('kt_modal_update_permission');
+                    const stateNameInput = document.querySelector('#kt_modal_update_permission input[name="stateName"]');
+                    const GSTInput = document.querySelector('#kt_modal_update_permission input[name="GST"]');
+                    const idInput = document.getElementById("stateID")
+                    const zoneInput = $("#editZone")
+
+                zoneInput.empty()
+                const emptyOption = `<option></option>`;
+                zoneInput.append(emptyOption);
+
+                for (let i = 0; i < data.length; i++) {
+                    const option = `<option value="${data[i].id}" ${data[i].id === (zone || '') ? 'selected' : ''}>${data[i].name}</option>`;
+
+                      zoneInput.append(option);
+                 }
+                        zoneInput.prop("disabled", false)
+                        zoneInput.trigger("change")
+
+                         // Set the values of the input fields
+                         stateNameInput.value = stateName
+                         GSTInput.value = GST
+                         idInput.value = idNumber
+                         
+                         // Show the modal
+                         $(editModal).modal('show');
+                })
+
+                
+            } 
+           })
+        }
+
+        function deleteState(stateID, stateName) {
+    Swal.fire({
+        text: "Are You Sure You Want To Delete " + stateName + " State",
+        icon: "warning",
+        showCancelButton: true,
+        buttonsStyling: false,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, return",
+        customClass: {
+            confirmButton: "btn btn-danger",
+            cancelButton: "btn btn-active-light"
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const data = new URLSearchParams()
+            data.append('id', stateID)
+
+            fetchPostRequest("/masters/states/delete", data, "State Deleted Successfully")
+           
+        } else {
+            // Handle the cancel action here
+        }
+    });
+}
+
+
+
+    </script>
+
+    <script>
+        const countryInput = $("#country")
+        const zoneInput = $("#zones")
+        countryInput.on("change", function(){
+            const countryID = countryInput.val()
+            fetch(`/masters/locations/get-zones?id=${countryID}`, {method : "GET"}).then((response) => {
+                if(response.status === 400) {
+                                    return response.json().then((data)=> {
+                                        Swal.fire({
+                                            text: data.message,
+                                            icon: "error",
+                                            buttonsStyling: !1,
+                                            confirmButtonText: "Ok, got it!",
+                                            customClass: {
+                                                confirmButton: "btn btn-primary"
+                                            }
+                                        })
+                                    })
+                                } else if(response.status === 200) {
+                                    return response.json().then((data) => {
+                                        zoneInput.empty()
+                                      if (response.status === 200) {
+                                        const emptyOption = `<option></option>`;
+                                        zoneInput.append(emptyOption);
+                                        for (let i = 0; i < data.length; i++) {
+                                          const option = `<option value="${data[i].id}">${data[i].name}</option>`;
+                                          zoneInput.append(option);
+                                        }
+                                        zoneInput.prop("disabled", false)
+                                        zoneInput.trigger("change")
+                                      } else if (response.status === 400) {
+                                        showError("No State Added In This Country");
+                                      }
+                                    });
+                                } else if(response.status === 500) {
+                                    Swal.fire({
+                                        text: "INTERNAL SERVER ERROR",
+                                        icon: "error",
+                                        buttonsStyling: !1,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn btn-primary"
+                                        }
+                                    }).then((data)=> {
+                                        if(data.isConfirmed) {
+                                            location.reload()
+                                        }
+                                    })
+                                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        })
+</script>
+
+<script src="../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+    <script src="../../../assets/js/custom/masters/states/state.js"></script>
+    <script src="../../../assets/js/custom/masters/states/edit-state.js"></script>
+    <%} %>

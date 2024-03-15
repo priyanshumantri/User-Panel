@@ -1,0 +1,91 @@
+<div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+    <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+        <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+            <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0"><%=pageName%></h1>
+            <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                <li class="breadcrumb-item text-muted">
+                    <a href="/dashboard" class="text-muted text-hover-primary">Dashboard</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                </li>
+                <li class="breadcrumb-item text-muted"><%=pageHead%></li>
+                <li class="breadcrumb-item">
+                    <span class="bullet bg-gray-400 w-5px h-2px"></span>
+                </li>
+                <li class="breadcrumb-item text-muted"><%=pageName%></li>
+        </div>
+    </div>
+</div>
+
+
+<% if(typeof message.error !="undefined" ) { %>
+    <!--begin::Alert-->
+    <div style="margin-left: 100px; margin-right: 100px;"
+        class="customAlert alert alert-dismissible bg-light-danger d-flex flex-column flex-center flex-sm-row p-5 mb-10">
+        <!--begin::Icon-->
+        <i class="ki-duotone ki-information-5 fs-2hx text-dager me-4 mb-5 mb-sm-0"><span
+                class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+        <!--end::Icon-->
+
+        <!--begin::Wrapper-->
+        <div class="d-flex flex-column pe-0 pe-sm-10">
+            <!--begin::Title-->
+            <h4 class="fw-semibold">Error</h4>
+            <!--end::Title-->
+
+            <!--begin::Content-->
+            <span>
+                <%= message.error %>
+            </span>
+            <!--end::Content-->
+        </div>
+        <!--end::Wrapper-->
+
+        <!--begin::Close-->
+        <button type="button"
+            class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
+            data-bs-dismiss="alert">
+            <i class="ki-duotone ki-cross fs-1 text-danger"><span class="path1"></span><span
+                    class="path2"></span></i>
+        </button>
+        <!--end::Close-->
+    </div>
+    <!--end::Alert-->
+    <%} %>
+
+
+        <% if(typeof message.success !="undefined" ) { %>
+            <!--begin::Alert-->
+            <div style="margin-right: 100px; margin-left: 100px;"
+                class="customAlert alert alert-dismissible bg-light-success d-flex flex-column flex-center flex-sm-row p-5 mb-10">
+                <!--begin::Icon-->
+                <i class="ki-duotone ki-check fs-2hx text-dager me-4 mb-5 mb-sm-0"><span
+                        class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                <!--end::Icon-->
+
+                <!--begin::Wrapper-->
+                <div class="d-flex flex-column pe-0 pe-sm-10">
+                    <!--begin::Title-->
+                    <h4 class="fw-semibold">Success</h4>
+                    <!--end::Title-->
+
+                    <!--begin::Content-->
+                    <span>
+                        <%= message.success %>
+                    </span>
+                    <!--end::Content-->
+                </div>
+                <!--end::Wrapper-->
+
+                <!--begin::Close-->
+                <button type="button"
+                    class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
+                    data-bs-dismiss="alert">
+                    <i class="ki-duotone ki-cross fs-1 text-success"><span class="path1"></span><span
+                            class="path2"></span></i>
+                </button>
+                <!--end::Close-->
+            </div>
+            <!--end::Alert-->
+            <%} %>  

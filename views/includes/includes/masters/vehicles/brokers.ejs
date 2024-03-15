@@ -1,0 +1,59 @@
+<% if(pageName === "brokers") {%> 
+    <script src="../../../assets/js/custom/masters/vehicles/brokers/table.js"></script>
+    <script src="../../../assets/js/custom/masters/vehicles/brokers/export-users.js"></script>
+    <script src="../../../assets/js/custom/masters/vehicles/brokers/add.js"></script> 
+    <script src="../../../assets/js/custom/masters/vehicles/brokers/update.js"></script> 
+    <script>
+        function addBroker() {
+            $("#newVehicle").trigger("reset")
+            $("#newBroker").css("display", "inline-block")
+            $("#updateBroker").css("display", "none")
+            $("#modalTitle").html("Add New Broker")
+            $("#state").val(null).select2()
+            $("#city").val(null).select2()
+            $("#gstDiv").css("display", "block")
+            $("#openingBalanceDiv").css("display", "block")
+            $("#openingBalanceTypeDiv").css("display", "block")
+        }
+        function editBroker(id) {
+           fetch(`/masters/brokers/edit?id=${id}`, {
+            method : "GET"
+           }).then(response=>{
+            if(response.status === 200) {
+                return response.json().then(data=> {
+                    $("#newBroker").css("display", "none")
+                    $("#updateBroker").css("display", "inline-block")
+                    $("#modalTitle").html("Update Broker")
+                    $("#brokerID").val(data._id)
+                    $("#name").val(data.name)
+                    $("#contactPerson").val(data.contactPerson)
+                    $("#number").val(data.mobile)
+                    $("#email").val(data.email)
+                    $("#address").val(data.address)
+                    $("#pan").val(data.PAN)
+                    $("#state option").each(function() {
+                        if($(this).val() === data.state) {
+                            $(this).prop("selected", true);
+                        }
+                    })
+                    $("#city option").each(function() {
+                        if($(this).val() === data.city) {
+                            $(this).prop("selected", true);
+                        }
+                    })
+                    $("#gstDiv").css("display", "none")
+                    $("#openingBalanceDiv").css("display", "none")
+                    $("#openingBalanceTypeDiv").css("display", "none")
+                    $("#city").select2()
+                    $("#state").select2()
+                    $("#kt_modal_add_user").modal("show")
+                })
+            }
+           })
+        }
+    </script>
+
+    <script>
+        
+    </script>
+<%} %>

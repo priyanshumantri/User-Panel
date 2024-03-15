@@ -1,0 +1,81 @@
+<% if(pageName==="role" ) { %>
+    <!--begin::Custom Javascript(used for this page only)-->
+    <script src="../../../assets/js/custom/apps/user-management/rolesadd.js"></script>
+    <script src="../../../assets/js/custom/apps/user-management/rolesupdate-role.js"></script>
+
+    <script>
+        const selectAllCheckbox = document.getElementById("selectAll");
+        const checkboxes = document.querySelectorAll(".checkbox-items");
+
+        selectAllCheckbox.addEventListener("change", function () {
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", function () {
+                // Check if all checkboxes are selected
+                const allChecked = [...checkboxes].every((cb) => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+            });
+        });
+    </script>
+    <script>
+        function updateRole() {
+            const e = document.getElementById("updateRoleForm")
+            Swal.fire({
+                text: "Are You Sure You Want To Update Permissions in this Role",
+                icon: "warning",
+                showCancelButton: !0,
+                buttonsStyling: !1,
+                confirmButtonText: "Yes",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = new URLSearchParams();
+                    for (const pair of new FormData(e)) {
+                        data.append(pair[0], pair[1]);
+                    }
+                    fetchPostRequest("/user-management/roles/edit", data, "Role Updated Successfully")
+                }
+            })
+        }
+    </script>
+
+
+    <script>
+        function deleteRole(id) {
+            Swal.fire({
+                text: "Are You Sure You Want To Delete This Role?",
+                icon: "warning",
+                showCancelButton: !0,
+                buttonsStyling: !1,
+                confirmButtonText: "Yes",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((response) => {
+                if (response.isConfirmed) {
+                    const url = `/user-management/roles/delete?id=${id}`
+                    //apending id to data object
+                    const data = new URLSearchParams();
+                    data.append("id", id);
+                    fetchPostRequest(url, data, "Role Deleted Successfully")
+                }
+            })
+        }
+    </script>
+
+
+
+
+
+    <!--end::Custom Javascript-->
+    <%} %>

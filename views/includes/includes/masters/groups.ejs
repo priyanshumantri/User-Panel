@@ -1,0 +1,48 @@
+<% if(pageName === "groups") {%> 
+ <script src="/../../../assets/js/custom/masters/groups/new.js"></script>
+ <script src="/../../../assets/js/custom/masters/groups/edit.js"></script>
+ <script src="/../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+
+ <script>
+    function deleteGroup(id) {
+        Swal.fire({
+                    text: "Are you sure you would like to cancel?",
+                    icon: "warning",
+                    showCancelButton: !0,
+                    buttonsStyling: !1,
+                    confirmButtonText: "Yes, delete itt!",
+                    cancelButtonText: "No, return",
+                    customClass: {
+                        confirmButton: "btn btn-primary",
+                        cancelButton: "btn btn-active-light"
+                    }
+                }).then((res)=> {
+                    const data = new URLSearchParams();
+                    data.append("id", id)
+                    fetchPostRequest("/masters/groups/delete", data, "Group Deleted Successfully")
+                    
+                   
+                })
+    }
+</script>
+
+<script>
+    function editGroup(id, name, under) {
+        $("#groupNameEdit").val(name)
+        $("#id").val(id)
+        const valueToSearch = `${name} (${under})`
+         //finding option with inner text and under same and setting it to selected
+       const underElement =  document.getElementById("under")
+         for(let i = 0; i < underElement.options.length; i++) {
+              if(underElement.options[i].value == under) {
+                underElement.options[i].selected = true;
+              }
+         }
+
+         $("#under").select2()
+          
+
+       $("#kt_modal_update_permission").modal("show")
+    }
+</script>
+<%} %>

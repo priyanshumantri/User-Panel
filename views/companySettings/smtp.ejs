@@ -1,0 +1,117 @@
+<%- include("../includes/header", {pageName : "smtp", pageHead : "settings" }) %>
+    <%- include("../includes/sidebar", {pageName : "smtp", pageHead : "settings" }) %>
+        <%- include("../includes/toolbar", {pageName : "smtp", pageHead : "settings" }) %>
+
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                    <div class="card" style="padding: 30px;">
+                        <!--begin::Card header-->
+
+                        <form action="/settings/smtp" method="POST">
+
+                            <div class="card-header border-0 pt-6">
+
+
+                                <div class="col-md-12">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Host</label>
+                                        <!--end::Label-->
+
+                                      
+                                        <input type="text" name="host"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" placeholder=""
+                                            value="<%= smtpData.host %>">
+                                        
+                                        <!--end::Input-->
+                                      
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Port</label>
+                                        <!--end::Label-->
+
+                                      
+                                        <input type="text" name="port"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" placeholder=""
+                                            value="<%= smtpData.port %>">
+                                        
+                                        <!--end::Input-->
+                                      
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Secure</label>
+                                        <!--end::Label-->
+
+                                      
+                                       <select name="secure" class="form-control form-control-solid mb-3 mb-lg-0">
+
+                                        <option value="true" <% if(smtpData.secure === "true") { %> selected="selected" <%} %> >True</option>
+                                        <option value="false" <% if(smtpData.secure === "false") { %> selected="selected" <%} %> >False</option>
+
+                                       </select>
+                                        
+                                        <!--end::Input-->
+                                      
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Email</label>
+                                        <!--end::Label-->
+
+                                      
+                                        <input type="text" name="email"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" placeholder=""
+                                            value="<%= smtpData.email %>">
+                                        
+                                        <!--end::Input-->
+                                      
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Password</label>
+                                        <!--end::Label-->
+
+                                      
+                                        <input type="password" name="password"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" placeholder=""
+                                            value="<%= smtpData.password %>">
+                                        
+                                        <!--end::Input-->
+                                      
+                                    </div>
+                                </div>
+                               
+                                <div style="margin-top: 30px;">
+                                    <button type="submit"
+                                    class="btn btn-primary btn-active-light-primary my-1">UPDATE</button>
+                                </div>
+
+
+
+                                <!--end::Card header-->
+                            </div>
+                        </form>
+                        <!--end::Card-->
+                    </div>
+                </div>
+                <!--end::Content container-->
+            </div>
+
+
+            <%- include("../includes/footer", {pageName : "settingsSMTP" }) %>

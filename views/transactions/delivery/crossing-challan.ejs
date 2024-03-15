@@ -1,0 +1,841 @@
+<%- include("../../includes/header", {pageName : "crossingChallan" }) %>
+    <%- include("../../includes/sidebar", {pageName : "crossingChallan" }) %>
+
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_content_container" class="app-container  container-xxl ">
+          
+   
+            <div style="padding: 30px;" class="card card-p-0 card-flush">
+              
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Branch</label>
+                            <% if (user.role.roleType === "ADMIN") { %>
+                            <select name="branch" id="branch" form="findLRForm" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Branch">
+                                <option></option>
+                                <% branchData.forEach(data => { %>
+                                <option <% if (typeof currentBranch !== "undefined" && data.id === currentBranch) { %> selected <% } %> value="<%=data.id%>"><%=data.name%></option>
+                                <% }) %>
+                            </select>
+                            <% } else { %>
+                            <input disabled type="text" id="branch" form="findLRForm" name="branch" class="form-control form-control-solid" value="<%=user.branch.name%>">
+                            <% } %>
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Date Range</label>
+                            <input class="form-control form-control-solid" name="dateRange" form="findLRForm" placeholder="Pick date range" id="searchRange" />
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <button style="margin-top: 20px;" type="button" onclick="findLR()" class="btn btn-sm btn-primary">Find</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+         
+       
+            </div>
+                </div>
+
+
+                <form id="findLRForm"></form>
+ 
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+             
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                 
+                    <div style="padding: 30px;" class="card card-p-0 card-flush">
+                        <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1">
+                                    <span class="svg-icon fs-1 position-absolute ms-4">
+                                        <i class="ki-duotone ki-magnifier fs-3">
+                                         <span class="path1"></span>
+                                         <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="Search Delivery Challans" />
+                                </div>
+                                <!--end::Search-->
+                                <!--begin::Export buttons-->
+                                <div id="kt_datatable_example_1_export" class="d-none"></div>
+                                <!--end::Export buttons-->
+                            </div>
+                            <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                                <button onclick="addCrossingChallan()" type="button" class="btn btn-primary hover-elevate-up" data-bs-toggle="modal" data-bs-target="#kt_modal_2">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Add New Crossing Challan
+                                </button>
+                                <button onclick="closeDeliveryChallan()" type="button" class="btn btn-info hover-elevate-up">
+                                    <i class="ki-duotone ki-cross-square fs-2">
+                                     <span class="path1"></span>
+                                     <span class="path2"></span>
+                                    </i>
+                                    Close Crossing Challans
+                                </button>
+                                <!--begin::Export dropdown-->
+                                <button type="button" class="btn btn-primary hover-elevate-up" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Export Report
+                                </button>
+                                <!--begin::Menu-->
+                                <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                        Copy to clipboard
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                        Export as Excel
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                        Export as CSV
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                  
+                                    <!--end::Menu item-->
+                                </div>
+                                <!--end::Menu-->
+                                <!--end::Export dropdown-->
+                    
+                                <!--begin::Hide default export buttons-->
+                                <div id="kt_datatable_example_buttons" class="d-none"></div>
+                                <!--end::Hide default export buttons-->
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table align-middle table-striped table-row-dashed gy-5 gs-7 custom-datatable" id="kt_datatable_example">
+                                <thead>
+                                    <!--begin::Table row-->
+                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                        <th class="min-w-250px">Action</th>
+                                        
+                                        <th class="min-w-150px">Delivery Challan Number</th>
+                                        <th class="min-w-100px">To</th>
+                                        <th class="min-w-75px">Date</th>
+                                        <th class="min-w-150px">Broker Name</th>
+                                        <th class="min-w-150px">Broker Contact</th>
+                                        <th class="min-w-150px">Vehicle Number</th>
+                                        <th class="min-w-75px">Total LR</th>
+                                        <th class="min-w-125px">Total Actual Weight</th>
+                                        <th class="min-w-125px">Total Charged Weight</th>
+                                        <th class="min-w-125px">Total PKG</th>
+                                    </tr>
+                                    <!--end::Table row-->
+                                </thead>
+                                <tbody id="lrDATA" class="fw-semibold text-gray-600">
+                                    <% if(typeof ccData !== "undefined") {%> 
+
+                                        <% ccData.forEach(data=> {%> 
+
+                                            <tr class="odd">
+                                                <td>
+
+                                                    <button onclick="viewLorryArrival('<%=data._id%>')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-eye fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                        </i>
+                                                    </button>
+                                                    
+                                                    <button <% if(data.closed === true) {%> disabled <% } else {%> onclick="editDeliveryChallan('<%=data._id%>')" <% } %>  class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-pencil fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-arrow-down fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-printer fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                         <span class="path5"></span>
+                                                        </i>
+                                                    </button>
+                                                   
+                                                    <button <% if(data.closed === true) {%> disabled <%} else {%>  onclick="deleteDeliveryChallan('<%=data._id%>')" <% } %> class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                                                        <i class="ki-duotone ki-trash-square fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                        </i>
+                                                    </button>
+
+                                                </td>
+                                            <td><%=data.number%></td>
+                                            <td><%=data.to.cityName%></td>
+                                            <td><%=data.date%></td>
+                                            <% if(data.vehicle.broker) {%> 
+                                            <td><%=data.vehicle.broker.name%>  </td>
+                                            <td><%=data.vehicle.broker.mobile%></td>
+                                            <%} %>
+                                            <td><%=data.vehicle.number%></td>
+                                            <td><%=data.material.length%></td>
+                                            <td><%= data.material.reduce((total, item) => total + item.actualWeight, 0) %></td>
+                                            <td><%= data.material.reduce((total, item) => total + item.chargedWeight, 0) %></td>
+                                            <td><%= data.material.reduce((total, item) => total + item.numberOfPackages, 0) %></td>
+                                           
+                                            </tr>
+
+                                        <%}) %>
+
+                                    <%} %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                  
+                </div>
+           </div>
+           <%     function getCurrentFinancialYear() {
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+          
+            // Check if the current month is April (month index 3) or later
+            // If it's April or later, return the current year and the next year as the financial year
+            // Otherwise, return the previous year and the current year as the financial year
+            const startYear = currentDate.getMonth() >= 3 ? currentYear : currentYear - 1;
+            const endYear = startYear + 1;
+          
+            // Format the financial year as "2324", "2425", etc.
+            const formattedFinancialYear = `${String(startYear).slice(-2)}${String(endYear).slice(-2)}`;
+          
+            return formattedFinancialYear;
+          }
+          %>
+  
+
+         <form id="crossingChallanForm">
+            <div class="modal bg-body fade" tabindex="-1" id="kt_modal_2"  data-bs-focus="false">
+             <div class="modal-dialog modal-fullscreen">
+                 <div class="modal-content custom-modal shadow-none">
+                     <div class="modal-header">
+                         <h5 class="modal-title" id="title"></h5>
+         
+                         <!--begin::Close-->
+                         <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                             <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                         </div>
+                         <!--end::Close-->
+                     </div>
+         
+                        <div class="modal-body">
+                         <div class="d-flex flex-column flex-lg-row">
+                             <!--begin::Content-->
+                             <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+                                 <!--begin::Card-->
+                                 <div class="card">
+                                     <!--begin::Card body-->
+                                     <div class="card-body p-12">
+                                         <!--begin::Form-->
+                                         
+                                             <!--begin::Wrapper-->
+                                             <div class="d-flex flex-column align-items-start flex-xxl-row">
+     
+                                                 <div class="col-lg-3" style="margin-right: 10px;">
+                                                     <input type="hidden" name="id" id="crossingChallanID">
+                                                     <label for="challanNumber" class="required form-label">Crossing Challan No.</label>
+                                                     <input tabindex="1" checkindex="1" onkeypress="return allowOnlyNumbers(event)" type="text" name="crossingChallanNumber" id="crossingChallanNumber" class="form-control form-control-solid" value="<%=dcNumber %>">
+                                                 </div>
+                                                 <div class="col-lg-3" style="margin-right: 10px;">
+                                                     <label for="challanDate" class="form-label required">Date</label>
+                                                             <input tabindex="2" checkindex="2"
+                                                             class="form-control form-control-solid fw-bold pe-5 flatpickr-input"
+                                                             placeholder="Select Challan Date" name="crossingChallanDate" type="text"
+                                                             id="crossingChallanDate">
+                                                 </div>
+     
+                                                
+                                                 <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="challanFor" class="form-label required">Select Transporter</label>
+                                                    <select data-dropdown-parent="#kt_modal_2"  tabindex="3" checkindex="3" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Vehicle Number" name="transporter" id="transporter">
+                                                        <option></option>
+                                                        <% brokerData.forEach((data)=> {%> 
+    
+                                                            <option value="<%=data.id%>"><%=data.name%></option>
+    
+                                                        <%}) %>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="challanFor" class="form-label required">Vehicle Number</label>
+                                                    <select data-dropdown-parent="#kt_modal_2"  tabindex="4" checkindex="4" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Vehicle Number" name="vehicleNumber" id="vehicleNumber">
+                                                        <option></option>
+                                                        <% vehicleData.forEach((data)=> {%> 
+    
+                                                            <option data-broker="<%=data.broker%>" data-owner="<%=data.owner%>" value="<%=data.id%>"><%=data.number%></option>
+    
+                                                        <%}) %>
+                                                    </select>
+                                                </div>
+                                                
+                                                
+                                                 <!--end::Input group-->
+                                             </div>
+                                             <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="brokerName" class="form-label required">Broker Name</label>
+                                                    <input type="text" name="brokerName" id="brokerName" disabled placeholder="Broker Name" class="form-control form-control-solid">
+                                                </div>
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                     <label for="brokerName" class="form-label required">Owner Name</label>
+                                                     <input type="text" name="ownerName" id="ownerName" disabled placeholder="Owner Name" class="form-control form-control-solid">
+                                                 </div>
+                                                
+                                                 <div class="col-lg-3" style="margin-right: 10px;">
+                                                     <label for="to" class="form-label required">To</label>
+                                                     <select disabled data-dropdown-parent="#kt_modal_2" tabindex="5" checkindex="5" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Destination" name="to" id="to">
+                                                         <option> </option>
+                                                         <% cityData.forEach((data)=> {%> 
+     
+                                                             <option value="<%=data.id%>"><%=data.cityName%></option>
+     
+                                                         <%}) %>
+                                                         
+                                                     </select>
+                                                 </div>
+     
+                                                 <div class="col-lg-3" style="margin-right: 10px;">
+                                                     <label for="vehicle" class="form-label required">Total LR</label>
+                                                     <input type="text" id="totalLR" class="form-control form-control-solid" disabled placeholder="Total LR" value="0">
+                                                 </div>
+                                             </div>
+                                             <!--end::Top-->
+     
+                                             <!--begin::Separator-->
+                                             <div class="separator separator-dashed my-10"></div>
+                                             <!--end::Separator-->
+     
+                                             <!--begin::Wrapper-->
+                                             <div class="mb-0">
+                                                 <div class="d-flex flex-column align-items-start flex-xxl-row">
+                                                     <div class="col-lg-2" style="margin-right: 10px;">
+                                                         <label for="selectLR" class="form-label required">Select LR Number</label>
+                                                         <select data-dropdown-parent="#kt_modal_2" tabindex="6" checkindex="6" disabled class="form-select form-select-solid" data-control="select2" data-placeholder="Select LR" id="selectLR">
+                                                             <option></option>
+                                                       
+                                                         </select>
+                                                     </div>
+                                                    
+         
+                                                     <div class="col-lg-2" style="margin-right: 10px;">
+                                                         <label class="form-label required">No. of Packages</label>
+                                                             <input type="hidden" id="originalNOP">
+                                                             <input tabindex="7" checkindex="7" onkeypress="return allowOnlyNumbers(event)"  disabled type="text" id="NOP" class="form-control form-control-solid" placeholder="Enter Packages Dispatched">
+                                                            
+                                                        
+                                                         
+                                                     </div>
+                                                     <div class="col-lg-3">
+                                                         <label class="required form-label">Actual Weight</label>
+                                                         <div class="input-group">
+                                                         <input type="hidden" id="originalActualWeight">
+                                                         <input tabindex="8" checkindex="8" onkeypress="return allowOnlyNumbers(event)" disabled style="margin-right: 10px;" placeholder="Weight" id="actualWeight" type="text" class="form-control form-control-solid">
+                                                         
+                                                        </div>
+                                                     </div>
+                                                     <div class="col-lg-3">
+                                                         <label class="form-label required">Charged Weight</label>
+                                                         <div class="input-group">
+                                                             <input type="hidden" id="originalChargedWeight">
+                                                             <input tabindex="9" checkindex="9" onkeypress="return allowOnlyNumbers(event)" disabled style="margin-right: 10px;" placeholder="Charged Weight" id="chargedWeight" type="text" class="form-control form-control-solid">
+                                                            
+                                                         </div>
+                                                     </div>
+
+                                                     <div class="col-lg-2">
+                                                        <label class="form-label required">Total LR Freight</label>
+                                                        <div class="input-group">
+                                                            <input tabindex="10" checkindex="10" onkeypress="return allowOnlyNumbers(event)" disabled style="margin-right: 10px;" placeholder="LR Freight" id="totalLRFreight" type="text" class="form-control form-control-solid">
+                                                           
+                                                        </div>
+                                                    </div>
+                                                 </div>
+                                                 <!--end::Top-->
+         
+                                                 <!--begin::Separator-->
+                                                 <div class="separator separator-dashed my-10"></div>
+     
+                                                 <!--begin::Table wrapper-->
+                                                 <div class="table-responsive mb-10">
+                                                     <!--begin::Table-->
+                                                     <table class="table g-5 gs-0 mb-0 fw-bold text-gray-700"
+                                                         data-kt-element="items">
+                                                         <!--begin::Table head-->
+                                                         <thead>
+                                                             <tr
+                                                                 class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase">
+                                                                 <th class="min-w-75px w-75px">Sr No.</th>
+                                                                 <th class="min-w-125px w-125px">LR Number</th>
+                                                                 <th class="min-w-100px w-100px">PKGs</th>
+                                                                 <th class="min-w-100px w-150px">Actual Weight</th>
+                                                                 <th class="min-w-100px w-150px">Charged Weight</th>
+                                                                 <th class="min-w-100px w-100px">Total LR Freight</th>
+                                                                 <th class="min-w-100px w-100px">Action</th>
+                                                             </tr>
+                                                         </thead>
+                                                         <!--end::Table head-->
+     
+                                                         <!--begin::Table body-->
+                                                         <tbody id="itemTableBody">
+                                                        
+                                                         </tbody>
+                                                         <!--end::Table body-->
+     
+                                                         <!--begin::Table foot-->
+                                                         <tfoot>
+                                                             <tr
+                                                                 class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700">
+                                                                 <th class="text-white">
+                                                                    
+                                                                 </th>
+     
+                                                                 <th class="text-white">
+                                                                   
+                                                                 </th>
+                                                                 <th class="text-white">
+                                                                     <input style="color: white;" disabled class="exclude form-control form-control-transparent" id="totalNOP">
+                                                                 </th>
+                                                               
+     
+                                                                 <th class="text-white">
+                                                                     <input style="color: white;" disabled class="exclude form-control form-control-transparent" id="totalActualWeight">
+                                                                 </th>
+                                                                    <th class="text-weight">
+                                                                     <input style="color: white;" disabled class="exclude form-control form-control-transparent" id="totalChargedWeight">
+                                                                    </th> 
+     
+                                                             </tr>
+                                                         </tfoot>
+                                                         <!--end::Table foot-->
+                                                     </table>
+                                                 </div>
+                                             </div>
+                                             <!--end::Wrapper-->
+                                  
+                                         <!--end::Form-->
+                                     </div>
+                                     <!--end::Card body-->
+                                 </div>
+                                 <!--end::Card-->
+                             </div>
+                             <!--end::Content-->
+     
+                        <!--begin::Sidebar-->
+                        <div class="flex-lg-auto min-w-lg-300px" style="width: 350px;">
+                            <!--begin::Card-->
+                            <div class="card" data-kt-sticky="true" data-kt-sticky-name="invoice"
+                                data-kt-sticky-offset="{default: false, lg: '200px'}"
+                                data-kt-sticky-width="{lg: '250px', lg: '300px'}" data-kt-sticky-left="auto"
+                                data-kt-sticky-top="150px" data-kt-sticky-animation="false" data-kt-sticky-zindex="95">
+
+                                <!--begin::Card body-->
+                                <div class="card-body p-10">
+                                    <!--begin::Input group-->
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Crossing Amt</label>
+                                        <input disabled value="0" type="number" oninput="validateNumberWithDecimals()" class="form-control form-control-solid" id="crossingAmtTotal" placeholder="Crossing Amount">
+                                        
+                                    </div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Door Delivery</label>
+                                        <input disabled value="0" type="number" oninput="validateNumberWithDecimals()" class="form-control form-control-solid" id="doorDeliveryTotal" placeholder="Crossing Amount">
+                                        
+                                    </div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Delivery Commision</label>
+                                        <input disabled value="0" type="number" oninput="validateNumberWithDecimals()" class="form-control form-control-solid" id="deliveryCommissionTotal" placeholder="Crossing Amount">
+                                        
+                                    </div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Others (+)</label>
+                                        <input disabled value="0" type="number" oninput="validateNumberWithDecimals()" class="form-control form-control-solid" id="othersAddAmtTotal" placeholder="Crossing Amount">
+                                        
+                                    </div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Others (-)</label>
+                                        <input disabled value="0" type="number" oninput="validateNumberWithDecimals()" class="form-control form-control-solid" id="othersSubAmtTotal" placeholder="Crossing Amount">
+                                        
+                                    </div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Advance</label>
+                                        <div style="display: inline-block; width: 85%;">
+                                            <input value="0" disabled tabindex="26" checkindex="26" type="number" name="advance" id="advance" class="form-control form-control-solid" placeholder="Advance">
+                                        </div>
+                                        <button data-bs-stacked-modal="#kt_modal_stacked_2" style="display: inline-block !important; vertical-align: top;" type="button" onclick="editAdvanceDetails()" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                            <i class="ki-duotone ki-pencil fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </button>
+                                    </div>
+                                    <div class="separator separator-dashed mb-8"></div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Balance</label>
+                                        <input name="balance" type="number" oninput="validateNumberWithDecimals(this)" class="form-control form-control-solid" id="balance" value="0" disabled placeholder="Balance">
+                                    </div>
+
+                                
+
+                                   
+                              
+
+                                  
+                           
+                          
+                                
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::Card-->
+                        </div>
+                        <!--end::Sidebar-->
+                         
+                         </div>
+                     </div>
+         
+                     <div class="modal-footer">
+                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="DCCloseBTN">Close</button>
+
+
+                         <button type="button" class="btn btn-primary" onclick="createDeliveryChallan()" id="crossingChallanSubmit">
+                            <span class="indicator-label">
+                            Create New Crossing Challan
+                        </span>
+                        <span class="indicator-progress">
+                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                         <button type="button" class="btn btn-primary" onclick="updateDeliveryChallan()" id="crossingChallanUpdateBTN">
+                            <span class="indicator-label">
+                                Update Crossing Challan
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                     </div>
+                 </div>
+             </div>
+         
+
+        
+  
+    </div>
+    <div class="modal fade" tabindex="-1" id="kt_modal_stacked_3">
+        <div class="modal-dialog custom-crossing modal-dialog-centered modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="editFreightTitle">Edit Freight Details</h3>
+        
+                    <!--begin::Close-->
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                    </div>
+                    <!--end::Close-->
+                </div>
+        
+                <div class="modal-body">
+                    
+          
+                    <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px; margin-right: 20px;">
+                        <input type="hidden" value="0" id="chargedWeightLR">
+                        <input type="hidden" value="0" id="actualWeightLR">
+                        <input type="hidden" value="0" id="pkgLR">
+                        <div class="col-lg-4" style="margin-right: 10px;">
+                            <label for="freightAmt" class="form-label">Select Rate ON</label>
+                            <select data-dropdown-parent="#kt_modal_stacked_3" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Rate On" id="rateON">
+                                <option></option>
+                                <option value="actualWeight">Actual Weight</option>
+                                <option value="chargedWeight">Charged Weight</option>
+                                <option value="pkg">Number of Packages</option>
+                                <option value="fix">FTL (Fix)</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-4" style="margin-right: 10px;">
+                            <label for="freightAmt" class="form-label">Rate</label>
+                            <input class="form-control form-control-solid" type="number" oninput="validateNumberWithDecimals(this)" id="rate">
+                        </div>
+                        <div class="col-lg-4" style="margin-right: 20px;">
+                            <label for="freightAmt" class="form-label">Crossing Amount</label>
+                            <input disabled class="form-control form-control-solid" type="number" oninput="validateNumberWithDecimals(this)" id="crossingAmt">
+                        </div>
+                    </div>
+                
+
+
+             
+                
+                        <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px; margin-right: 20px;">
+                            <div class="col-lg-3" style="margin-right: 10px;">
+                                <label for="freightAmt" class="form-label">Door Delivery</label>
+                                <input class="form-control form-control-solid" type="number" oninput="validateNumberWithDecimals(this)" id="doorDelivery">
+                            </div>
+                            <div class="col-lg-3" style="margin-right: 10px;">
+                                <label for="freightAmt" class="form-label">LR Charges</label>
+                                <input class="form-control form-control-solid" type="number" oninput="validateNumberWithDecimals(this)" id="lrCharges">
+                            </div>
+                            <div class="col-lg-3" style="margin-right: 10px;">
+                                <label for="freightAmt" class="form-label">E-Way Bill Charges</label>
+                                <input class="form-control form-control-solid" type="number" oninput="validateNumberWithDecimals(this)" id="ewayBillCharges">
+                            </div>
+                                <div class="col-lg-3" style="margin-right: 20px;">
+                                    <label for="freightAmt" class="form-label">Delivery Commision</label>
+                                    <input class="form-control form-control-solid" type="number" oninput="validateNumberWithDecimals(this)" id="deliveryCommission">
+                                </div>
+                        </div>
+                    
+                        <div id="repeaterAdd">
+                           
+                        </div>
+                        <div class="col-lg-12" style="margin-top: 20px;">
+                            <button onclick="addRepeaterList('add')" type="button" class="btn btn-flex btn-light-primary">
+                                <i class="ki-duotone ki-plus fs-3"></i>
+                                Add Others (+)
+                            </button>
+                        </div>
+                        <div id="repeaterSub">
+                          
+                        </div>
+                        <div class="col-lg-12" style="margin-top: 20px;">
+                            <button type="button" onclick="addRepeaterList('sub')" class="btn btn-flex btn-light-primary">
+                                <i class="ki-duotone ki-plus fs-3"></i>
+                                Add Others (-)
+                            </button>
+                           </div>
+                      
+                
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="button" onclick="saveLRFreight('1')" id="saveLRFreightBTN" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal fade" tabindex="-1" id="kt_modal_stacked_2">
+            <div class="modal-dialog modal-dialog-centered modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="editFreightTitle">Edit Advance Details</h3>
+            
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+            
+                    <div class="modal-body">
+                 
+    
+                       
+                            <div id="advanceCash">
+                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px;">
+                                    <div class="col-lg-3" style="margin-right: 10px; ">
+                                        <input oninput="validateNumberWithDecimals(this)" value="0"  class="form-control form-control-solid" type="number" name="cashAmount" id="cashAmount" placeholder="Amt Paid in Cash">
+                                    </div> 
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <select disabled data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Cash Payment Ledger" name="cashLedger" id="cashLedger">
+                                            <option></option>
+                                           <%cashinhand.forEach((data)=> {%> 
+                                            <option value="<%=data._id%>"><%=data.name%></option>
+                                            <%}) %>
+                                        </select>
+                                    </div> 
+                                    <div class="col-lg-2" style="margin-right: 10px;">
+                                        <select data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Cash Payment Status" name="cashStatus" id="cashStatus">
+                              
+                                            <option value="paid">Paid</option>
+                                            <option value="due" selected>Due</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <input placeholder="Select Date" type="text" name="cashDate" id="cashDate" class="form-control form-control-solid">
+                                     </div>
+                                </div>
+                            </div>
+                    
+    
+                            <div id="advanceBank">
+                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px;">
+                                    <div class="col-lg-3" style="margin-right: 10px; ">
+                                        <input oninput="validateNumberWithDecimals(this)" value="0"  class="form-control form-control-solid" type="number" name="bankAmount" id="bankAmount" placeholder="Amt Paid via Cheque">
+                                    </div> 
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <select disabled data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Bank A/C" name="bankLedger" id="bankLedger">
+                                            <option></option>
+                                            <%bankAccounts.forEach((data)=> {%> 
+                                                <option value="<%=data._id%>"><%=data.name%></option>
+                                                <%}) %>
+                                        </select>
+                                    </div> 
+                                    <div class="col-lg-2" style="margin-right: 10px;">
+                                        <select data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Cash Payment Status" name="bankStatus" id="bankStatus">
+                                      
+                                            <option value="paid">Paid</option>
+                                            <option value="due" selected>Due</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                       <input placeholder="Select Date" type="text" name="bankDate" id="bankDate" class="form-control form-control-solid">
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <div id="advanceDiesel">
+                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px;">
+                                    <div class="col-lg-3" style="margin-right: 10px; ">
+                                        <input oninput="validateNumberWithDecimals(this)" value="0"  class="form-control form-control-solid" type="number" name="dieselAmount" id="dieselAmount" placeholder="Diesel Amt">
+                                    </div> 
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <select disabled data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Diesel Ledger" name="dieselLedger" id="dieselLedger">
+                                            <option></option>
+                                            <%sundrycreditors.forEach((data)=> {%> 
+                                                <option value="<%=data._id%>"><%=data.name%></option>
+                                                <%}) %>
+                                        </select>
+                                    </div> 
+                                    <div class="col-lg-2" style="margin-right: 10px;">
+                                        <select data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Cash Payment Status" name="dieselStatus" id="dieselStatus">
+                                           
+                                            <option value="paid">Paid</option>
+                                            <option value="due" selected>Due</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <input placeholder="Select Date" type="text" name="dieselDate" id="dieselDate" class="form-control form-control-solid">
+                                     </div>
+                                </div>
+                            </div>
+                        
+                          
+                    
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                        <button type="button" onclick="saveAdvanceDetails()" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+    </form>
+    <form id="dcCloseForm">
+    <div class="modal fade bg-body" tabindex="-1" id="kt_modal_3">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content custom-modal">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="dcCloseTitle">Delivery Challan Actions</h3>
+    
+                    <!--begin::Close-->
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                    </div>
+                    <!--end::Close-->
+                </div>
+    
+                <div class="modal-body">
+                    <div style="padding: 30px;" class="card card-p-0 card-flush">
+                        <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1">
+                                    <span class="svg-icon fs-1 position-absolute ms-4">
+                                        <i class="ki-duotone ki-magnifier fs-3">
+                                         <span class="path1"></span>
+                                         <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <input type="text" data-kt-filter="search-dcClose" class="form-control form-control-solid w-250px ps-14" placeholder="Search Crossing Challans" />
+                                </div>
+                         
+                            </div>
+                            <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                          
+                    
+                               
+                                <div id="kt_datatable_example_buttons" class="d-none"></div>
+                              
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table  class="table align-middle table-striped table-row-bordered gy-5 gs-7 custom-datatable" id="dcCloseTable">
+                                <thead>
+                                    <!--begin::Table row-->
+                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                      
+                                        <th class="min-w-75px">
+                                            <input type="checkbox" class="form-check-input" id="selectAll">
+                                        </th>
+                                        <th class="min-w-150px">Expiry</th>
+                                        <th class="min-w-100px">Delivery Challan Number</th>
+                                        
+                                        <th class="min-w-75px">Date</th>
+                                        <th class="min-w-100px">Vehicle Number</th>
+                                        <th class="min-w-75px">Total LR</th>
+                                        <th class="min-w-100px">Total Actual Weight</th>
+                                        <th class="min-w-75px">Total Charged Weight</th>
+                                        <th class="min-w-75px">Total PKG</th>
+                                    </tr>
+                                    <!--end::Table row-->
+                                </thead>
+                                <tbody id="dcData" class="fw-semibold text-gray-600">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary hover-elevate-up" id="closeDCBTN" onclick="submitCloseDC()">
+                        <span class="indicator-label">
+                            Close Crossing Chalans
+                        </span>
+                        <span class="indicator-progress">
+                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-info hover-elevate-up" id="extendDCBTN" onclick="submitExtendDC()">
+                        <span class="indicator-label">
+                            Extend Expiry
+                        </span>
+                        <span class="indicator-progress">
+                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+
+                <%- include("../../includes/footer", {pageName : "crossingChallan" }) %>

@@ -1,0 +1,131 @@
+<% if(pageName==="vehicles" ){%>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6/inputmask.min.js"></script>
+
+    <script src="../../../assets/js/custom/masters/vehicles/vehicles/table.js"></script>
+    <script src="../../../assets/js/custom/masters/vehicles/vehicles/export-users.js"></script>
+    <script src="../../../assets/js/custom/masters/vehicles/vehicles/add.js"></script>
+    <script src="../../../assets/js/custom/masters/vehicles/vehicles/update.js"></script>
+    <script>
+        $("#insuranceValidity").flatpickr({
+            dateFormat: "d-m-Y",
+            minDate: "today"
+        });
+
+        $("#permitValidity").flatpickr({
+            dateFormat: "d-m-Y",
+            minDate: "today"
+        });
+    </script>
+    <script>
+
+        function editVehicleBTN(id) {
+            $("#updateVehicle").css("display", "inline-block")
+            $("#createVehicle").css("display", "none")
+            $("#modalTitle").html("Update Vehicle Details")
+
+            fetchGetRequest(`/masters/vehicles/edit?id=${id}`).then((data) => {
+                $("#owner option").each(function () {
+                            if ($(this).val() === data.owner) {
+                                $(this).prop("selected", true)
+                            }
+                        })
+
+                        $("#driver option:not(:first)").remove()
+                        const constructedOptions = `
+                        <%driverData2.forEach((info)=> {%>
+                            <option value="<%=info.id%>"><%=info.name%> </option>
+                            <%})%>
+                        `
+                        $("#driver").append(constructedOptions).select2()
+
+                        $("#driver option").each(function () {
+                            if ($(this).val() === data.driver) {
+                                $(this).prop("selected", true)
+                            }
+                        })
+                        $("#vehicleNumber").val(data.number)
+                        $("#vehicleType").val(data.type)
+                        $("#engineNumber").val(data.engineNumber)
+                        $("#chassisNumber").val(data.chassisNumber)
+                        $("#permitNumber").val(data.permitNumber)
+                        $("#permitValidity").val(data.permitValidity)
+                        $("#insuranceValidity").val(data.insuranceValidity)
+                        $("#broker").val(data.broker)
+                        $("#vehicleID").val(data._id)
+                        $("#oldDriver").val(data.driver)
+                        $("#oldOwner").val(data.owner)
+                        $("#oldBroker").val(data.broker)
+                        $("#insuranceProvider option").each(function () {
+                            if ($(this).val() === data.insuranceProvider) {
+                                $(this).prop("selected", true)
+                            }
+                        })
+                        $("#insuranceProvider").select2()
+                        $("#driver").select2()
+                        $("#owner").select2()
+                        $("#broker").select2()
+                        $("#kt_modal_add_user").modal("show")
+            })
+           
+        }
+
+    </script>
+    <script>
+       $("#vehicleNumber").on("keydown", function(){
+        if (event.key === "Tab" && !event.shiftKey) {
+                if ($(this).val() == "") {
+                    showError("Please Enter Vehicle Number")
+                } else {
+                    if ($(this).val().length < 9) {
+                        showError("Invalid Vehicle Number")
+                    } else {
+                        fetchGetRequest(`/masters/vehicles/getVehicleDetails?vehicleNumber=${$(this).val()}`).then((data)=> {
+                            $("#vehicleType").val(data.vehicleType)
+                            $("#engineNumber").val(data.engineNumber)
+                            $("#chassisNumber").val(data.chassisNumber)
+                            let done = false
+                            $("#insuranceProvider option").each(function () {
+                                if ($(this).val() === data.insuranceProvider) {
+                                    done = true
+                                    $(this).prop("selected", true)
+                                }
+                            })
+                            if (!done) {
+                                $("#insuranceProvider").append(`<option value="${data.insuranceProvider}" selected>${data.insuranceProvider}</option>`)
+                                $("#insuranceProvider").val(data.insuranceProvider).select2()
+                            }
+
+                            $("#insuranceProvider").select2()
+                            $("#driver").select2()
+                            $("#owner").select2()
+                            $("#broker").select2()
+
+
+                        })
+                    }
+                }
+            }
+       })
+    </script>
+    <script>
+        function newBrokerBTN() {
+            $("#newVehicle").trigger("reset")
+            $("#updateVehicle").css("display", "none")
+            $("#createVehicle").css("display", "inline-block")
+            $("#modalTitle").html("Add New Vehicle")
+            $("#insuranceProvider").val(null).select2()
+            $("#driver option:not(:first)").remove()
+            const constructedOptions = `
+            <%driverData.forEach((info)=> {%>
+                <option value="<%=info.id%>"><%=info.name%> </option>
+                <%})%>
+            `
+            $("#driver").append(constructedOptions).select2()
+
+            $("#driver").val(null).select2()
+            $("#owner").val(null).select2()
+        }
+    </script>
+
+
+    <%} %>

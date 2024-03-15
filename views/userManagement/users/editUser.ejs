@@ -1,0 +1,298 @@
+<%- include("../../includes/header", {pageName : "manageUsers" }) %>
+    <%- include("../../includes/sidebar", {pageName : "manageUsers" }) %>
+        <%- include("../../includes/toolbar", {pageName : "Edit User" , pageHead : "Manage Users" }) %>
+
+                            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                                <!--begin::Content container-->
+                                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                                    <form action="/user-management/manage-users/edit" method="POST" id="updateUserForm">
+                                        <input type="hidden" name="userID" value="<%=userData.id%>">
+                                        <input type="hidden" name="oldEmail" value="<%=userData.email%>">
+                                        <input type="hidden" name="oldRole" value="<%=userData.role%>">
+                                        <!--begin::Card-->
+                                        <div class="card">
+                                            <div class="card mb-5 mb-xl-10">
+                                                <!--begin::Card header-->
+                                                <div class="card-header border-0 cursor-pointer" role="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#kt_account_profile_details" aria-expanded="true"
+                                                    aria-controls="kt_account_profile_details">
+                                                    <!--begin::Card title-->
+                                                    <div class="card-title m-0">
+                                                        <h3 class="fw-bold m-0">Profile Details</h3>
+                                                    </div>
+                                                    <!--end::Card title-->
+                                                </div>
+                                                <!--begin::Card header-->
+                                                <form action="/user-management/manage-users/edit" method="POST">
+                                                    <!--begin::Content-->
+                                                    <div id="kt_account_settings_profile_details" class="collapse show">
+                                                        <!--begin::Form-->
+                                                        <form id="kt_account_profile_details_form"
+                                                            class="form fv-plugins-bootstrap5 fv-plugins-framework"
+                                                            novalidate="novalidate">
+                                                            <!--begin::Card body-->
+                                                            <div class="card-body border-top p-9">
+
+
+                                                                <!--begin::Input group-->
+                                                                <div class="row mb-6">
+                                                                    <!--begin::Label-->
+                                                                    <label
+                                                                        class="col-lg-4 col-form-label required fw-semibold fs-6">Full
+                                                                        Name</label>
+                                                                    <!--end::Label-->
+
+                                                                    <!--begin::Col-->
+                                                                    <div class="col-lg-8">
+                                                                        <!--begin::Row-->
+                                                                        <div class="row">
+                                                                            <!--begin::Col-->
+                                                                            <div
+                                                                                class="col-lg-6 fv-row fv-plugins-icon-container">
+                                                                                <input type="text" name="firstName"
+                                                                                    id="firstName"
+                                                                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                                                                    placeholder="First name"
+                                                                                    value="<%=userData.firstName%>">
+
+
+
+                                                                            </div>
+                                                                            <!--end::Col-->
+
+                                                                            <!--begin::Col-->
+                                                                            <div
+                                                                                class="col-lg-6 fv-row fv-plugins-icon-container">
+                                                                                <input type="text" name="lastName"
+                                                                                    id="lastName"
+                                                                                    class="form-control form-control-lg form-control-solid"
+                                                                                    placeholder="Last name"
+                                                                                    value="<%=userData.lastName%>">
+
+
+                                                                            </div>
+                                                                            <!--end::Col-->
+                                                                        </div>
+                                                                        <!--end::Row-->
+                                                                    </div>
+                                                                    <!--end::Col-->
+                                                                </div>
+                                                                <!--end::Input group-->
+
+                                                                <!--begin::Input group-->
+                                                                <div class="row mb-6">
+                                                                    <!--begin::Label-->
+                                                                    <label
+                                                                        class="col-lg-4 col-form-label required fw-semibold fs-6">Email</label>
+                                                                    <!--end::Label-->
+
+                                                                    <!--begin::Col-->
+                                                                    <div
+                                                                        class="col-lg-8 fv-row fv-plugins-icon-container">
+                                                                        <input type="email" name="email" id="email"
+                                                                            class="form-control form-control-lg form-control-solid"
+                                                                            value="<%=userData.email%>">
+                                                                        <p class="custom-error-messages">
+
+                                                                            <% if(typeof emailError !=="undefined" ) {%>
+
+                                                                                <%= emailError %>
+                                                                                    <% } %>
+                                                                        </p>
+                                                                    </div>
+                                                                    <!--end::Col-->
+                                                                </div>
+                                                                <!--end::Input group-->
+
+                                                                <!--begin::Input group-->
+                                                                <div class="row mb-6">
+                                                                    <!--begin::Label-->
+                                                                    <label
+                                                                        class="col-lg-4 col-form-label fw-semibold fs-6">
+                                                                        <span>Mobile No.</span>
+                                                                    </label>
+                                                                    <!--end::Label-->
+
+                                                                    <!--begin::Col-->
+                                                                    <div
+                                                                        class="col-lg-8 fv-row fv-plugins-icon-container">
+                                                                        <input id="mobile" type="tel"
+                                                                            name="mobileNumber"
+                                                                            class="form-control form-control-lg form-control-solid"
+                                                                            placeholder="Phone number"
+                                                                            value="<%=userData.mobileNumber%>">
+                                                                        <p class="custom-error-messages">
+
+                                                                            <% if(typeof mobiileNumberError!=="undefined" ) { %>
+
+                                                                                <%= mobileNumberError %>
+                                                                                    <% } %>
+                                                                        </p>
+                                                                    </div>
+                                                                    <!--end::Col-->
+                                                                </div>
+                                                                <!--end::Input group-->
+    <!--begin::Input group-->
+                                                                <div class="row mb-6">
+                                                                    <!--begin::Label-->
+                                                                    <label
+                                                                        class="col-lg-4 col-form-label fw-semibold fs-6">
+                                                                        <span class="required">Select user Branch</span>
+
+
+                                                                        <span class="ms-1" data-bs-toggle="tooltip"
+                                                                            aria-label="Country of origination"
+                                                                            data-bs-original-title="Country of origination"
+                                                                            data-kt-initialized="1">
+                                                                            <i
+                                                                                class="ki-duotone ki-information-5 text-gray-500 fs-6"><span
+                                                                                    class="path1"></span><span
+                                                                                    class="path2"></span><span
+                                                                                    class="path3"></span></i></span>
+                                                                    </label>
+                                                                    <!--end::Label-->
+
+                                                                    <!--begin::Col-->
+                                                                   
+                                                                    
+                                                                    <div class="col-lg-8 fv-row fv-plugins-icon-container">
+                                                                        <input type="hidden" name="oldBranch" value="<%=userData.branch%>">
+                                                                        <select data-control="select2" name="branch" aria-label="<%=userData.branch%>" data-placeholder="<%=userData.branch%>" class="form-select form-select-solid form-select-lg fw-semibold" id="selectBranch">
+
+                                                                            <% branchData.forEach(data=> { %>
+
+
+
+                                                                                <option value="<%=data.id%>" 
+                                                                                <% if(userData.branch==data.id) {%>
+                                                                                    selected <% } %> > <%=data.name%>
+                                                                                </option>
+
+                                                                                <% }); %>
+
+
+                                                                        </select>
+                                                                    </div>
+
+                                                                    
+                                                                    <!--end::Col-->
+                                                                </div>
+
+                                                                <div class="row mb-6">
+                                                                    <!--begin::Label-->
+                                                                    <label
+                                                                        class="col-lg-4 col-form-label fw-semibold fs-6">
+                                                                        <span class="required">Select user Godown</span>
+
+
+                                                                        <span class="ms-1" data-bs-toggle="tooltip"
+                                                                            aria-label="Country of origination"
+                                                                            data-bs-original-title="Country of origination"
+                                                                            data-kt-initialized="1">
+                                                                            <i
+                                                                                class="ki-duotone ki-information-5 text-gray-500 fs-6"><span
+                                                                                    class="path1"></span><span
+                                                                                    class="path2"></span><span
+                                                                                    class="path3"></span></i></span>
+                                                                    </label>
+                                                                    <!--end::Label-->
+
+                                                                    <!--begin::Col-->
+                                                                   
+                                                                    
+                                                                    <div class="col-lg-8 fv-row fv-plugins-icon-container">
+                                                                        <input type="hidden" name="oldGodown" value="<%=userData.godown%>">
+                                                                        <select id="selectGodown" data-control="select2" data-placeholder="Select User Godown" name="godown" aria-label="<%=userData.branch%>" data-placeholder="<%=userData.branch%>" class="form-select form-select-solid form-select-lg fw-semibold ">
+                                                                            <option></option>
+                                                                            <% godownData.forEach(data=> { %>
+                                                                                
+                                                                                <option value="<%=data.id%>" <% if(userData.godown==data.id) {%> selected <% } %> > 
+                                                                                    <%=data.name%> 
+                                                                                </option>
+
+                                                                                <% }); %>
+
+
+                                                                        </select>
+                                                                    </div>
+
+                                                                    
+                                                                    <!--end::Col-->
+                                                                </div>
+
+                                                                <!--begin::Input group-->
+                                                                <div class="row mb-6">
+                                                                    <!--begin::Label-->
+                                                                    <label
+                                                                        class="col-lg-4 col-form-label fw-semibold fs-6">
+                                                                        <span class="required">Role</span>
+
+
+                                                                        <span class="ms-1" data-bs-toggle="tooltip"
+                                                                            aria-label="Country of origination"
+                                                                            data-bs-original-title="Country of origination"
+                                                                            data-kt-initialized="1">
+                                                                            <i
+                                                                                class="ki-duotone ki-information-5 text-gray-500 fs-6"><span
+                                                                                    class="path1"></span><span
+                                                                                    class="path2"></span><span
+                                                                                    class="path3"></span></i></span>
+                                                                    </label>
+                                                                    <!--end::Label-->
+
+                                                                    <!--begin::Col-->
+                                                                   
+                                                                    
+                                                                    <div class="col-lg-8 fv-row fv-plugins-icon-container">
+                                                                        <select data-control="select2" name="role" aria-label="<%=userData.role%>" data-placeholder="<%=userData.role%>" class="form-select form-select-solid form-select-lg fw-semibold ">
+
+                                                                            <% roleData.forEach(data=> { %>
+
+
+
+                                                                                <option value="<%=data.id%>" 
+                                                                                <% if(userData.role==data.id) {%>
+                                                                                    selected <% } %> > <%=data.roleType%>
+                                                                                </option>
+
+                                                                                <% }); %>
+
+
+                                                                        </select>
+                                                                    </div>
+                                                                    <!--end::Col-->
+                                                                </div>
+                                                                <!--end::Input group-->
+                                                               
+                                                            </div>
+                                                            <!--end::Card body-->
+
+                                                            <!--begin::Actions-->
+                                                            <div
+                                                                class="card-footer d-flex justify-content-end py-6 px-9">
+
+                                                                <button type="button" onclick="editUser()"
+                                                                    class="btn btn-primary"
+                                                                    id="kt_account_profile_details_submit">Save
+                                                                    Changes</button>
+                                                            </div>
+                                                            <!--end::Actions-->
+                                                            <input type="hidden">
+                                                        </form>
+                                                        <!--end::Form-->
+                                                    </div>
+                                                </form>
+                                                <!--end::Content-->
+                                            </div>
+                                        </div>
+                                        <!--end::Card-->
+                                    </form>
+                                </div>
+                                <!--end::Content container-->
+                            </div>
+
+
+                            <%- include("../../includes/footer", {pageName : "editUser" }) %>

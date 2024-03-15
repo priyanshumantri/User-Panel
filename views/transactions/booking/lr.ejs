@@ -1,0 +1,918 @@
+<%- include("../../includes/header", {pageName : "lrOK" }) %>
+    <%- include("../../includes/sidebar", {pageName : "LR" }) %>
+
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_content_container" class="app-container  container-xxl ">
+          
+   
+            <div style="padding: 30px;" class="card card-p-0 card-flush">
+              
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Branch</label>
+                            <% if (user.role.roleType === "ADMIN") { %>
+                            <select name="branch" id="branch" form="findLRForm" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Branch">
+                                <option></option>
+                                <% branchData.forEach(data => { %>
+                                <option <% if (typeof currentBranch !== "undefined" && data.id === currentBranch) { %> selected <% } %> value="<%=data.id%>"><%=data.name%></option>
+                                <% }) %>
+                            </select>
+                            <% } else { %>
+                            <input disabled type="text" id="branch" form="findLRForm" name="branch" class="form-control form-control-solid" value="<%=user.branch.name%>">
+                            <% } %>
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Date Range</label>
+                            <input class="form-control form-control-solid" name="dateRange" form="findLRForm" placeholder="Pick date range" id="searchRange" />
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <button style="margin-top: 20px;" type="button" onclick="findLR()" class="btn btn-sm btn-primary">Find</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+         
+       
+        </div>
+    </div>
+
+
+    <form id="findLRForm"></form>
+ 
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+             
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                 
+                    <div style="padding: 30px;" class="card card-p-0 card-flush">
+                        <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1">
+                                    <span class="svg-icon fs-1 position-absolute ms-4">
+                                        <i class="ki-duotone ki-magnifier fs-3">
+                                         <span class="path1"></span>
+                                         <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="Search Lorry Reciept" />
+                                </div>
+                                <!--end::Search-->
+                                <!--begin::Export buttons-->
+                                <div id="kt_datatable_example_1_export" class="d-none"></div>
+                                <!--end::Export buttons-->
+                            </div>
+                            <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                                <button onclick="addLR()" type="button" class="btn btn-primary btn-active-light-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_2">
+                                    <i class="ki-duotone ki-plus-square fs-2">
+                                          <span class="path1"></span>
+                                          <span class="path2"></span>
+                                          <span class="path3"></span>
+                                    </i>
+                                    Add New Lorry Reciept
+                                </button>
+                                <button onclick="addLR()" type="button" class="btn btn-primary btn-active-light-primary" data-bs-toggle="modal" data-bs-target="#lrAssignModal">
+                                    <i class="ki-duotone ki-double-right-arrow fs-2">
+                                       <span class="path1"></span>
+                                       <span class="path2"></span>
+                                    </i>
+                                    Assign Lorry Reciept
+                                </button>
+                                <!--begin::Export dropdown-->
+                                <button type="button" class="btn btn-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Export Report
+                                </button>
+                                <!--begin::Menu-->
+                                <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                        Copy to clipboard
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                        Export as Excel
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                        Export as CSV
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                  
+                                    <!--end::Menu item-->
+                                </div>
+                                <!--end::Menu-->
+                                <!--end::Export dropdown-->
+                    
+                                <!--begin::Hide default export buttons-->
+                                <div id="kt_datatable_example_buttons" class="d-none"></div>
+                                <!--end::Hide default export buttons-->
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table align-middle  rounded table-row-dashed fs-6 g-5" id="kt_datatable_example">
+                                <thead>
+                                    <!--begin::Table row-->
+                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                        <th class="min-w-250px">Action</th>
+                                        
+                                        <th class="min-w-100px">LR Number</th>
+                                        
+                                        <th class="min-w-75px">Date</th>
+                                        <th class="min-w-100px">From</th>
+                                        <th class="min-w-100px">To</th>
+                                        <th class="min-w-100px">Consignor</th>
+                                        <th class="min-w-100px">Consignee</th>
+                                        <th class="min-w-75px">Invoice No.</th>
+                                        <th class="min-w-75px">Actual Weight</th>
+                                        <th class="min-w-75px">Charged Weight</th>
+                                        <th class="min-w-75px">PKG</th>
+                                        <th class="min-w-75px">Billed At</th>
+                                        <th class="min-w-75px">Total Freight</th>
+                                    </tr>
+                                    <!--end::Table row-->
+                                </thead>
+                                <tbody id="lrDATA" class="fw-semibold text-gray-600">
+                                    <% if(typeof lrDATA !== "undefined") {%> 
+
+                                        <% lrDATA.forEach(data=> {%> 
+
+                                            <tr class="odd">
+                                                <td>
+
+                                                    <button onclick="viewLR('<%=data._id%>')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-eye fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                        </i>
+                                                    </button>
+                                                    
+                                                    <button <% if(data.materialStatus.delivered.qty == data.total.qty) {%>  disabled <%} else {%> onclick="editLR('<%=data._id%>')" <%} %>  class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-pencil fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button onclick="downloadLorryReciept('<%=data._id%>')" class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-arrow-down fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-printer fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                         <span class="path5"></span>
+                                                        </i>
+                                                    </button>
+                                                   
+                                                    <button <% if(data.materialStatus.delivered.qty == data.total.qty) {%>  disabled <%} else {%> onclick="deleteLR('<%=data._id%>')" <%} %>  class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                                                        <i class="ki-duotone ki-trash-square fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                        </i>
+                                                    </button>
+
+                                                </td>
+                                                <td>
+                                                    <%=data.lrNumber%>
+                                                </td>
+                                                
+                                                <td>
+                                                    <%=data.date%>
+                                                </td>
+                                                <td><%=data.from.cityName%></td>
+                                                <td><%=data.to.cityName%></td>
+                                                <td><%=data.consignorName%></td>
+                                                <td><%=data.consigneeName%></td>
+                                                <td><%=data.invoiceNumber%></td>
+                                                <td><%=data.total.actualWeight%></td>
+                                                <td><%=data.total.chargedWeight%></td>
+                                                <td><%=data.total.qty%></td>
+                                                <td><%=data.billedAt.name%></td>
+                                                <td></td>
+                                            </tr>
+
+                                        <%}) %>
+
+                                    <%} %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                  
+                </div>
+           </div>
+           <%     function getCurrentFinancialYear() {
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+          
+            // Check if the current month is April (month index 3) or later
+            // If it's April or later, return the current year and the next year as the financial year
+            // Otherwise, return the previous year and the current year as the financial year
+            const startYear = currentDate.getMonth() >= 3 ? currentYear : currentYear - 1;
+            const endYear = startYear + 1;
+          
+            // Format the financial year as "2324", "2425", etc.
+            const formattedFinancialYear = `${String(startYear).slice(-2)}${String(endYear).slice(-2)}`;
+          
+            return formattedFinancialYear;
+          }
+          %>
+    <form id="lrForm">
+           <div class="modal bg-body  fade" tabindex="-1" id="kt_modal_2" data-bs-focus="false">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content custom-modal shadow-none">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="lrFormTitle">Modal title</h5>
+        
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+        
+                    <div class="modal-body">
+                        <div class="d-flex flex-column flex-lg-row">
+                            <!--begin::Content-->
+                            <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+                               <div class="card">
+                                            <!--begin::Card body-->
+                                            <div class="card-body p-12">
+                                                <!--begin::Form-->
+                                                
+                                                    <!--begin::Wrapper-->
+                                                    <div class="d-flex flex-column align-items-start flex-xxl-row">
+                                                       
+                                                        <div class="col-lg-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-1" id="serialDiv">
+                                                                    <% if(user.godown.serialToUse === "godown") {%> 
+                                                                        <%=user.godown.serial%>
+                                                                        <%} else if(user.godown.serialToUse === "branch") {%> 
+                                                                            <%=user.branch.serial%>
+                                                                            <%} %>
+                                                                </div>
+                                                                <div class="col-lg-2" id="lrInputDiv" style="display: none;">
+                                                           
+                                                                <input tabindex="1" checkindex="1" type="number" class="form-control form-control-solid" name="lrNumber" id="lrNumberInput" value="<%=lrNumber%>">
+                                                           
+                                                                </div>
+                                                                <div style="display: none;" id="lrSelectDiv" class="col-lg-3">
+                                                                    <select disabled data-control="select2" data-placeholder="LR Number" name="lrNumberUpdate" id="lrNumber" class="form-select form-select-solid">
+                                                                        <option></option>
+                                                                </select>
+                                                                </div>
+                                                                <div class="col-lg-3 fv-row">
+                                                                    
+                                                                    <select tabindex="1" checkindex="1" name="loadType" data-dropdown-parent="#kt_modal_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Load Type" id="selectLoadType">
+                                                                        <option></option>
+                                                                        <option value="PTL">Part Load (PTL)</option>
+                                                                        <option value="FTL">Full Load (FTL)</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-lg-3 fv-row">
+                                                                      <!--begin::Datepicker-->
+                                                                      <select tabindex="2"  checkindex="2" data-dropdown-parent="#kt_modal_2" id="selectVehicle" class="form-select form-select-solid" name="vehicle"
+                                                                      data-placeholder="Select Vehicle Number" data-control="select2" disabled>
+                                                                      <option></option>
+                                                                     <%vehicleData.forEach((data)=> {%> 
+                                                                          <option value="<%=data.id%>"><%=data.number%></option>
+                                                                      <%})%>
+                                                                  </select>
+                                                                </div>
+                                                                <div class="col-lg-3">
+                                                                    <input tabindex="3"  checkindex="3" id="lr_date" class="form-control form-control-solid fw-bold pe-5 flatpickr-input" placeholder="Select date" name="lrDate" type="text">
+            
+                                                                </div>
+                                                               </div>
+                                                        </div>
+                                                       
+                                                              </div>  <!--begin::Datepicker-->
+                                                   
+                    
+                                                    <!--begin::Separator-->
+                                                    <div class="separator separator-dashed my-10"></div>
+                                                    <!--end::Separator-->
+                                                    
+                                                    <label class="form-label fs-6 fw-bold text-gray-700 mb-3">Basic Details</label>
+                                                    <div class="col-lg-12">
+                                                       
+                                                        <div class="row">
+                                                            <div class="fv-row col-lg-6">
+                                                                <select tabindex="4"  checkindex="4" data-dropdown-parent="#kt_modal_2" name="from" id="fromLocation" class="form-select form-select-solid" data-placeholder="Select From" data-control="select2">
+                                                                    <option></option>
+                                                                   
+                                                                    <% cityData.forEach((data)=> {%> 
+                                                                        <option value="<%=data.id%>"><%=data.cityName%></option>
+                                                                    <%}) %>
+                                                                </select>
+                                                            </div>
+                    
+                                                            <div class="fv-row col-lg-6">
+                                                                <select tabindex="5" checkindex="5" data-dropdown-parent="#kt_modal_2" name="to" id="toLocation" class="form-select form-select-solid" data-placeholder="Select Destination" data-control="select2">
+                                                                   
+                                                                    <option></option>
+                                                                    <% cityData.forEach((data)=> {%> 
+                                                                        <option value="<%=data.id%>"><%=data.cityName%></option>
+                                                                    <%}) %>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="separator separator-dashed my-10"></div>
+                                                    <!--begin::Wrapper-->
+                                                    <div class="mb-0">
+                                                        <!--begin::Row-->
+                                                        <div class="row gx-10 mb-5">
+                                                            <!--begin::Col-->
+                                                            <div class="col-lg-6">
+                                                                <label class="form-label fs-6 fw-bold text-gray-700 mb-3">Consignor Details</label>
+                    
+                                                                <!--begin::Input group-->
+                                                                <div class="mb-5 fv-row">
+                                                                    <select tabindex="6" checkindex="6" data-dropdown-parent="#kt_modal_2" name="consignor" id="selectConsignor" data-control="select2" class="form-select form-select-solid" data-placeholder="Select Consignor">
+                                                                     <option> </option>
+                                                                         <% clientData.forEach((data)=> {%> 
+                                                                    <option value="<%=data.id%>"><%=data.name%></option>    
+                                                                      <%}) %>
+                                                                         </select>
+
+
+                                                                </div>
+                                                                 <div class="mb-5">
+                                                                    <input tabindex="7" checkindex="7" type="text" class="form-control form-control-solid" name="consignorGST" id="consignorGST"
+                                                                        placeholder="GST Number" disabled>
+                                                                </div>
+                                                                <div class="mb-5" style="display: none;" id="bookingSourceDiv">
+                                                                    <select tabindex="8" checkindex="8" data-dropdown-parent="#kt_modal_2" name="selectBookingSource" data-control="select2" id="selectBookingSource" class="form-select form-select-solid" data-placeholder="Select Booking Source">
+                                                                        <option></option>
+                                                                            <% clientData.forEach((data)=> {%> 
+                                                                       <option value="<%=data.id%>"><%=data.name%></option>    
+                                                                         <%}) %>
+                                                                            </select>
+                                                                </div>
+                                                                <div class="mb-5 form-check form-switch form-check-custom form-check-solid">
+                                                                    <input class="form-check-input switch" type="checkbox" name="bookingSource" id="bookingSource" />
+                                                                    <label class="form-check-label" for="bookingSource">
+                                                                        Booking Source
+                                                                    </label>
+                                                                </div>
+                                                             </div>
+                                                             <div class="col-lg-6">
+                                                                <label class="form-label fs-6 fw-bold text-gray-700 mb-3">Consignee</label>
+                    
+                                                               <!--begin::Input group-->
+                                                               <div class="mb-5 fv-row">
+                                                                <select tabindex="9" checkindex="9" data-dropdown-parent="#kt_modal_2" name="consignee" data-control="select2" id="selectConsignee" class="form-select form-select-solid" data-placeholder="Select Consignee">
+                                                                 <option></option>
+                                                                     <% clientData.forEach((data)=> {%> 
+                                                                <option value="<%=data.id%>"><%=data.name%></option>    
+                                                                  <%}) %>
+                                                                     </select>
+                                                            </div>
+                    
+                                                            <div class="mb-5">
+                                                                <input tabindex="10" checkindex="10" type="text" class="form-control form-control-solid" name="consigneeGST" id="consigneeGST"
+                                                                    placeholder="GST Number" disabled>
+                                                            </div>
+                                                            <div class="mb-5" style="display: none;" id="deliverySourceDiv">
+                                                                <select tabindex="11" checkindex="11" data-dropdown-parent="#kt_modal_2" name="selectDeliverySource" data-control="select2" id="selectDeliverySource" class="form-select form-select-solid" data-placeholder="Select Delivery Source">
+                                                                    <option></option>
+                                                                        <% clientData.forEach((data)=> {%> 
+                                                                   <option value="<%=data.id%>"><%=data.name%></option>    
+                                                                     <%}) %>
+                                                                        </select>
+                                                            </div>
+                                                            <div class="mb-5 form-check form-switch form-check-custom form-check-solid">
+                                                                <input class="form-check-input switch" type="checkbox" name="deliverySource" id="deliverySource" />
+                                                                <label class="form-check-label" for="deliverySource">
+                                                                   Delivery Source
+                                                                </label>
+                                                            </div>
+                                                            
+                                                        </div>
+                    
+                                                        <div class="separator separator-dashed my-10"></div>
+                                                        <label class="form-label fs-6 fw-bold text-gray-700 mb-3">Billing Details</label>
+                                                        <div class="col-lg-12">
+                                                           
+                                                            <div class="fv-row row">
+                                                             
+                        
+                                                                <div class="fv-row col-lg-4">
+                                                                    <select tabindex="12" checkindex="12" data-dropdown-parent="#kt_modal_2" name="billedAt" id="selectBilledAt" class="form-select form-select-solid" data-placeholder="Select Billing At" data-control="select2">
+                                                                        <option></option>
+                                                                        <% branchData.forEach((data)=> {%> 
+                                                                            <option value="<%=data.id%>"><%=data.name%></option>
+                                                                        <%}) %>
+                                                                    
+                                                                    </select>
+                                                                </div>
+                    
+                                                                <div class="fv-row col-lg-4">
+                                                                    <select tabindex="13" checkindex="13" data-dropdown-parent="#kt_modal_2" name="billedTo" id="selectBilledTo" class="form-select form-select-solid" data-placeholder="Select Billing To" data-control="select2">
+                                                                        <option></option>
+                                                                        <% clientData.forEach((data)=> {%> 
+                                                                            <option value="<%=data.id%>"><%=data.name%></option>
+                                                                        <%}) %>
+                                                                    
+                                                                    </select>
+                                                                </div>
+                                                                <div class="fv-row col-lg-4">
+                                                                    <select tabindex="14" checkindex="14" data-dropdown-parent="#kt_modal_2" name="gstPaidBy" id="selectGstPaidBy" class="form-select form-select-solid" data-placeholder="GST To be Paid By" data-control="select2">
+                                                                        <option></option>
+                                                                        <option value="TPT">Third Party</option>
+                                                                        <option value="consignee">Consignee</option>
+                                                                        <option value="consignor">Consignor</option>
+                                                                        <option value="transporter">Transporter</option>
+                                                                    
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                            <!--end::Col-->
+                                                        </div>
+                                                        <!--end::Row-->
+                    
+                                                        <!--begin::Table wrapper-->
+                                                        <div class="table-responsive mb-10">
+                                                            <!--begin::Table-->
+                                                            <table class="table g-5 gs-0 mb-0 fw-bold text-gray-700"
+                                                                data-kt-element="items" id="lrContent">
+                                                                <!--begin::Table head-->
+                                                                <thead>
+                                                                    <tr class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase">
+                                                                        <th class="min-w-75px w-75px">Packages</th>
+                                                                        <th class="min-w-125px w-125px">Packaging</th>
+                                                                        <th class="min-w-125px w-125px">Content</th>
+                                                                        <th class="min-w-75px w-100px">Actual Weight</th>
+                                                                        <th class="min-w-100px w-100px">Charge Weight</th>
+                                                                        <th class="min-w-100px w-100px">Rate On</th>
+                                                                        <th class="min-w-100px w-100px">Rate</th>
+                                                                        <th class="min-w-100px w-100px">Amount</th>
+                                                                        <th class="min-w-100px w-100px"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <!--end::Table head-->
+                    
+                                                                <!--begin::Table body-->
+                                                                <tbody id="itemTableBody">
+                                                                    <tr class="border-bottom border-bottom-dashed" data-kt-element="item">
+                                                                        <td class="pe-7">
+                                                                            <input tabindex="15" checkindex="15" value="0" id="numberOfPackagesNew" oninput="validateWholeNumber(this)" type="text" class="form-control form-control-solid mb-2" placeholder="QTY">
+                    
+                                                                           
+                                                                        </td>
+                    
+                                                                        <td class="ps-0">
+                                                                            <select tabindex="16" checkindex="16" data-dropdown-parent="#kt_modal_2" id="selectPackagingNew" class="form-select form-select-solid"data-placeholder="Packaging" data-control="select2">
+                                                                                <option></option>
+                                                                                <% mopData.forEach((data)=> {%> 
+                                                                                    <option value="<%=data.id%>"><%=data.methodOfPackaging%></option>
+                                                                                <%}) %>
+                                                                            
+                                                                            </select>
+                                                                        </td>
+                    
+                                                                        <td class="ps-0">
+                                                                            <select tabindex="17" checkindex="17" data-dropdown-parent="#kt_modal_2" id="selectGoodsDescriptionNew" class="form-select form-select-solid" data-placeholder="Goods Type" data-control="select2">
+                                                                                <option></option>
+                                                                                <% goodsDescriptionData.forEach((data)=> {%> 
+                                                                                    <option value="<%=data.id%>"><%=data.goodsDescription%></option>
+                                                                                <%}) %>
+                                                                            
+                                                                            </select>
+                                                                        </td>
+                    
+                                                                        <td class="ps-0">
+                                                                            <input tabindex="18" checkindex="18" value="0" id="actualWeightNew" oninput="validateNumberWithDecimals(this)" class="form-control form-control-solid" type="text"  placeholder="Actual Weight">
+                                                                        </td>
+                                                                        <td class="ps-0">
+                                                                            <input tabindex="19" checkindex="19" value="0" id="chargedWeightNew" oninput="validateNumberWithDecimals(this)" class="form-control form-control-solid" type="text"  placeholder="Charged Weight">
+                                                                        </td>
+                                                                        <td>
+                                                                            <select tabindex="20" checkindex="20" disabled data-dropdown-parent="#kt_modal_2" id="rateONNew" class="form-select form-select-solid" data-placeholder="Rate On" data-control="select2">
+                                                                                <option></option>
+                                                                              
+                                                                                
+                                                                             
+                                                                            
+                                                                            </select>
+                                                                        </td>
+                                                                        <td class="pt-5">
+                                                                            <input tabindex="21" checkindex="21" value="0" id="rateNew" disabled oninput="validateNumberWithDecimals(this)" class="form-control form-control-solid" type="text"  placeholder="Rate">
+                                                                        </td>
+                                                                        <td class="pt-5">
+                                                                             <input tabindex="22" checkindex="22" disabled id="amountNew" class="form-control form-control-solid" type="text" disabled placeholder="Amount">
+                                                                            </td>
+                                                                       
+                                                                         
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="separator separator-dashed my-10"></div>
+                                                        <div class="col-lg-12">
+                                                            <div class="row">
+                                                                <div class="table-responsive mb-10">
+                                                                    <!--begin::Table-->
+                                                                    <table id="eway-table" class="table g-5 gs-0 mb-0 fw-bold text-gray-700" data-kt-element="items" id="lrContent">
+                                                                        <!--begin::Table head-->
+                                                                        <thead>
+                                                                            <tr class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase">
+                                                                                <th class="min-w-200px w-150px">Invoice Number</th>
+                                                                                <th class="min-w-200px w-150px">Invoice Amount</th>
+                                                                                <th class="min-w-200px w-150px">E-Way Bill Expiry</th>
+                                                                                <th class="min-w-200px w-150px">E-Way Bill Number</th>
+                                                                                
+                                                                                <th class="min-w-100px w-100px text-end"></th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <!--end::Table head-->
+                                                        
+                                                                        <!--begin::Table body-->
+                                                                        <tbody id="ewayBillTable">
+                                                                            <tr class="border-bottom border-bottom-dashed" data-kt-element="item">
+                                                                                <td class="col-lg-4 ps-0">
+                                                                                    <input tabindex="23" checkindex="23" id="invoiceNumber" oninput="validateWholeNumber(this)" type="text" class="form-control form-control-solid mb-2" placeholder="Invoice Number">
+                                                                                </td>
+                                                                                <td class="col-lg-4 ps-0">
+                                                                                    <input tabindex="24" checkindex="24" id="invoiceValue" oninput="validateNumberWithDecimals(this)" class="form-control form-control-solid" type="text" placeholder="Invoice Value">
+                                                                                </td>
+                                                                               
+                                                                                <td class="col-lg-4 ps-0">
+                                                                                    <input tabindex="25"checkindex="25" class="form-control form-control-solid" placeholder="Set Eway Bill Expiry" id="expiry"/>
+                                                                                </td>
+                                                                                <td class="col-lg-4 ps-0">
+                                                                                    <input tabindex="26" checkindex="26" id="ewayBillNumber" oninput="validateWholeNumber(this)" class="form-control form-control-solid" type="text" placeholder="E-Way Bill Number">
+                                                                                </td>
+                                                                             
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                    
+                                                        <div class="separator separator-dashed my-10"></div>
+                                                        <div class="col-lg-12">
+                                                            
+                                                            <div class="row">
+                                                            
+                                                                <div class="col-lg-6">
+                                                                    <label for="deliveryBY" class="required form-label fs-6 fw-bold text-gray-700 mb-3">Delivery By</label>
+                                                                    <select tabindex="27" checkindex="27" data-dropdown-parent="#kt_modal_2" id="deliveryBy" name="deliveryBy" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Selivery By">
+                                                                        <option></option>
+                                                                        <option value="DOOR">Door</option>
+                                                                        <option value="GODOWN">Godown</option>
+                                                                        <option value="DAP">Delivery Against Paymnet</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label class="form-label fs-6 fw-bold text-gray-700 mb-3">Delivery Address</label>
+                                                                    <input tabindex="28" checkindex="28" class="form-control form-control-solid" type="name" name="deliveryAddress" id="deliveryAddress" placeholder="Delivery Address">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="separator separator-dashed my-10"></div>
+
+                                                        <div class="col-lg-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-2">
+                                                                    <div class="form-check form-switch form-check-custom form-check-solid">
+                                                                        <input class="form-check-input switch" type="checkbox" id="eway" checked="checked" />
+                                                                        <label class="form-check-label" for="flexSwitchChecked">
+                                                                            Eway Bill Required?
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-2">
+                                                                    <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                                                        <input class="form-check-input switch" name="materialHold" type="checkbox" id="materialHold"/>
+                                                                        <label class="form-check-label" for="materialHold">
+                                                                            Material Hold
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="holdAtDiv" style="display: none;" class="col-lg-2">
+                                                                    <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                                                        <input disabled class="form-check-input switch" name="holdAt" type="checkbox"  id="holdAt"/>
+                                                                        <label id="holdAtLabel" class="form-check-label" for="holdAt">
+                                                                            At Booking Godown
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-2">
+                                                                    <div class="form-check form-switch form-check-custom form-check-solid">
+                                                                        <input class="form-check-input switch" name="pod" type="checkbox" id="pod" checked="checked" />
+                                                                        <label class="form-check-label" for="pod">
+                                                                            POD Required?
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-lg-2">
+                                                                    <div class="form-check form-switch form-check-custom form-check-solid">
+                                                                        <input class="form-check-input switch" name="risk" type="checkbox" id="risk"  />
+                                                                        <label class="form-check-label" for="risk">
+                                                                            Career Risk?
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        <!--end::Table-->
+                    
+                                                    </div>
+                                                    <!--end::Wrapper-->
+                                                
+                                                <!--end::Form-->
+                                            </div>
+                                            <!--end::Card body-->
+                                        </div>      
+                            </div>  
+                            <!--end::Content-->
+                        
+                            <!--begin::Sidebar-->
+                            <div class="flex-lg-auto min-w-lg-300px" style="width: 400px;">
+                                <!--begin::Card-->
+                        <div class="card" data-kt-sticky="true" data-kt-sticky-name="invoice" data-kt-sticky-offset="{default: false, lg: '200px'}" data-kt-sticky-width="{lg: '250px', lg: '300px'}" data-kt-sticky-left="auto" data-kt-sticky-top="150px" data-kt-sticky-animation="false" data-kt-sticky-zindex="95">
+                        
+                            <!--begin::Card body-->
+                            <div class="card-body p-10" >  
+                                <!--begin::Input group-->
+                                <div class="mb-10">
+                                    <div>
+                                        <label for="basicFreight" class="form-label" style="display: inline-block; width: 150px;">Basic Freight</label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="basicFreight" id="basicFreight" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Basic Freight">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="collectionCharges" class="form-label" style="display: inline-block; width: 150px;">Collection </label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="collectionCharges" id="collectionCharges" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Collection Charges">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="deliveryCharges" class="form-label" style="display: inline-block; width: 150px;">Delivery </label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="deliveryCharges" id="deliveryCharges" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Delivery Charges">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="labourCharges" class="form-label" style="display: inline-block; width: 150px;">Labour </label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="labourCharges" id="labourCharges" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Labour Charges">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="rebookingCharges" class="form-label" style="display: inline-block; width: 150px;">Rebooking </label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="rebookingCharges" id="rebookingCharges" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Rebooking Charges">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="loadingDetention" class="form-label" style="display: inline-block; width: 150px;">Loading Detention</label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="loadingDetention" id="loadingDetention" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Loading Detention">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="unloadingDetention" class="form-label" style="display: inline-block; width: 150px;">Unloading Detention</label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="unloadingDetention" id="unloadingDetention" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Unloading Detention">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="demmurage" class="form-label" style="display: inline-block; width: 150px;">Demmurage</label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="demmurages" id="demmurage" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Demurage">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="unloadingCharges" class="form-label" style="display: inline-block; width: 150px;">Unloading </label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="unloadingCharges" id="unloadingCharges" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Unloading Charges">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="exWeight" class="form-label" style="display: inline-block; width: 150px;">Ex Weight</label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="exWeight" id="exWeight" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Ex Weight">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="exHeight" class="form-label" style="display: inline-block; width: 150px;">Ex Height</label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="exHeight" id="exHeight" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Ex Height">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="stCharges" class="form-label" style="display: inline-block; width: 150px;">ST. </label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="stCharges" id="stCharges" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="ST. Charges">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="others" class="form-label" style="display: inline-block; width: 150px;">Others</label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="others" id="others" class="sub-total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Others">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="subTotal" class="form-label" style="display: inline-block; width: 150px;">Sub Total</label>
+                                        <input value="0" oninput="validateNumberWithDecimals(this)" type="text" name="subTotal" id="subTotal" class="total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Sub Total">
+                                    </div>
+                                </div>
+                                <!--end::Input group-->
+                        
+                                <!--begin::Separator-->
+                                <div class="separator separator-dashed mb-8"></div>
+                                <!--end::Separator--> 
+                        
+                                <div>
+                                    <label for="SGST" class="form-label" style="display: inline-block; width: 150px;">SGST</label>
+                                    <input disabled value="0" oninput="validateNumberWithDecimals(this)" type="text" name="SGST" id="SGST" class="form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="ST. Charges">
+                                </div>
+                        
+                                <div>
+                                    <label for="CGST" class="form-label" style="display: inline-block; width: 150px;">CGST</label>
+                                    <input disabled value="0" oninput="validateNumberWithDecimals(this)" type="text" name="CGST" id="CGST" class="form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Others">
+                                </div>
+                                
+                                <div>
+                                    <label for="IGST" class="form-label" style="display: inline-block; width: 150px;">IGST</label>
+                                    <input disabled value="0" oninput="validateNumberWithDecimals(this)" type="text" name="IGST" id="IGST" class="form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Sub Total">
+                                </div>
+                                <div class="separator separator-dashed mb-8"></div>
+                                <!--end::Separator-->
+                                    
+                                
+                                <div>
+                                    <label for="gstSubTotal" class="form-label" style="display: inline-block; width: 150px;">GST Sub Total</label>
+                                    <input disabled value="0" oninput="validateNumberWithDecimals(this)" type="text" name="gstSubTotal" id="gstSubTotal" class="total form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Others">
+                                </div>
+                                
+                                <div style="margin-top: 10px; margin-bottom: 10px;">
+                                    <label for="total" class="form-label" style="display: inline-block; width: 150px;">Total</label>
+                                    <input disabled value="0" oninput="validateNumberWithDecimals(this)" type="text" name="total" id="total" class="form-control form-control-solid" style="display: inline-block; width: calc(100% - 160px);" placeholder="Sub Total">
+                                </div>
+                                
+                    
+                    
+                            </div>
+                            <!--end::Card body-->
+                        </div>     
+                        <!--end::Card-->         
+                            </div>  
+                            <!--end::Sidebar-->
+                        </div>
+                    </div>
+        
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="modalCloseBTN">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary" id="lrSubmit">
+                            <span class="indicator-label">
+                                Create New LR
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-primary" id="lrUPDATE">
+                            <span class="indicator-label">
+                                Update LR
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </div>
+
+
+        <form id="lrAssignForm">
+            <div class="modal fade" id="lrAssignModal" tabindex="-1" aria-hidden="true">
+                <!--begin::Modal dialog-->
+                <div class="modal-dialog modal-dialog-centered mw-650px">
+                    <!--begin::Modal content-->
+                    <div class="modal-content">
+                        <!--begin::Modal header-->
+                        <div class="modal-header">
+                            <!--begin::Modal title-->
+                            <h2 class="fw-bold">Assign New Lorry Reciept</h2>
+                            <!--end::Modal title-->
+                            <!--begin::Close-->
+                            <div class="btn btn-icon btn-sm btn-active-icon-primary"
+                                data-kt-permissions-modal-action="close">
+                                <i class="ki-duotone ki-cross fs-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </div>
+                            <!--end::Close-->
+                        </div>
+                        <!--end::Modal header-->
+                        <!--begin::Modal body-->
+                        <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                            <!--begin::Form-->
+                            <form id="newZone" class="form fv-plugins-bootstrap5 fv-plugins-framework">
+                                <div class="fv-row mb-7">
+                                    <label class="fs-6 fw-semibold form-label mb-2">
+                                        <span class="required">Consignor Name</span>
+                                    </label>
+                                    <select name="consignorName" id="assignConsignor" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Consignor Name" data-dropdown-parent="#lrAssignModal">
+                                        <option></option>
+                                        <% clientData.forEach(data=> {%> 
+
+                                            <option value="<%=data.id%>"><%=data.name%></option>
+                                            
+                                        <%}) %>
+                                    </select>
+                                </div>
+
+                                <div class="fv-row mb-7">
+                                    <label class="fs-6 fw-semibold form-label mb-2">
+                                        <span class="required">Consignee Name</span>
+                                    </label>
+                                    <select name="consigneeName" id="assignConsignee" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Consignee Name" data-dropdown-parent="#lrAssignModal">
+                                        <option></option>
+                                        <% clientData.forEach(data=> {%> 
+
+                                            <option value="<%=data.id%>"><%=data.name%></option>
+                                            
+                                        <%}) %>
+                                    </select>
+                                </div>
+
+                                <div class="fv-row mb-7">
+                                    <label class="fs-6 fw-semibold form-label mb-2">
+                                        <span class="required">From</span>
+                                    </label>
+                                    <select  name="from" id="assignFrom" class="form-select form-select-solid" data-control="select2" data-placeholder="Select From" data-dropdown-parent="#lrAssignModal">
+                                        <option></option>
+                                        <% cityData.forEach(data=> {%> 
+
+                                            <option value="<%=data.id%>"><%=data.cityName%></option>
+                                            
+                                        <%}) %>
+                                    </select>
+                                </div>
+
+                                <div class="fv-row mb-7">
+                                    <label class="fs-6 fw-semibold form-label mb-2">
+                                        <span class="required">To</span>
+                                    </label>
+                                    <select name="to" id="assignTo" class="form-select form-select-solid" data-control="select2" data-placeholder="Select To" data-dropdown-parent="#lrAssignModal">
+                                        <option></option>
+                                        <% cityData.forEach(data=> {%> 
+
+                                            <option value="<%=data.id%>"><%=data.cityName%></option>
+                                            
+                                        <%}) %>
+                                    </select>
+                                </div>
+
+
+                                <div class="text-center pt-15">
+                                    <button type="reset" class="btn btn-light me-3"
+                                        data-kt-permissions-modal-action="cancel">Discard</button>
+                                    <button type="submit" class="btn btn-primary"
+                                        data-kt-permissions-modal-action="submit">
+                                        <span class="indicator-label">Submit</span>
+                                        <span class="indicator-progress">Please wait...
+                                            <span
+                                                class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                                    </button>
+                                </div>
+                                <!--end::Actions-->
+                            </form>
+                            <!--end::Form-->
+                        </div>
+                        <!--end::Modal body-->
+                    </div>
+                    <!--end::Modal content-->
+                </div>
+                <!--end::Modal dialog-->
+            </div>
+        </form>
+            <%- include("../../includes/footer", {pageName : "lrOK" }) %>

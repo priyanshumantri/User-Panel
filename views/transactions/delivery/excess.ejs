@@ -1,0 +1,271 @@
+<%- include("../../includes/header", {pageName : "excess" }) %>
+    <%- include("../../includes/sidebar", {pageName : "excess" }) %>
+        <%- include("../../includes/toolbar", {pageName : "Excess" , pageHead : "Transactions" }) %>
+
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                    <div class="card card-flush">
+                        <!--begin::Card header-->
+                        <div class="card-header mt-6">
+                            <!--begin::Card title-->
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1 me-5">
+                                    <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-5">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <input type="text" data-kt-permissions-table-filter="search"
+                                        class="form-control form-control-solid w-250px ps-13" placeholder="Search Excess">
+                                </div>
+                                <!--end::Search-->
+                            </div>
+                            <!--end::Card title-->
+                            <!--begin::Card toolbar-->
+                            <div class="card-toolbar">
+                                <!--begin::Button-->
+                                <button type="button" class="btn btn-light-primary" data-bs-toggle="modal"
+                                    data-bs-target="#kt_modal_update_permission">
+                                    <i class="ki-duotone ki-plus-square fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>Add New Excess</button>
+                                <!--end::Button-->
+                            </div>
+                            <!--end::Card toolbar-->
+                        </div>
+                        <!--end::Card header-->
+                        <!--begin::Card body-->
+                        <div class="card-body pt-0">
+                            <!--begin::Table-->
+                            <div id="kt_permissions_table_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                <div class="table-responsive">
+                                    <div id="kt_permissions_table_wrapper"
+                                        class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                        <div class="table-responsive">
+                                            <table
+                                                class="table align-middle table-row-dashed fs-6 gy-5 mb-0 dataTable no-footer"
+                                                id="kt_permissions_table">
+                                                <thead>
+                                                    <tr
+                                                        class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                                        <th class="min-w-125px sorting" style="width: 348.141px;">Lorry Arrival Number</th>
+
+                                                        <th class="sorting_disabled" style="width: 232.906px;">Challan Number</th>
+
+                                                        <th class="min-w-125px sorting" style="width: 320.312px;">Lorry Reciept Number</th>
+                                                        <th class="min-w-125px sorting" style="width: 320.312px;">Qty</th>
+                                                        <th class="min-w-125px sorting" style="width: 320.312px;">Actual Weight</th>
+                                                        <th class="min-w-125px sorting" style="width: 320.312px;">Charged Weight</th>
+                                                        <th class="text-end min-w-100px sorting_disabled" style="width: 259.141px;"> Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="fw-semibold text-gray-600">
+                                                  <% data.forEach(info=> {%> 
+
+                                                    <tr data-rowid="" class="odd">
+                                                        <td><%=info.lorryArrival.number%></td>
+                                                        <td><%=info.challan.number%></td>
+                                                        <td> <%= info.lr.lrNumber %> </td>
+                                                        <td><%=info.qty%></td>
+                                                        <td><%=info.chargedWeight%></td>
+                                                        <td><%=info.actualWeight%></td>
+                                                        <td class="text-end">
+
+                                                         <% if(info.action === "complete") {%> 
+                                                            <% if(info.reportedAt == user.godown.id) {%> 
+                                                                <button onclick="actionExcess('<%=info.id%>', '<%=info.qty%>', '<%=info.actualWeight%>', '<%=info.chargedWeight%>')" class="btn btn-icon btn-primary btn-active-light-primary w-30px h-30px me-3">
+                                                                    <i class="ki-duotone ki-double-check-circle fs-3">
+                                                                        <span class="path1"></span>
+                                                                        <span class="path2"></span>
+                                                                        <span class="path3"></span>
+                                                                        <span class="path4"></span>
+                                                                        <span class="path5"></span>
+                                                                    </i>
+                                                                </button>
+                                                                <%} %>
+                                                            <%} else {%> 
+                                                                <span class="badge badge-success">Completed</span>
+                                                                <%} %>
+
+                                                            <% if(info.reportedBy == user.godown.id) {%> 
+                                                                <button onclick="deleteExcess('<%=info.id%>')" class="btn btn-icon btn-danger btn-active-light-danger w-30px h-30px me-3">
+                                                                    <i class="ki-duotone ki-trash fs-3">
+                                                                        <span class="path1"></span>
+                                                                        <span class="path2"></span>
+                                                                        <span class="path3"></span>
+                                                                        <span class="path4"></span>
+                                                                        <span class="path5"></span>
+                                                                    </i>
+                                                                </button>
+                                                                <%} %>
+                                                        </td>
+                                                    </tr>
+                                                    <%}) %>
+
+
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!--end::Table-->
+                            </div>
+                            <!--end::Card body-->
+                        </div>
+                    </div>
+                    <!--end::Content-->
+                </div>
+                <div class="modal fade" id="kt_modal_update_permission" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="fw-bold">Add New Excess</h2>
+                                <div class="btn btn-icon btn-sm btn-active-icon-primary"
+                                    data-kt-permissions-modal-action="close">
+                                    <i class="ki-duotone ki-cross fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </div>
+                            </div>
+                            <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                        
+                                <form id="kt_modal_update_permission_form" class="form" action="#">
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Lorry Arrival Number
+                                        </label>
+                                        <select name="lorryArrival" id="lorryArrival" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Lorry Arrival Number" data-dropdown-parent="#kt_modal_update_permission">
+                                           <option></option>
+                                           <% laData.forEach(data=> {%> 
+                                            <option value="<%=data.id%>"><%=data.number%></option>
+                                            <%}) %>
+                                        </select>
+                                    </div>
+
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Challan Number
+                                        </label>
+                                        <input placeholder="Challan Number" type="text" class="form-control form-control-solid" name="challanNumber" id="challanNumber" disabled>
+                                    </div>
+
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Lorry Reciept Number
+                                        </label>
+                                        <select disabled name="lr" id="lr" class="form-select form-select-solid" data-control="select2" data-placeholder="Select LR Number" data-dropdown-parent="#kt_modal_update_permission">
+                                           <option></option>
+                                        </select>
+                                    </div>
+
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Qty
+                                        </label>
+                                        <input type="hidden" id="maxQty">
+                                        <input value="0" disabled name="qty" id="qty" type="text" class="form-control form-control-solid" placeholder="Enter Excess Qty Recieved">
+                                    </div>
+
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Actual Weight
+                                        </label>
+                                        <input type="hidden" id="maxActualWeight">
+                                        <input value="0" disabled name="actualWeight" id="actualWeight" type="text" class="form-control form-control-solid" placeholder="Enter Excess Actual Weight Recieved">
+                                    </div>
+
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Charged Weight
+                                        </label>
+                                        <input type="hidden" id="maxChargedWeight">
+                                        <input value="0" disabled name="chargedWeight" id="chargedWeight" type="text" class="form-control form-control-solid" placeholder="Enter Excess Charged Weight Recieved">
+                                    </div>
+
+                                    <div class="text-center pt-15">
+                                        <button type="reset" class="btn btn-danger me-3"
+                                            data-kt-permissions-modal-action="cancel" id="closeBTN">Discard</button>
+
+                                        <button type="button" class="btn btn-primary" id="newExcess" onclick="addNewExcess()">
+                                            <span class="indicator-label">
+                                                Add New Excess
+                                            </span>
+                                            <span class="indicator-progress">
+                                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="excessAction" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="fw-bold">Excess Action</h2>
+                                <div class="btn btn-icon btn-sm btn-active-icon-primary"
+                                    data-kt-permissions-modal-action="close">
+                                    <i class="ki-duotone ki-cross fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </div>
+                            </div>
+                            <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                        
+                                <form id="kt_modal_update_permission_form" class="form" action="#">
+                                    <input type="hidden" name="excessID" id="excessID">
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Qty
+                                        </label>
+                                        <input type="hidden" id="excessMaxQty">
+                                        <input value="0" name="qty" id="excessQty" type="text" class="form-control form-control-solid" placeholder="Enter Excess Qty Recieved">
+                                    </div>
+
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Actual Weight
+                                        </label>
+                                        <input type="hidden" id="excessMaxActualWeight">
+                                        <input disabled value="0" name="actualWeight" id="excessActualWeight" type="text" class="form-control form-control-solid" placeholder="Enter Excess Actual Weight Recieved">
+                                    </div>
+
+                                    <div class="fv-row mb-7">
+                                        <label class="fs-6 fw-semibold form-label mb-2">
+                                           Charged Weight
+                                        </label>
+                                        <input type="hidden" id="excessMaxChargedWeight">
+                                        <input value="0" name="chargedWeight" id="excessChargedWeight" type="text" class="form-control form-control-solid" placeholder="Enter Excess Charged Weight Recieved">
+                                    </div>
+
+                                    <div class="text-center pt-15">
+                                        <button type="reset" class="btn btn-danger me-3"
+                                            data-kt-permissions-modal-action="cancel" id="excessCloseBTN">Discard</button>
+
+                                        <button type="button" class="btn btn-primary" id="actionSubmitBTN" onclick="actionOnExcess()">
+                                            <span class="indicator-label">
+                                                Add New Excess
+                                            </span>
+                                            <span class="indicator-progress">
+                                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%- include("../../includes/footer", {pageName : "excess" }) %>

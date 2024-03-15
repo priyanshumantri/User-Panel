@@ -1,0 +1,278 @@
+<%- include("../../includes/header", {pageName : "balanceSheet" }) %>
+    <%- include("../../includes/sidebar", {pageName : "balanceSheet" }) %>
+
+
+        <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+            <div id="kt_app_content_container" class="app-container  container-xxl ">
+
+                <div style="padding: 30px;" class="card card-p-0 card-flush">
+                    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                        <div class="card-title">
+                            <!--begin::Search-->
+                            <div class="d-flex align-items-center position-relative my-1">
+                                <span class="svg-icon fs-1 position-absolute ms-4">
+                                    <i class="ki-duotone ki-magnifier fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <input type="text" data-kt-filter="search"
+                                    class="form-control form-control-solid w-250px ps-14"
+                                    placeholder="Search Entry" />
+                            </div>
+                            <!--end::Search-->
+                            <!--begin::Export buttons-->
+                            <div id="kt_datatable_example_1_export" class="d-none"></div>
+                            <!--end::Export buttons-->
+                        </div>
+                        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                            <!--begin::Export dropdown-->
+                            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
+                                data-kt-menu-placement="bottom-end">
+                                <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
+                                        class="path2"></span></i>
+                                Export Report
+                            </button>
+                            <!--begin::Menu-->
+                            <div id="kt_datatable_example_export_menu"
+                                class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                                data-kt-menu="true">
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                        Copy to clipboard
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#excel" class="menu-link px-3" data-kt-export="excel">
+                                        Export as Excel
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                        Export as CSV
+                                    </a>
+                                </div>
+                                <div class="menu-item px-3">
+                                    <a id="pdf" class="menu-link px-3">
+                                        Export as PDF
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+
+                                <!--end::Menu item-->
+                            </div>
+                            <!--end::Menu-->
+                            <!--end::Export dropdown-->
+
+                            <!--begin::Hide default export buttons-->
+                            <div id="kt_datatable_example_buttons" class="d-none"></div>
+                            <!--end::Hide default export buttons-->
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <style>
+                           [data-bs-theme = "dark"] .table-bordered {
+                                border: 1px solid wheat;
+                            }
+                            [data-bs-theme = "dark"] .border-right {
+                                border-right: 3px solid wheat;
+                            }
+                            [data-bs-theme = "dark"] .sum {
+                                border-top: 2px solid #dfecf1;
+                                border-bottom: 2px solid #dfecf1;
+                            }
+                            [data-bs-theme = "light"] .table-bordered {
+                                border: 1px solid #353839;
+                            }
+                            [data-bs-theme = "light"] .table-bordered, [data-bs-theme = "light"] tr{
+                                border: 1px solid #353839
+                            }
+                            [data-bs-theme = "light"] .table-bordered tbody tr td {
+                               color: black;
+                               font-weight: 600;
+                            }
+                            [data-bs-theme = "light"] .sum {
+                                border-top: 3px solid #475c6c;
+                                border-bottom: 3px solid #475c6c;
+                            }
+                            [data-bs-theme = "light"] .bold {
+                                color: black !important;
+                                font-weight: 900 !important;
+                            }
+                            .table-bordered {
+                                border-radius: 10px;
+                            }
+                        </style>
+                        <div class="container">
+                            <div id="pAndL" class="row">
+                                <div class="col-md-6"  style="padding-right: 0 !important; padding-left: 0 !important;">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 80%" class="bold">Liabilities</th>
+                                                <th style="width: 20%;" class="border-right bold" >Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="lhs">
+                                           <% if(constructedBalanceSheet.totalCapitalAccount < 0) {%> 
+                                            <tr class="upper">
+                                                <td>Capital Account</td>
+                                                <td class="border-right"><%= Math.abs(constructedBalanceSheet.totalCapitalAccount).toFixed(2) %></td>
+                                            </tr>
+                                            <%} %>
+                                            <% if(constructedBalanceSheet.totalLoansAndLiabilities < 0) {%> 
+                                            <tr class="upper">
+                                                <td>Loans and Liabilities</td>
+                                                <td class="border-right"><%= Math.abs(constructedBalanceSheet.totalLoansAndLiabilities).toFixed(2) %></td>
+                                            </tr>    
+                                            <%} %>
+                                            
+                                            <% if(constructedBalanceSheet.totalCurrentLiability < 0) {%> 
+                                                <tr class="upper">
+                                                    <td>Current Liabilities</td>
+                                                    <td class="border-right"><%= Math.abs(constructedBalanceSheet.totalCurrentLiability).toFixed(2) %></td>
+                                                </tr>    
+                                            <%} %>
+                                            <% if(constructedBalanceSheet.totalFixedAssets < 0) {%> 
+                                            <tr class="upper">
+                                                <td>Fixed Assets</td>
+                                                <td class="border-right"><%= constructedBalanceSheet.totalFixedAssets.toFixed(2) %></td>
+                                            </tr>    
+                                            <%} %>
+                                            <% if(constructedBalanceSheet.totalCurrentAssets < 0) {%> 
+                                            <tr class="upper">
+                                                <td>Current Assets</td>
+                                                <td class="border-right"><%= constructedBalanceSheet.totalCurrentAssets.toFixed(2) %></td>
+                                            </tr>    
+                                            <%} %>
+                                            <% if(constructedBalanceSheet.totalInvestments < 0) {%> 
+                                                <tr class="upper">
+                                                    <td>Investments</td>
+                                                    <td class="border-right"><%= constructedBalanceSheet.totalInvestments.toFixed(2) %></td>
+                                                </tr>    
+                                            <%} %>
+                                            <% if(constructedBalanceSheet.netProfit > 0) {%> 
+                                                <tr>
+                                                    <td>Net Profit</td>
+                                                    <td class="border-right"><%= constructedBalanceSheet.netProfit.toFixed(2) %></td>
+                                                </tr>
+                                                <%} else {%> 
+                                                    <tr>
+                                                        <td><span style="visibility: hidden;">0</span></td>
+                                                        <td class="border-right"></td>
+                                                    </tr>    
+                                                    <%} %>
+                                                
+                                                <tr>
+                                                    <td>Total</td>
+                                                    <td class="border-right sum"><%= constructedBalanceSheet.total.toFixed(2) %></td>
+                                                </tr>   
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 0 !important; padding-left: 0 !important;">
+                                    <table class="table table-bordered" >
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 80%" class="bold">Assets</th>
+                                                <th style="width: 20%" class="bold">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="rhs">
+                                            <% if(constructedBalanceSheet.totalFixedAssets > 0) {%> 
+                                                <tr class="upper">
+                                                    <td>Fixed Assets</td>
+                                                    <td><%= constructedBalanceSheet.totalFixedAssets.toFixed(2) %></td>
+                                                </tr>    
+                                                <%} %>
+                                                <% if(constructedBalanceSheet.totalCurrentAssets > 0) {%> 
+                                                <tr class="upper">
+                                                    <td>Current Assets</td>
+                                                    <td><%= constructedBalanceSheet.totalCurrentAssets.toFixed(2) %></td>
+                                                </tr>    
+                                                <%} %>
+                                                <% if(constructedBalanceSheet.totalInvestments > 0) {%> 
+                                                    <tr class="upper">
+                                                        <td>Investments</td>
+                                                        <td><%= constructedBalanceSheet.totalInvestments.toFixed(2) %></td>
+                                                    </tr>    
+                                                <%} %>
+                                                <% if(constructedBalanceSheet.totalCapitalAccount > 0) {%> 
+                                                    <tr class="upper">
+                                                        <td>Capital Account</td>
+                                                        <td><%= Math.abs(constructedBalanceSheet.totalCapitalAccount).toFixed(2) %></td>
+                                                    </tr>
+                                                    <%} %>
+                                                    <% if(constructedBalanceSheet.totalLoansAndLiabilities > 0) {%> 
+                                                    <tr class="upper">
+                                                        <td>Loans and Liabilities</td>
+                                                        <td><%= Math.abs(constructedBalanceSheet.totalLoansAndLiabilities).toFixed(2) %></td>
+                                                    </tr>    
+                                                    <%} %>
+                                                    
+                                                    <% if(constructedBalanceSheet.totalCurrentLiability > 0) {%> 
+                                                        <tr class="upper">
+                                                            <td>Current Liabilities</td>
+                                                            <td><%= Math.abs(constructedBalanceSheet.totalCurrentLiability).toFixed(2) %></td>
+                                                        </tr>    
+                                                    <%}  %>
+
+
+                                                    <% if(constructedBalanceSheet.netLoss > 0) {%> 
+                                                        <tr>
+                                                            <td>Net Loss</td>
+                                                            <td><%= constructedBalanceSheet.netLoss.toFixed(2) %></td>
+                                                        </tr>    
+                                                    <%} else {%> 
+                                                    <tr>
+                                                        <td><span style="visibility: hidden;">0</span></td>
+                                                        <td></td>
+                                                    </tr>    
+                                                    <%} %>
+
+                                                    
+                                           
+                                                        <tr>
+                                                            <td>Total</td>
+                                                            <td class="sum"><%= constructedBalanceSheet.total.toFixed(2) %></td>
+                                                        </tr>   
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <script>
+         window.onload = function() {
+    const emptyRowLeft = "<tr class='upper'><td><span style='visibility: hidden;'>0</span></td><td class='border-right'></td></tr>";
+    const emptyRowRight = "<tr class='upper'><td><span style='visibility: hidden;'>0</span></td><td></td></tr>";
+    const rhs = $("#rhs .upper").length;
+    const lhs = $("#lhs .upper").length;
+    
+    if (rhs > lhs) {
+        for (let i = 0; i < rhs - lhs; i++) {
+            $("#lhs .upper:last").after(emptyRowLeft);
+        }
+    } else if (lhs > rhs) {
+        for (let i = 0; i < lhs - rhs; i++) {
+            $("#rhs .upper:last").after(emptyRowRight);
+        }
+    }
+};
+
+        </script>
+        <%- include("../../includes/footer", {pageName : "balanceSheet" }) %>

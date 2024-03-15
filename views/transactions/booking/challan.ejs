@@ -1,0 +1,525 @@
+<%- include("../../includes/header", {pageName : "challan" }) %>
+    <%- include("../../includes/sidebar", {pageName : "challan" }) %>
+
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_content_container" class="app-container  container-xxl ">
+          
+   
+            <div style="padding: 30px;" class="card card-p-0 card-flush">
+              
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Branch</label>
+                            <% if (user.role.roleType === "ADMIN") { %>
+                            <select name="branch" id="branch" form="findLRForm" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Branch">
+                                <option></option>
+                                <% branchData.forEach(data => { %>
+                                <option <% if (typeof currentBranch !== "undefined" && data.id === currentBranch) { %> selected <% } %> value="<%=data.id%>"><%=data.name%></option>
+                                <% }) %>
+                            </select>
+                            <% } else { %>
+                            <input disabled type="text" id="branch" form="findLRForm" name="branch" class="form-control form-control-solid" value="<%=user.branch.name%>">
+                            <% } %>
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Date Range</label>
+                            <input class="form-control form-control-solid" name="dateRange" form="findLRForm" placeholder="Pick date range" id="searchRange" />
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <button style="margin-top: 20px;" type="button" onclick="findLR()" class="btn btn-sm btn-primary">Find</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+         
+       
+        </div>
+    </div>
+
+
+    <form id="findLRForm"></form>
+ 
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+             
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                 
+                    <div style="padding: 30px;" class="card card-p-0 card-flush">
+                        <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1">
+                                    <span class="svg-icon fs-1 position-absolute ms-4">
+                                        <i class="ki-duotone ki-magnifier fs-3">
+                                         <span class="path1"></span>
+                                         <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="Search Challan" />
+                                </div>
+                                <!--end::Search-->
+                                <!--begin::Export buttons-->
+                                <div id="kt_datatable_example_1_export" class="d-none"></div>
+                                <!--end::Export buttons-->
+                            </div>
+                            <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                                <button onclick="addChallan()" type="button" class="btn btn-primary btn-active-light-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_2">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Add New Challan
+                                </button>
+                                <!--begin::Export dropdown-->
+                                <button type="button" class="btn btn-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Export Report
+                                </button>
+                                <!--begin::Menu-->
+                                <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                        Copy to clipboard
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                        Export as Excel
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                        Export as CSV
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                  
+                                    <!--end::Menu item-->
+                                </div>
+                                <!--end::Menu-->
+                                <!--end::Export dropdown-->
+                    
+                                <!--begin::Hide default export buttons-->
+                                <div id="kt_datatable_example_buttons" class="d-none"></div>
+                                <!--end::Hide default export buttons-->
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table align-middle  rounded table-row-dashed fs-6 g-5" id="kt_datatable_example">
+                                <thead>
+                                    <!--begin::Table row-->
+                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                        <th class="min-w-250px">Action</th>
+                                        
+                                        <th class="min-w-100px">Challan Number</th>
+                                        
+                                        <th class="min-w-75px">Date</th>
+                                        <th class="min-w-100px">Vehicle Number</th>
+                                        <th class="min-w-100px">Vehicle Owner</th>
+                                        <th class="min-w-100px">Vehicle Driver</th>
+                                        <th class="min-w-75px">Total LR</th>
+                                        <th class="min-w-100px">Total Actual Weight</th>
+                                        <th class="min-w-75px">Total Charged Weight</th>
+                                        <th class="min-w-75px">Total PKG</th>
+                                    </tr>
+                                    <!--end::Table row-->
+                                </thead>
+                                <tbody id="lrDATA" class="fw-semibold text-gray-600">
+                                    <% if(typeof challanDATA !== "undefined") {%> 
+
+                                        <% challanDATA.forEach(data=> {%> 
+
+                                            <tr class="odd">
+                                                <td>
+
+                                                    <button onclick="viewChallan('<%=data._id%>')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-eye fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                        </i>
+                                                    </button>
+                                                    
+                                                    <button <% if(data.lorryArrival) {%> disabled <% } else {%> onclick="editChallan('<%=data._id%>')" <% } %>  class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-pencil fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-arrow-down fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-printer fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                         <span class="path5"></span>
+                                                        </i>
+                                                    </button>
+                                                   
+                                                    <button <% if(data.lorryArrival) {%> disabled <% } else {%> onclick="deleteChallan('<%=data._id%>')" <% } %>  class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                                                        <i class="ki-duotone ki-trash-square fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                        </i>
+                                                    </button>
+
+                                                </td>
+                                            <td><%=data.number%></td>
+                                            <td><%=data.date%></td>
+                                            <td><%=data.vehicle.number%></td>
+                                            <td><%=data.vehicle.owner.name%></td>
+                                            <td><%=data.vehicle.driver.name%></td>
+                                            <td><%=data.material.length%></td>
+                                            <td><%= data.material.reduce((total, item) => total + item.actualWeight, 0) %></td>
+                                            <td><%= data.material.reduce((total, item) => total + item.chargedWeight, 0) %></td>
+                                            <td><%= data.material.reduce((total, item) => total + item.qty, 0) %></td>
+                                           
+                                            </tr>
+
+                                        <%}) %>
+
+                                    <%} %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                  
+                </div>
+           </div>
+           <%     function getCurrentFinancialYear() {
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+          
+            // Check if the current month is April (month index 3) or later
+            // If it's April or later, return the current year and the next year as the financial year
+            // Otherwise, return the previous year and the current year as the financial year
+            const startYear = currentDate.getMonth() >= 3 ? currentYear : currentYear - 1;
+            const endYear = startYear + 1;
+          
+            // Format the financial year as "2324", "2425", etc.
+            const formattedFinancialYear = `${String(startYear).slice(-2)}${String(endYear).slice(-2)}`;
+          
+            return formattedFinancialYear;
+          }
+          %>
+    <form id="challanForm">
+           <div class="modal bg-body  fade" tabindex="-1" id="kt_modal_2" data-bs-focus="false">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content custom-modal shadow-none">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="title"></h5>
+        
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+        
+                    <div class="modal-body">
+                          <!--begin::Layout-->
+                    <div class="d-flex flex-column flex-lg-row">
+                        <!--begin::Content-->
+                        <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+                            <!--begin::Card-->
+                            <div class="card">
+                                <!--begin::Card body-->
+                                <div class="card-body p-12">
+                                    <!--begin::Form-->
+                                    
+                                        <!--begin::Wrapper-->
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row">
+                                            <div class="col-lg-4" style="margin-right: 10px; display: none;" id="addChallanNumberDiv">
+                                            <label for="newChallan" class="form-label required">Challan No.</label>
+                                            <input tabindex="1" checkindex="1" type="number" value="<%=challanNumber%>" name="challanNumberNew" id="challanNumberNew" class="form-control form-control-solid">
+                                            </div>
+                                            <div class="col-lg-4" style="margin-right: 10px; display: none;" id="editChallanNumberDiv">
+                                                    <label for="challanNumber" class="required form-label">Challan No.</label>
+                                                    <select tabindex="1" checkindex="1" name="challanNumber" id="selectChallanNew" data-control="select2" data-placeholder="Select Challan Number" class="form-select form-select-solid">
+                                                        <option></option>
+                                                        <% challanDATA.forEach(data=> {%> 
+                                                            <option value="<%=data.id%>"><%=data.number%></option>
+                                                            <%}) %>
+                                                    </select>
+                                                </div>
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="challanDate" class="form-label required">Challan Date</label>
+                                                        <input tabindex="2" checkindex="2"
+                                                        class="form-control form-control-solid fw-bold pe-5 flatpickr-input"
+                                                        placeholder="Select Challan Date" name="challanDate" type="text"
+                                                        id="challanDate">
+                                            </div>
+
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="challanFor" class="form-label required">Challan For</label>
+                                                <select tabindex="3" checkindex="3" data-dropdown-parent="#kt_modal_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Challan For" name="challanFor" id="challanFor">
+                                                    <option></option>
+                                                    <option value="branch">Branch</option>
+                                                    <option value="multiBranch">Multi Branch</option>
+                                                </select>
+                                            </div>
+                                           
+
+                                            <!--end::Input group-->
+                                        </div>
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="from" class="form-label required">From</label>
+                                                <input checkindex="4" tabindex="4" type="text" name="from" id="from" disabled value="<%=user.branch.name%>" class="form-control form-control-solid">
+                                            </div>
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="to" class="form-label required">To</label>
+                                                <select checkindex="5" tabindex="5" data-dropdown-parent="#kt_modal_2" disabled class="form-select form-select-solid" data-control="select2" data-placeholder="Select Destination" name="to" id="to">
+                                                    <option></option>
+                                                    <% branchData.forEach((data)=> {%> 
+                                                            <option value="<%=data.id%>"><%=data.name%></option>
+                                                        <%}) %>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="vehicle" class="form-label required">Select Vehicle No.</label>
+                                                <select tabindex="6" checkindex="6" data-dropdown-parent="#kt_modal_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Vehicle" name="vehicle" id="vehicle">
+                                                    <option></option>
+                                                    <% vehicleData.forEach((data)=> {%> 
+                                                            <option value="<%=data.id%>"><%=data.number%></option>
+                                                        <%}) %>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!--end::Top-->
+
+                                        <!--begin::Separator-->
+                                        <div class="separator separator-dashed my-10"></div>
+                                        <!--end::Separator-->
+
+                                        <!--begin::Wrapper-->
+                                        <div class="mb-0">
+                                            <div class="d-flex flex-column align-items-start flex-xxl-row">
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="selectLR" class="form-label required">Select LR Number</label>
+                                                    <select tabindex="7" checkindex="7" data-dropdown-parent="#kt_modal_2" disabled class="form-select form-select-solid" data-control="select2" data-placeholder="Select LR" id="selectLR">
+                                                        <option></option>
+                                                        <% lrDATA.forEach(data=> {%> 
+
+                                                            <option value="<%=data.id%>"><%=data.lrNumber%></option>
+                                                            
+                                                        <%}) %>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label id="handlingBranchLabel" for="handlingBranch" class="form-label">Handling Branch</label>
+                                                    <select checkindex="8" tabindex="8" data-dropdown-parent="#kt_modal_2" disabled class="form-select form-select-solid" data-control="select2" data-placeholder="Select Handling Branch" id="handlingBranch">
+                                                        <option></option>
+                                                        <% branchData.forEach((data)=> {%> 
+                                                                <option value="<%=data.id%>"><%=data.name%></option>
+                                                            <%}) %>
+                                                    </select>
+                                                </div>
+    
+                                                <div class="col-lg-2" style="margin-right: 10px;">
+                                                    <label class="form-label required">No. of Packages</label>
+                                                        <input type="hidden" id="originalNOP">
+                                                        <input tabindex="9" checkindex="9" onkeypress="return allowOnlyNumbers(event)"  disabled type="text" id="NOP" class="form-control form-control-solid" placeholder="Enter Packages Dispatched">
+                                                       
+                                                   
+                                                    
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label class="required form-label">Actual Weight</label>
+                                                    <div class="input-group">
+                                                    <input type="hidden" id="originalActualWeight">
+                                                    <input tabindex="10" checkindex="10" disabled style="margin-right: 10px;" placeholder="Weight" id="actualWeight" type="text" class="form-control form-control-solid">
+                                                    
+                                                   </div>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label class="form-label required">Charged Weight</label>
+                                                    <div class="input-group">
+                                                        <input type="hidden" id="originalChargedWeight">
+                                                        <input checkindex="11" tabindex="11" disabled style="margin-right: 10px;" placeholder="Charged Weight" id="chargedWeight" type="text" class="form-control form-control-solid">
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--end::Top-->
+    
+                                            <!--begin::Separator-->
+                                            <div class="separator separator-dashed my-10"></div>
+
+                                            <!--begin::Table wrapper-->
+                                            <div class="table-responsive mb-10">
+                                                <!--begin::Table-->
+                                                <table class="table g-5 gs-0 mb-0 fw-bold text-gray-700"
+                                                    data-kt-element="items" id="challanContent">
+                                                    <!--begin::Table head-->
+                                                    <thead>
+                                                        <tr
+                                                            class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase">
+                                                            <th class="min-w-25px w-25px">Sr No.</th>
+                                                            <th class="min-w-200px w-200px">LR Number</th>
+                                                            <th class="min-w-100px w-100px">PKGs</th>
+                                                            <th class="min-w-200px w-200px">Handling Branch</th>
+                                                            <th class="min-w-125px w-125px">Actual Weight</th>
+                                                            <th class="min-w-125px w-125px">Charged Weight</th>
+                                                            <th class="min-w-50px w-50px">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <!--end::Table head-->
+
+                                                    <!--begin::Table body-->
+                                                    <tbody id="itemTableBody">
+                                                     
+                                                    </tbody>
+                                                    <!--end::Table body-->
+
+                                                    <!--begin::Table foot-->
+                                                    <tfoot>
+                                                        <tr
+                                                            class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700">
+                                                            <th class="text-white">
+                                                               
+                                                            </th>
+
+                                                            <th class="text-white">
+                                                              
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input disabled class="exclude form-control form-control-transparent" id="totalNOP">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                
+                                                            </th>
+
+                                                            <th class="text-white">
+                                                                <input disabled class="exclude form-control form-control-transparent" id="totalActualWeight">
+                                                            </th>
+                                                               <th class="text-weight">
+                                                                <input disabled class="exclude form-control form-control-transparent" id="totalChargedWeight">
+                                                               </th> 
+
+                                                        </tr>
+                                                    </tfoot>
+                                                    <!--end::Table foot-->
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!--end::Wrapper-->
+                                    </form>
+                                    <!--end::Form-->
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::Card-->
+                        </div>
+                        <!--end::Content-->
+
+                        <!--begin::Sidebar-->
+                        <div class="flex-lg-auto min-w-lg-300px" style="width: 350px;">
+                            <!--begin::Card-->
+                            <div class="card" data-kt-sticky="true" data-kt-sticky-name="invoice"
+                                data-kt-sticky-offset="{default: false, lg: '200px'}"
+                                data-kt-sticky-width="{lg: '250px', lg: '300px'}" data-kt-sticky-left="auto"
+                                data-kt-sticky-top="150px" data-kt-sticky-animation="false" data-kt-sticky-zindex="95">
+
+                                <!--begin::Card body-->
+                                <div class="card-body p-10">
+                                    <!--begin::Input group-->
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Broker Details</label>
+                                        <input type="text" class="form-control form-control-solid" id="brokerName" disabled placeholder="Name">
+                                        <input type="text" class="form-control form-control-solid" id="brokerContact" disabled placeholder="Mobile Number">
+                                    </div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Owner Details</label>
+                                        <input type="text" class="form-control form-control-solid" id="ownerName" disabled placeholder="Name">
+                                        <input type="text" class="form-control form-control-solid" id="ownerContact" disabled placeholder="Mobile Number">
+                                    </div>
+                                    <div class="separator separator-dashed mb-8"></div>
+                                
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Driver Details</label>
+                                        <input type="text" class="form-control form-control-solid" id="driverName" disabled placeholder="Name">
+                                        <input type="text" class="form-control form-control-solid" id="driverContact" disabled placeholder="Mobile Number">
+                                    </div>
+                                    <div class="separator separator-dashed mb-8"></div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Vehicle Details</label>
+                                        <input type="text" class="form-control form-control-solid" id="engineNumber" disabled placeholder="Engine Number">
+                                        <input type="text" class="form-control form-control-solid" id="chassisNumber" disabled placeholder="Chassis Number">
+                                    </div>
+
+                                    <div class="separator separator-dashed mb-8"></div>
+
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Insurance Details</label>
+                                        
+                                        <input type="text" class="form-control form-control-solid" id="insuranceProvider" disabled placeholder="Insuarnce Provider">
+                                        <input type="text" class="form-control form-control-solid" id="insuranceNumber" disabled placeholder="Insurance Number">
+                                        <input type="text" class="form-control form-control-solid" id="insuranceValidity" disabled placeholder="insuranceValidity">
+                                    </div>
+                                    <div class="separator separator-dashed mb-8"></div>
+                                    <div class="mb-8">
+                                        <label class="form-label fw-bold fs-6 text-gray-700">Permit Details</label>
+                                        <input type="text" class="form-control form-control-solid" id="permitNumber" disabled placeholder="Permit Number">
+                                        <input type="text" class="form-control form-control-solid" id="permitValidity" disabled placeholder="Permit Validity">
+                                    </div>
+                              
+
+                                  
+                           
+                          
+                                
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::Card-->
+                        </div>
+                        <!--end::Sidebar-->
+                    </div>
+                    <!--end::Layout-->
+                    </div>
+        
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="modalCloseBTN">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="createChallan()" id="challanSubmit">
+                            <span class="indicator-label">
+                                Create New Challan
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="updateChallan()" id="challanUpdate">
+                            <span class="indicator-label">
+                                Update Challan
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </div>
+ 
+
+       
+                <%- include("../../includes/footer", {pageName : "challan" }) %>

@@ -1,0 +1,105 @@
+<%- include("../includes/header", {pageName : "overview", pageHead : "settings" }) %>
+    <%- include("../includes/sidebar", {pageName : "overview", pageHead : "settings" }) %>
+        <%- include("../includes/toolbar", {pageName : "overview", pageHead : "settings" }) %>
+       <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                    <div class="card" style="padding: 30px;">
+                        <!--begin::Card header-->
+
+                        <form action="/settings/overview" method="POST" enctype="multipart/form-data">
+
+                            <div class="card-header border-0 pt-6">
+
+
+                                <div style="padding: 10px;" class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Company Name</label>
+                                        <!--end::Label-->
+
+                                      
+                                        <input type="text" name="companyName"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" placeholder=""
+                                            value="<%= companyData.companyName %>">
+                                        
+                                        <!--end::Input-->
+                                      
+                                    </div>
+                                </div>
+
+                                <div style="padding: 10px;" class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <label  class="required form-label">Company Logo</label>
+                                        <input type="file" name="companyLogo" class="form-control form-control-solid mb-3 mb-lg-0">
+
+
+                                    </div>
+                             
+                                    
+                                </div>
+
+                                <div style="padding: 10px;" class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <label class="required form-label">Website URL</label>
+                                        <input type="text" name="website" class="form-control form-control-solid mb-3 mb-lg-0" value="<%= companyData.websiteURL %>">
+
+
+                                    </div>
+                             
+                                    
+                                </div>
+                                
+                                <div style="padding: 10px;" class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <label class="required form-label">Address</label>
+                                        <input type="text" name="address" class="form-control form-control-solid mb-3 mb-lg-0" value="<%= companyData.companyAddress %>">
+
+
+                                    </div>
+                             
+                                    
+                                </div>
+
+                                <div style="padding: 10px;" class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <label class="required form-label">Email</label>
+                                        <input type="text" name="email" class="form-control form-control-solid mb-3 mb-lg-0" value="<%= companyData.companyEmail %>">
+
+
+                                    </div>
+                             
+                                    
+                                </div>
+
+                                <div style="padding: 10px;" class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <label class="required form-label">Pan Card</label>
+                                        <input type="text" name="pan" class="form-control form-control-solid mb-3 mb-lg-0" value="<%= companyData.panCard %>">
+
+
+                                    </div>
+                             
+                                    
+                                </div>
+
+                                <div style="margin-top: 30px;">
+                                    <button type="submit"
+                                    class="btn btn-primary btn-active-light-primary my-1">UPDATE</button>
+                                </div>
+
+
+
+                                <!--end::Card header-->
+                            </div>
+                        </form>
+                        <!--end::Card-->
+                    </div>
+                </div>
+                <!--end::Content container-->
+            </div>
+
+
+            <%- include("../includes/footer", {pageName : "overviews" }) %>

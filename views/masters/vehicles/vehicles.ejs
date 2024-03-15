@@ -1,0 +1,804 @@
+<%- include("../../includes/header", {pageName : "vehicles" }) %>
+    <%- include("../../includes/sidebar", {pageName : "vehicles" }) %>
+        <%- include("../../includes/toolbar", {pageName : "Manage Vehicles" , pageHead : "Masters" }) %>
+
+
+
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                    <!--begin::Card-->
+                    <div class="card">
+                        <!--begin::Card header-->
+                        <div class="card-header border-0 pt-6">
+                            <!--begin::Card title-->
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1">
+                                    <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-5"><span
+                                            class="path1"></span><span class="path2"></span></i> <input type="text"
+                                        data-kt-user-table-filter="search"
+                                        class="form-control form-control-solid w-250px ps-13"
+                                        placeholder="Search Vehicle">
+                                </div>
+                                <!--end::Search-->
+                            </div>
+                            <!--begin::Card title-->
+
+                            <!--begin::Card toolbar-->
+                            <div class="card-toolbar">
+                                <!--begin::Toolbar-->
+                                <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+                                    <!--begin::Filter-->
+                                    <button type="button" class="btn btn-light-primary me-3"
+                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                        <i class="ki-duotone ki-filter fs-2"><span class="path1"></span><span
+                                                class="path2"></span></i> Filter
+                                    </button>
+                                    <!--begin::Menu 1-->
+                                    <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true">
+                                        <!--begin::Header-->
+                                        <div class="px-7 py-5">
+                                            <div class="fs-5 text-dark fw-bold">Filter Options</div>
+                                        </div>
+                                        <!--end::Header-->
+
+                                        <!--begin::Separator-->
+                                        <div class="separator border-gray-200"></div>
+                                        <!--end::Separator-->
+
+                                        <!--begin::Content-->
+                                        <div class="px-7 py-5" data-kt-user-table-filter="form">
+                                            <!--begin::Input group-->
+                                            <div class="mb-10">
+                                                <label class="form-label fs-6 fw-semibold">Role:</label>
+                                                <select
+                                                    class="form-select form-select-solid fw-bold select2-hidden-accessible"
+                                                    data-kt-select2="true" data-placeholder="Select option"
+                                                    data-allow-clear="true" data-kt-user-table-filter="role"
+                                                    data-hide-search="true" data-select2-id="select2-data-7-41h3"
+                                                    tabindex="-1" aria-hidden="true" data-kt-initialized="1">
+                                                    <option data-select2-id="select2-data-9-troo"></option>
+                                                    <option value="Administrator">Administrator</option>
+                                                    <option value="Analyst">Analyst</option>
+                                                    <option value="Developer">Developer</option>
+                                                    <option value="Support">Support</option>
+                                                    <option value="Trial">Trial</option>
+                                                </select><span
+                                                    class="select2 select2-container select2-container--bootstrap5"
+                                                    dir="ltr" data-select2-id="select2-data-8-q5m9"
+                                                    style="width: 100%;"><span class="selection"><span
+                                                            class="select2-selection select2-selection--single form-select form-select-solid fw-bold"
+                                                            role="combobox" aria-haspopup="true" aria-expanded="false"
+                                                            tabindex="0" aria-disabled="false"
+                                                            aria-labelledby="select2-mv8x-container"
+                                                            aria-controls="select2-mv8x-container"><span
+                                                                class="select2-selection__rendered"
+                                                                id="select2-mv8x-container" role="textbox"
+                                                                aria-readonly="true" title="Select option"><span
+                                                                    class="select2-selection__placeholder">Select
+                                                                    option</span></span><span
+                                                                class="select2-selection__arrow" role="presentation"><b
+                                                                    role="presentation"></b></span></span></span><span
+                                                        class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                            </div>
+                                            <!--end::Input group-->
+
+                                            <!--begin::Input group-->
+                                            <div class="mb-10">
+                                                <label class="form-label fs-6 fw-semibold">Two Step
+                                                    Verification:</label>
+                                                <select
+                                                    class="form-select form-select-solid fw-bold select2-hidden-accessible"
+                                                    data-kt-select2="true" data-placeholder="Select option"
+                                                    data-allow-clear="true" data-kt-user-table-filter="two-step"
+                                                    data-hide-search="true" data-select2-id="select2-data-10-gxp2"
+                                                    tabindex="-1" aria-hidden="true" data-kt-initialized="1">
+                                                    <option data-select2-id="select2-data-12-k908"></option>
+                                                    <option value="Enabled">Enabled</option>
+                                                </select><span
+                                                    class="select2 select2-container select2-container--bootstrap5"
+                                                    dir="ltr" data-select2-id="select2-data-11-5qs3"
+                                                    style="width: 100%;"><span class="selection"><span
+                                                            class="select2-selection select2-selection--single form-select form-select-solid fw-bold"
+                                                            role="combobox" aria-haspopup="true" aria-expanded="false"
+                                                            tabindex="0" aria-disabled="false"
+                                                            aria-labelledby="select2-bwxv-container"
+                                                            aria-controls="select2-bwxv-container"><span
+                                                                class="select2-selection__rendered"
+                                                                id="select2-bwxv-container" role="textbox"
+                                                                aria-readonly="true" title="Select option"><span
+                                                                    class="select2-selection__placeholder">Select
+                                                                    option</span></span><span
+                                                                class="select2-selection__arrow" role="presentation"><b
+                                                                    role="presentation"></b></span></span></span><span
+                                                        class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                            </div>
+                                            <!--end::Input group-->
+
+                                            <!--begin::Actions-->
+                                            <div class="d-flex justify-content-end">
+                                                <button type="reset"
+                                                    class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
+                                                    data-kt-menu-dismiss="true"
+                                                    data-kt-user-table-filter="reset">Reset</button>
+                                                <button type="submit" class="btn btn-primary fw-semibold px-6"
+                                                    data-kt-menu-dismiss="true"
+                                                    data-kt-user-table-filter="filter">Apply</button>
+                                            </div>
+                                            <!--end::Actions-->
+                                        </div>
+                                        <!--end::Content-->
+                                    </div>
+                                    <!--end::Menu 1--> <!--end::Filter-->
+
+                                    <!--begin::Export-->
+                                    <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal"
+                                        data-bs-target="#kt_modal_export_users">
+                                        <i class="ki-duotone ki-exit-up fs-2"><span class="path1"></span><span
+                                                class="path2"></span></i> Export
+                                    </button>
+                                    <!--end::Export-->
+
+                                    <!--begin::Add user-->
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#kt_modal_add_user" onclick="newBrokerBTN()">
+                                        <i class="ki-duotone ki-plus fs-2"></i> Add New Vehicle
+                                    </button>
+                                    <!--end::Add user-->
+                                </div>
+                                <!--end::Toolbar-->
+
+                                <!--begin::Group actions-->
+                                <div class="d-flex justify-content-end align-items-center d-none"
+                                    data-kt-user-table-toolbar="selected">
+                                    <div class="fw-bold me-5">
+                                        <span class="me-2" data-kt-user-table-select="selected_count"></span> Selected
+                                    </div>
+
+                                    <form method="POST" id="deleteVehiclesBulk" action="/masters/branches/delete">
+
+
+
+                                        <button type="button" class="btn btn-danger"
+                                            data-kt-user-table-select="delete_selected">
+                                            Delete Selected
+                                        </button>
+                                    </form>
+
+
+
+                                </div>
+                                <!--end::Group actions-->
+
+                                <!--begin::Modal - Adjust Balance-->
+                                <div class="modal fade" id="kt_modal_export_users" tabindex="-1" aria-hidden="true">
+                                    <!--begin::Modal dialog-->
+                                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                                        <!--begin::Modal content-->
+                                        <div class="modal-content">
+                                            <!--begin::Modal header-->
+                                            <div class="modal-header">
+                                                <!--begin::Modal title-->
+                                                <h2 class="fw-bold">Export Users</h2>
+                                                <!--end::Modal title-->
+
+                                                <!--begin::Close-->
+                                                <div class="btn btn-icon btn-sm btn-active-icon-primary"
+                                                    data-kt-users-modal-action="close">
+                                                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span
+                                                            class="path2"></span></i>
+                                                </div>
+                                                <!--end::Close-->
+                                            </div>
+                                            <!--end::Modal header-->
+
+                                            <!--begin::Modal body-->
+                                            <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                                                <!--begin::Form-->
+                                                <form id="kt_modal_export_users_form"
+                                                    class="form fv-plugins-bootstrap5 fv-plugins-framework" action="#">
+                                                    <!--begin::Input group-->
+                                                    <div class="fv-row mb-10">
+                                                        <!--begin::Label-->
+                                                        <label class="fs-6 fw-semibold form-label mb-2">Select
+                                                            Roles:</label>
+                                                        <!--end::Label-->
+
+                                                        <!--begin::Input-->
+                                                        <select name="role" data-control="select2"
+                                                            data-placeholder="Select a role" data-hide-search="true"
+                                                            class="form-select form-select-solid fw-bold select2-hidden-accessible"
+                                                            data-select2-id="select2-data-13-ibvm" tabindex="-1"
+                                                            aria-hidden="true" data-kt-initialized="1">
+                                                            <option data-select2-id="select2-data-15-6l5n"></option>
+                                                            <option value="Administrator">Administrator
+                                                            </option>
+                                                            <option value="Analyst">Analyst</option>
+                                                            <option value="Developer">Developer</option>
+                                                            <option value="Support">Support</option>
+                                                            <option value="Trial">Trial</option>
+                                                        </select><span
+                                                            class="select2 select2-container select2-container--bootstrap5"
+                                                            dir="ltr" data-select2-id="select2-data-14-lelb"
+                                                            style="width: 100%;"><span class="selection"><span
+                                                                    class="select2-selection select2-selection--single form-select form-select-solid fw-bold"
+                                                                    role="combobox" aria-haspopup="true"
+                                                                    aria-expanded="false" tabindex="0"
+                                                                    aria-disabled="false"
+                                                                    aria-labelledby="select2-role-vt-container"
+                                                                    aria-controls="select2-role-vt-container"><span
+                                                                        class="select2-selection__rendered"
+                                                                        id="select2-role-vt-container" role="textbox"
+                                                                        aria-readonly="true" title="Select a role"><span
+                                                                            class="select2-selection__placeholder">Select
+                                                                            a role</span></span><span
+                                                                        class="select2-selection__arrow"
+                                                                        role="presentation"><b
+                                                                            role="presentation"></b></span></span></span><span
+                                                                class="dropdown-wrapper"
+                                                                aria-hidden="true"></span></span>
+                                                        <!--end::Input-->
+                                                    </div>
+                                                    <!--end::Input group-->
+
+                                                    <!--begin::Input group-->
+                                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                                        <!--begin::Label-->
+                                                        <label class="required fs-6 fw-semibold form-label mb-2">Select
+                                                            Export Format:</label>
+                                                        <!--end::Label-->
+
+                                                        <!--begin::Input-->
+                                                        <select name="format" data-control="select2"
+                                                            data-placeholder="Select a format" data-hide-search="true"
+                                                            class="form-select form-select-solid fw-bold select2-hidden-accessible"
+                                                            data-select2-id="select2-data-16-n6t4" tabindex="-1"
+                                                            aria-hidden="true" data-kt-initialized="1">
+                                                            <option data-select2-id="select2-data-18-jo89"></option>
+                                                            <option value="excel">Excel</option>
+                                                            <option value="pdf">PDF</option>
+                                                            <option value="cvs">CVS</option>
+                                                            <option value="zip">ZIP</option>
+                                                        </select><span
+                                                            class="select2 select2-container select2-container--bootstrap5"
+                                                            dir="ltr" data-select2-id="select2-data-17-ez0q"
+                                                            style="width: 100%;"><span class="selection"><span
+                                                                    class="select2-selection select2-selection--single form-select form-select-solid fw-bold"
+                                                                    role="combobox" aria-haspopup="true"
+                                                                    aria-expanded="false" tabindex="0"
+                                                                    aria-disabled="false"
+                                                                    aria-labelledby="select2-format-d1-container"
+                                                                    aria-controls="select2-format-d1-container"><span
+                                                                        class="select2-selection__rendered"
+                                                                        id="select2-format-d1-container" role="textbox"
+                                                                        aria-readonly="true"
+                                                                        title="Select a format"><span
+                                                                            class="select2-selection__placeholder">Select
+                                                                            a format</span></span><span
+                                                                        class="select2-selection__arrow"
+                                                                        role="presentation"><b
+                                                                            role="presentation"></b></span></span></span><span
+                                                                class="dropdown-wrapper"
+                                                                aria-hidden="true"></span></span>
+                                                        <!--end::Input-->
+                                                        <div class="fv-plugins-message-container invalid-feedback">
+                                                        </div>
+                                                    </div>
+                                                    <!--end::Input group-->
+
+                                                    <!--begin::Actions-->
+                                                    <div class="text-center">
+                                                        <button type="reset" class="btn btn-light me-3"
+                                                            data-kt-users-modal-action="cancel">
+                                                            Discard
+                                                        </button>
+
+                                                        <button type="submit" class="btn btn-primary"
+                                                            data-kt-users-modal-action="submit">
+                                                            <span class="indicator-label">
+                                                                Submit
+                                                            </span>
+                                                            <span class="indicator-progress">
+                                                                Please wait... <span
+                                                                    class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                    <!--end::Actions-->
+                                                </form>
+                                                <!--end::Form-->
+                                            </div>
+                                            <!--end::Modal body-->
+                                        </div>
+                                        <!--end::Modal content-->
+                                    </div>
+                                    <!--end::Modal dialog-->
+                                </div>
+                                <!--end::Modal - New Card-->
+
+                                <!--begin::Modal - Add task-->
+                                <div class="modal fade" id="kt_modal_add_user" tabindex="-1" aria-hidden="true" data-bs-focus="false">
+                                    <!--begin::Modal dialog-->
+                                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                                        <!--begin::Modal content-->
+                                        <div class="modal-content">
+                                            <!--begin::Modal header-->
+                                            <div class="modal-header" id="kt_modal_add_user_header">
+                                                <!--begin::Modal title-->
+                                                <h2 class="fw-bold" id="modalTitle">Add New Vehicle</h2>
+                                                <!--end::Modal title-->
+
+                                                <!--begin::Close-->
+                                                <div class="btn btn-icon btn-sm btn-active-icon-primary"
+                                                    data-kt-users-modal-action="close">
+                                                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span
+                                                            class="path2"></span></i>
+                                                </div>
+                                                <!--end::Close-->
+                                            </div>
+                                            <!--end::Modal header-->
+
+                                            <!--begin::Modal body-->
+                                            <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                                                <!--begin::Form-->
+                                                <form id="newVehicle"
+                                                    class="form fv-plugins-bootstrap5 fv-plugins-framework" action=""
+                                                    method="POST" enctype="multipart/form-data">
+                                                    <!--begin::Scroll-->
+                                                    <div class="d-flex flex-column scroll-y me-n7 pe-7"
+                                                        id="kt_modal_add_user_scroll" data-kt-scroll="true"
+                                                        data-kt-scroll-activate="{default: false, lg: true}"
+                                                        data-kt-scroll-max-height="auto"
+                                                        data-kt-scroll-dependencies="#kt_modal_add_user_header"
+                                                        data-kt-scroll-wrappers="#kt_modal_add_user_scroll"
+                                                        data-kt-scroll-offset="300px" style="max-height: 683px;">
+                                                        
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <input type="hidden" name="id" id="vehicleID">
+                                                            <label for="broker" class="required fw-semibold fs-6 mb-2 form-label">
+                                                                Select Broker
+                                                            </label>
+                                                                <select data-dropdown-parent="#kt_modal_add_user" name="broker" id="broker" class="form-control form-control-solid mb-3 mb-lg-0" data-control="select2" data-placeholder="Select an option">
+                                                            <option></option>
+                                                            <% brokerData.forEach((data) => { %>
+                                                                <option value="<%=data.id%>">
+                                                                    <%=data.name%>
+                                                                </option>
+                                                            <% }) %>
+                                                            </select>
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <input type="hidden" name="oldDriver" id="oldDriver">
+                                                            <input type="hidden" name="oldOwner" id="oldOwner">
+                                                            <input type="hidden" name="oldBroker" id="oldBroker">
+                                                            <label for="owner" class="required fw-semibold fs-6 mb-2 form-label">
+                                                                Select Vehicle Owner
+                                                            </label>
+                                                                <select data-dropdown-parent="#kt_modal_add_user" name="owner" id="owner" class="form-control form-control-solid mb-3 mb-lg-0" data-control="select2" data-placeholder="Select an option">
+                                                            <option></option>
+                                                            <% ownerData.forEach((data) => { %>
+                                                                <option value="<%=data.id%>">
+                                                                    <%=data.name%>
+                                                                </option>
+                                                            <% }) %>
+                                                            </select>
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <label for="driver" class="required fw-semibold fs-6 mb-2 form-label">
+                                                                Select Vehicle Driver
+                                                            </label>
+                                                                <select data-dropdown-parent="#kt_modal_add_user" id="driver" name="driver" class="form-control form-control-solid mb-3 mb-lg-0"
+                                                                data-control="select2" data-placeholder="Select an option">
+                                                            <option></option>
+                                                            <% driverData.forEach((data) => { %>
+                                                                <option value="<%=data.id%>">
+                                                                    <%=data.name%>
+                                                                </option>
+                                                            <% }) %>
+                                                          </select>
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="required fw-semibold fs-6 mb-2"> Vehicle Number </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+                                                            <input placeholder="Enter New Vehicle Number" type="text"
+                                                            name="vehicleNumber" id="vehicleNumber"
+                                                            class="form-control form-control-solid mb-3 mb-lg-0" oninput="convertToUpper(this)">
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+                                                       
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="required fw-semibold fs-6 mb-2"> Vehicle Type </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input placeholder="Enter New Vehicle Type" type="text"
+                                                                name="vehicleType" id="vehicleType"
+                                                                class="form-control form-control-solid mb-3 mb-lg-0">
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="fw-semibold fs-6 mb-2"> Engine Number </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input id="engineNumber" placeholder="Enter Vehicle Engine Number" type="text"
+                                                                name="engineNumber"
+                                                                class="form-control form-control-solid mb-3 mb-lg-0">
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="fs-6 mb-2">Chassis Number</label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input id="chassisNumber" placeholder="Enter Chassis Number" type="text"
+                                                                name="chassisNumber"
+                                                                class="form-control form-control-solid mb-3 mb-lg-0">
+
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="fw-semibold fs-6 mb-2"> Permit Number </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input id="permitNumber" placeholder="Enter Permit Number" type="text"
+                                                                name="permitNumber"
+                                                                class="form-control form-control-solid mb-3 mb-lg-0">
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="required fw-semibold fs-6 mb-2"> Permit Validity </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input id="permitValidity" name="permitValidity" class="form-control form-control-solid" placeholder="Pick a date" id="permitValidity"/>
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="required fw-semibold fs-6 mb-2"> Insurance Validity </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input id="insuranceValidity" name="insuranceValidity" class="form-control form-control-solid" placeholder="Pick a date" id="insuranceValidity"/>
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="fw-semibold fs-6 mb-2"> Insurance Number </label>
+                                                            <!--end::Label-->
+
+                                                            <!--begin::Input-->
+
+                                                            <input id="insuranceNumber" placeholder="Enter Insuarance Number" type="text"
+                                                                name="insuranceNumber"
+                                                                class="form-control form-control-solid mb-3 mb-lg-0">
+                                                            <!--end::Input-->
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="fv-row mb-7 fv-plugins-icon-container">
+                                                            <!--begin::Label-->
+                                                            <label class="fw-semibold fs-6 mb-2"> Insurance Provider </label>
+
+                                                            <select data-dropdown-parent="#kt_modal_add_user" id="insuranceProvider" data-dropdown-parent="#kt_modal_add_user" class="form-select form-select-solid" name="insuranceProvider" data-control="select2" data-placeholder="Select Insuarance provider">
+                                                                <option></option>
+                                                                <option value="Bajaj Allianz General Insurance Company">Bajaj Allianz General Insurance Company</option>
+                                                                <option value="Bharti AXA General Insurance Company">Bharti AXA General Insurance Company</option>
+                                                                <option value="Cholamandalam MS General Insurance Company">Cholamandalam MS General Insurance Company</option>
+                                                                <option value="Edelweiss General Insurance Company">Edelweiss General Insurance Company</option>
+                                                                <option value="Future Generali India Insurance Company">Future Generali India Insurance Company</option>
+                                                                <option value="HDFC ERGO General Insurance Company">HDFC ERGO General Insurance Company</option>
+                                                                <option value="ICICI Lombard General Insurance Company">ICICI Lombard General Insurance Company</option>
+                                                                <option value="IFFCO Tokio General Insurance Company">IFFCO Tokio General Insurance Company</option>
+                                                                <option value="Kotak Mahindra General Insurance Company">Kotak Mahindra General Insurance Company</option>
+                                                                <option value="Liberty General Insurance Company">Liberty General Insurance Company</option>
+                                                                <option value="Magma HDI General Insurance Company">Magma HDI General Insurance Company</option>
+                                                                <option value="Navi General Insurance Company">Navi General Insurance Company</option>
+                                                                <option value="Raheja QBE General Insurance Company">Raheja QBE General Insurance Company</option>
+                                                                <option value="Reliance General Insurance Company">Reliance General Insurance Company</option>
+                                                                <option value="Royal Sundaram General Insurance Company">Royal Sundaram General Insurance Company</option>
+                                                                <option value="SBI General Insurance Company">SBI General Insurance Company</option>
+                                                                <option value="Shriram General Insurance Company">Shriram General Insurance Company</option>
+                                                                <option value="TATA AIG General Insurance Company">TATA AIG General Insurance Company</option>
+                                                                <option value="Universal Sompo General Insurance Company">Universal Sompo General Insurance Company</option>
+                                                                <option value="ACKO General Insurance">ACKO General Insurance</option>
+                                                                <option value="Digit Insurance">Digit Insurance</option>
+                                                                <option value="Go Digit General Insurance">Go Digit General Insurance</option>
+                                                            </select>
+
+                                                            <div class="fv-plugins-message-container invalid-feedback">
+                                                            </div>
+                                                        </div>
+                                                        <!--end::Input group-->
+
+                                                        <!--begin::Actions-->
+                                                        <div class="text-center pt-15">
+                                                            <button type="reset" class="btn btn-light me-3"
+                                                                data-kt-users-modal-action="cancel">
+                                                                Discard
+                                                            </button>
+
+                                                            <button id="createVehicle" type="submit" class="btn btn-primary"
+                                                                data-kt-users-modal-action="submit" >
+                                                                <span class="indicator-label">
+                                                                Add New Vehicle
+                                                                </span>
+                                                                <span class="indicator-progress">
+                                                                    Please wait... <span
+                                                                        class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                                                </span>
+                                                            </button>
+
+                                                            <button id="updateVehicle" type="submit" class="btn btn-primary"
+                                                            data-kt-users-modal-action="update" style="display: none;" onclick="updateBroker()">
+                                                            <span class="indicator-label">
+                                                             Update Vehicle
+                                                                </span>
+                                                                <span class="indicator-progress">
+                                                                    Please wait... <span
+                                                                        class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                                                </span>
+                                                            </button>
+                                                        </div>
+                                                        <!--end::Actions-->
+
+                                                        <!--end::Form-->
+                                                    </div>
+                                                </form>
+                                                <!--end::Modal body-->
+                                            </div>
+                                            <!--end::Modal content-->
+                                        </div>
+                                        <!--end::Modal dialog-->
+                                    </div>
+                                    <!--end::Modal - Add task-->
+                                </div>
+                                <!--end::Card toolbar-->
+                            </div>
+                            <!--end::Card header-->
+
+                            <!--begin::Card body-->
+                            <div class="card-body py-4">
+
+                                <!--begin::Table-->
+                                <div id="kt_table_users_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+                                        id="kt_table_users">
+                                        <thead>
+                                            <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                                <th class="w-10px pe-2 sorting_disabled" rowspan="1" colspan="1"
+                                                    aria-label="" style="width: 29.8906px;">
+                                                    <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            data-kt-check="true"
+                                                            data-kt-check-target="#kt_table_users .form-check-input"
+                                                            value="1">
+                                                    </div>
+                                                </th>
+                                                <th class="min-w-125px sorting" tabindex="0"
+                                                    aria-controls="kt_table_users" rowspan="1" colspan="1"
+                                                    aria-label="User: activate to sort column ascending"
+                                                    style="width: 150px;">Vehicle Number</th>
+                                                <th class="min-w-125px sorting" tabindex="0"
+                                                    aria-controls="kt_table_users" rowspan="1" colspan="1"
+                                                    aria-label="Role: activate to sort column ascending"
+                                                    style="width: 250px;">Vehicle Owner</th>
+                                                <th class="min-w-125px sorting" tabindex="0"
+                                                    aria-controls="kt_table_users" rowspan="1" colspan="1"
+                                                    aria-label="Last login: activate to sort column ascending"
+                                                    style="width: 250.016px;">Vehicle Driver</th>
+                                                <th class="sorting" tabindex="0" aria-controls="kt_table_users"
+                                                    rowspan="1" colspan="1"
+                                                    aria-label="OK: activate to sort column ascending"
+                                                    style="width: 150px">Insurance Validity</th>
+                                                <th class="min-w-125px sorting" tabindex="0"
+                                                    aria-controls="kt_table_users" rowspan="1" colspan="1"
+                                                    aria-label="Email : activate to sort column ascending"
+                                                    style="width: 167.016px;">Permit Validity</th>
+                                                <th class="text-end min-w-100px sorting_disabled" rowspan="1"
+                                                    colspan="1" aria-label="Actions" style="width: 143.625px;">
+                                                    Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <!--begin::Table body-->
+                                        <tbody class="text-gray-600 fw-bold">
+                                            
+                                            <% data.forEach((data)=> {%> 
+                                               <tr class="odd">
+                                                   <!--begin::Checkbox-->
+                                                   <td>
+                                                       <div
+                                                           class="form-check form-check-sm form-check-custom form-check-solid">
+                                                           <input class="form-check-input" type="checkbox" name="id"
+                                                               value="<%=data.id%>" form="deleteVehiclesBulk">
+                                                       </div>
+                                                   </td>
+                                                   <!--end::Checkbox-->
+                                                   <!--begin::User=-->
+                                                   <td class=" align-items-center">
+                                                     <%=data.number%>
+                                                   </td>
+                                                   <!--end::User=-->
+                                                   <!--begin::Role=-->
+                                                   <td>
+                                                   </td>
+                                                   <!--end::Role=-->
+                                                   <!--begin::Last login=-->
+                                                   <td data-order="">
+                                                       <%=data.driver.name%>
+                                                   </td>
+
+                                                   <% 
+                                                    // Assuming data.insuranceValidity is in the format "dd-mm-yyyy"
+                                                    var dateParts = data.insuranceValidity.split("-");
+                                                    var day = parseInt(dateParts[0], 10);
+                                                    var month = parseInt(dateParts[1], 10) - 1; // Months are zero-indexed in JavaScript
+                                                    var year = parseInt(dateParts[2], 10);
+
+                                                    // Convert the licenseValidity date string to a JavaScript Date object
+                                                    var licenseValidityDate = new Date(year, month, day);
+
+                                                    const today = new Date();
+                                                    const sevenDaysAhead = new Date(today);
+                                                    sevenDaysAhead.setDate(today.getDate() + 7);
+
+
+                                                    // Check if the insurance has expired
+                                                    var isInsuranceExpired = licenseValidityDate < sevenDaysAhead;
+                                                    %>
+                                                   <td>
+                                                    <% if(isInsuranceExpired) {%> 
+                                                        <span class="badge badge-light-danger fs-7 m-1"> <%=data.insuranceValidity%></span>
+                                                        <%} else {%> 
+                                                            <span class="badge badge-light-success fs-7 m-1"> <%=data.insuranceValidity%></span>
+                                                            
+                                                            <% } %>
+
+                                                   </td>
+                                                   <% 
+                                                    // Assuming data.permitValidity is in the format "dd-mm-yyyy"
+                                                    var dateParts = data.permitValidity.split("-");
+                                                    var day = parseInt(dateParts[0], 10);
+                                                    var month = parseInt(dateParts[1], 10) - 1; // Months are zero-indexed in JavaScript
+                                                    var year = parseInt(dateParts[2], 10);
+
+                                                    // Convert the permitValidity date string to a JavaScript Date object
+                                                    var permitValidityDate = new Date(year, month, day);
+                                                    // Check if the permit has expired
+                                                    var isPermitExpired = permitValidityDate < sevenDaysAhead;
+                                                    %>
+
+                                                   <td>
+                                                    <% if(isPermitExpired) {%> 
+                                                        <span class="badge badge-light-danger fs-7 m-1"> <%=data.permitValidity%></span>
+                                                        <%} else {%> 
+                                                            <span class="badge badge-light-success fs-7 m-1"> <%=data.permitValidity%></span>
+                                                            
+                                                            <% } %>
+                                                   </td>
+                                                   <!--end::Last login=-->
+                                                   <!--begin::Two step=-->
+                                                   
+   
+   
+                                                   <!--end::Two step=-->
+                                                   <!--begin::Joined-->
+   
+                                                   <!--begin::Joined-->
+                                                   <!--begin::Action=-->
+                                                   <td class="text-end">
+                                                       <a href="#"
+                                                           class="btn btn-light btn-active-light-primary btn-sm"
+                                                           data-kt-menu-trigger="click"
+                                                           data-kt-menu-placement="bottom-end"
+                                                           data-kt-menu-flip="top-end">Actions
+                                                           <!--begin::Svg Icon | path: icons/duotone/Navigation/Angle-down.svg-->
+                                                           <span class="svg-icon svg-icon-5 m-0">
+                                                               <svg xmlns="http://www.w3.org/2000/svg"
+                                                                   xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                   width="24px" height="24px" viewBox="0 0 24 24"
+                                                                   version="1.1">
+                                                                   <g stroke="none" stroke-width="1" fill="none"
+                                                                       fill-rule="evenodd">
+                                                                       <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                                                       <path
+                                                                           d="M6.70710678,15.7071068 C6.31658249,16.0976311 5.68341751,16.0976311 5.29289322,15.7071068 C4.90236893,15.3165825 4.90236893,14.6834175 5.29289322,14.2928932 L11.2928932,8.29289322 C11.6714722,7.91431428 12.2810586,7.90106866 12.6757246,8.26284586 L18.6757246,13.7628459 C19.0828436,14.1360383 19.1103465,14.7686056 18.7371541,15.1757246 C18.3639617,15.5828436 17.7313944,15.6103465 17.3242754,15.2371541 L12.0300757,10.3841378 L6.70710678,15.7071068 Z"
+                                                                           fill="#000000" fill-rule="nonzero"
+                                                                           transform="translate(12.000003, 11.999999) rotate(-180.000000) translate(-12.000003, -11.999999)">
+                                                                       </path>
+                                                                   </g>
+                                                               </svg>
+                                                           </span>
+                                                           <!--end::Svg Icon-->
+                                                       </a>
+                                                       <!--begin::Menu-->
+   
+                                                       <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
+                                                           data-kt-menu="true">
+                                                           <!--begin::Menu item-->
+   
+                                                           <div class="menu-item px-3">
+                                                            <a onclick="editVehicleBTN('<%=data.id%>')"
+                                                                class="menu-link px-3">Edit</a>
+                                                           </div>
+   
+                                                           <!--end::Menu item-->
+   
+                                                       </div>
+                                                       <!--end::Menu-->
+                                                   </td>
+   
+                                             
+   
+   
+   
+                                               </tr>
+                                               <%}) %>
+   
+                                           </tbody>
+                                        <!--end::Table body-->
+                                    </table>
+                                    </div>
+
+                                </div>
+                                <!--end::Table-->
+                            </div>
+                            <!--end::Card body-->
+                        </div>
+                        <!--end::Card-->
+                    </div>
+                    <!--end::Content container-->
+                </div>
+                <!--end::Content-->
+            </div>
+
+
+            <%- include("../../includes/footer", {pageName : "vehicles" }) %>

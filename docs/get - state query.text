@@ -1,0 +1,18 @@
+countryInput.on("change", function () {
+    const countryID = countryInput.val();
+    fetch(`/masters/locations/get-states?id=${countryID}`, {
+      method: "GET",
+    }).then((response) => {
+      return response.json().then((data) => {
+        if (response.status === 200) {
+          for (let i = 0; i < data.length; i++) {
+            const option = `<option value="${data[i].id}">${data[i].name}</option>`;
+            stateInput.append(option);
+          }
+          stateInput.trigger("change")
+        } else if (response.status === 400) {
+          showError("No State Added In This Country");
+        }
+      });
+    });
+  });

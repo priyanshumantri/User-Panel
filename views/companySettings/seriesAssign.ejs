@@ -1,0 +1,329 @@
+<%- include("../includes/header", {pageName : "lrSeriesAssign" }) %>
+    <%- include("../includes/sidebar", {pageName : "lrSeriesAssign" }) %>
+        <%- include("../includes/toolbar", {pageName : "Assign LR Series" , pageHead : "Settings" }) %>
+
+
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <!--begin::Card-->
+                <div class="card card-flush">
+                    <!--begin::Card header-->
+                    <div class="card-header mt-6">
+                        <!--begin::Card title-->
+                        <div class="card-title">
+                            <!--begin::Search-->
+                            <div class="d-flex align-items-center position-relative my-1 me-5">
+                                <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-5">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                <input type="text" data-kt-permissions-table-filter="search"
+                                    class="form-control form-control-solid w-250px ps-13"
+                                    placeholder="Search Assigned Series">
+                            </div>
+                            <!--end::Search-->
+                        </div>
+                        <!--end::Card title-->
+
+                        
+                        <!--begin::Card toolbar-->
+                        <div class="card-toolbar">
+                            <!--begin::Button-->
+                            <button type="button" class="btn btn-light-primary"data-bs-toggle="modal" data-bs-target="#kt_modal_2" onclick="addSeries()">
+                                <i class="ki-duotone ki-plus-square fs-3">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>Assign New Series</button>
+                            <!--end::Button-->
+                        </div>
+                        <!--end::Card toolbar-->
+                    </div>
+                    <!--end::Card header-->
+                    <!--begin::Card body-->
+                    <div class="card-body pt-0">
+                        <!--begin::Table-->
+                        <div id="kt_permissions_table_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                            <div class="table-responsive">
+                                <table class="table align-middle table-row-dashed fs-6 gy-5 mb-0 dataTable no-footer"
+                                    id="kt_permissions_table">
+                                    <thead>
+                                        <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                            <th class="min-w-125px sorting" tabindex="0"
+                                                aria-controls="kt_permissions_table" rowspan="1" colspan="1"
+                                                aria-label="Name: activate to sort column ascending"
+                                                style="width: 348.75px;">Assigned For</th>
+                                            <th class="min-w-125px sorting" tabindex="0"
+                                                aria-controls="kt_permissions_table" rowspan="1" colspan="1"
+                                                aria-label="Name: activate to sort column ascending"
+                                                style="width: 348.75px;">Branch</th>
+                                            <th class="sorting_disabled" rowspan="1" colspan="1"
+                                                aria-label="Assigned To" style="width: 233.328px;">Godown</th>
+                                            <th class="min-w-125px sorting" tabindex="0"
+                                                aria-controls="kt_permissions_table" rowspan="1" colspan="1"
+                                                aria-label="Created Date: activate to sort column ascending"
+                                                style="width: 320.859px;">From</th>
+                                                <th class="min-w-125px sorting" tabindex="0"
+                                                aria-controls="kt_permissions_table" rowspan="1" colspan="1"
+                                                aria-label="Created Date: activate to sort column ascending"
+                                                style="width: 320.859px;">To</th>
+                                                <th class="min-w-125px sorting" tabindex="0"
+                                                aria-controls="kt_permissions_table" rowspan="1" colspan="1"
+                                                aria-label="Created Date: activate to sort column ascending"
+                                                style="width: 320.859px;">Used</th>
+                                            <th class="text-end min-w-100px sorting_disabled" rowspan="1" colspan="1"
+                                                aria-label="Actions" style="width: 259.562px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fw-semibold text-gray-600">
+
+
+                                        <% seriesData.forEach(data=> {%> 
+
+                                            
+                                        <tr data-rowid="<%=data.id%>" class="odd">
+                                            <td>
+                                                <% if(data.for==="lr" ) {%>
+                                                    Lorry Reciepts
+                                                <%} %>
+                                                
+                                                <% if(data.for==="challan" ) {%>
+                                                    Challans
+                                                <%} %>
+                                                
+                                                <% if(data.for==="la" ) {%>
+                                                    Lorry Arrival
+                                                <% } %>
+                                                
+                                                <% if(data.for==="dc" ) {%>
+                                                    Delivery Challans
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                             <%=data.branch.name%>
+                                            </td>
+                                            <td>
+                                                <% if(data.location === "godown") {%> 
+                                                    <%=data.godown.name%>
+                                                    <%} else { %> 
+                                                        NA
+                                                        <% }%>
+                                            </td>
+                                            <td><%=data.start%></td>
+                                            <td><%=data.end%></td>
+                                            <td><%= parseInt(data.end) - parseInt(data.balance) %></td>
+                                            <td class="text-end">
+                                               <% if(data.active === true) {%> 
+
+                                                <button onclick="stopSeriesAssigned('<%=data.id%>')" class="btn btn-light-primary btn-icon btn-active-primary w-30px h-30px delete-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Stop Usage of This Series">
+                                                    <i class="ki-duotone ki-cross-square fs-3">
+                                                     <span class="path1"></span>
+                                                     <span class="path2"></span>
+                                                     </i>
+                                                </button>
+
+                                               <%} else {%> 
+                                                <button onclick="startSeriesAssigned('<%=data.id%>')" class="btn btn-light-success btn-icon btn-active-success w-30px h-30px delete-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Start Usage of This Series">
+                                                    <i class="ki-duotone ki-check-circle fs-3">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </button>
+                                                <%} %>
+
+                                              
+
+                                                <button <% if(((parseInt(data.end) - parseInt(data.start) + 1)) !== parseInt(data.balance)) {%> disabled <%} %> onclick="deleteSeriesAssigned('<%=data.id%>')"
+                                                    class="btn btn-icon btn-light-danger btn-active-danger w-30px h-30px delete-button"
+                                                    data-kt-permissions-table-filter="delete_row">
+                                                    <i class="ki-duotone ki-trash fs-3">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                        <span class="path4"></span>
+                                                        <span class="path5"></span>
+                                                    </i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                      
+                                            
+                                        <%}) %>
+                                    
+
+                                    </tbody>
+                                </table>
+                            </div>
+                           
+                        </div>
+                        <!--end::Table-->
+                    </div>
+                    <!--end::Card body-->
+                </div>
+              <form id="seriesAssign">
+
+                <div class="modal bg-body fade" tabindex="-1" id="kt_modal_2">
+                    <div class="modal-dialog modal-fullscreen">
+                        <div class="modal-content custom-modal shadow-none">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalTitle"></h5>
+                
+                                <!--begin::Close-->
+                                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                                </div>
+                                <!--end::Close-->
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-flex flex-column flex-lg-row">
+                                    <!--begin::Content-->
+                                    <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+                                        <!--begin::Card-->
+                                        <div class="card">
+                                            <!--begin::Card body-->
+                                            <div class="card-body p-12">
+                                                <!--begin::Form-->
+                                                
+                                                    <!--begin::Wrapper-->
+                                                    <div class="d-flex flex-column align-items-start flex-xxl-row">
+
+                                                        <div class="col-lg-4" style="margin-right: 10px;">
+                                                            <label class="fs-6 fw-semibold form-label mb-2">
+                                                                <span class="required">Assign For</span>
+                                                            </label>
+                                                            <select tabindex="1" checkindex="1" name="assignFor" id="assignFor" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Assign For" data-dropdown-parent="#kt_modal_2">
+                                                                <option></option>
+                                                                
+                                                                <option value="branch">Branch</option>
+                                                                <option value="godown">Godown</option>
+                                                                
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-lg-4" style="margin-right: 10px;">
+                                                            <label class="fs-6 fw-semibold form-label mb-2">
+                                                                <span class="required">Branch</span>
+                                                            </label>
+                                                            <select disabled tabindex="2" checkindex="2" name="branch" id="selectBranch" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Branch" data-dropdown-parent="#kt_modal_2">
+                                                                <option></option>
+                    
+                                                                <% branchData.forEach(data=> {%> 
+                    
+                                                                    <option value="<%=data.id%>"><%=data.name%></option>
+                    
+                                                                <%}) %>
+                                                                
+                                                            </select>
+                                                        </div>
+            
+                                                        <div class="col-lg-4" style="margin-right: 10px;">
+                                                            <label class="fs-6 fw-semibold form-label mb-2">
+                                                                <span class="required">Godown</span>
+                                                            </label>
+                                                            <select tabindex="3" checkindex="3" disabled name="godown" id="selectGodown" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Godown" data-dropdown-parent="#kt_modal_2">
+                                                          
+                    
+                                                               
+                                                                
+                                                            </select>
+                                                        </div>
+                                                       
+            
+                                                        <!--end::Input group-->
+                                                    </div>
+                                                    <div class="separator separator-dashed my-10"></div>
+                                                    <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                                        <div class="col-lg-4" style="margin-right: 10px;">
+                                                            <label for="for" class="form-label required">For</label>
+                                                            <select disabled tabindex="4" checkindex="4" data-dropdown-parent="#kt_modal_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Series For"  id="for">
+                                                                <option></option>
+                                                                <option value="lr">Lorry Reciept</option>
+                                                                <option value="challan">Challan</option>
+                                                                <option value="la">Lorry Arrival</option>
+                                                                <option value="dc">Delivery Challan</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-lg-4" style="margin-right: 10px;">
+                                                            <label for="from" class="form-label required">From</label>
+                                                            <input disabled tabindex="5" checkindex="5" value="0" type="number"  id="from" class="form-control form-control-solid" placeholder="Enter From">
+                                                        </div>
+                                                        <div class="col-lg-4" style="margin-right: 10px;">
+                                                            <label for="to" class="form-label required">To</label>
+                                                            <input disabled tabindex="6" checkindex="6" value="0" type="number"  id="to" class="form-control form-control-solid" placeholder="Enter To">
+                                                        </div>
+            
+                                                    </div>
+
+                                                      <!--begin::Separator-->
+                                                 <div class="separator separator-dashed my-10"></div>
+     
+                                                 <!--begin::Table wrapper-->
+                                                 <div class="table-responsive mb-10">
+                                                     <!--begin::Table-->
+                                                     <table class="table g-5 gs-0 mb-0 fw-bold text-gray-700"
+                                                         data-kt-element="items">
+                                                         <!--begin::Table head-->
+                                                         <thead>
+                                                             <tr
+                                                                 class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase">
+                                                                 <th class="min-w-150px w-150px">For</th>
+                                                                 <th class="min-w-150px w-150px">From</th>
+                                                                 <th class="min-w-150px w-150px">To</th>
+                                                                 <th class="min-w-150px w-150px">Action</th>
+                                                             </tr>
+                                                         </thead>
+                                                         <!--end::Table head-->
+     
+                                                         <!--begin::Table body-->
+                                                         <tbody id="itemTableBody">
+                                                        
+                                                         </tbody>
+                                                        
+                                                     </table>
+                                                 </div>
+
+
+                                                    <!--end::Wrapper-->
+                                                </form>
+                                                <!--end::Form-->
+                                            </div>
+                                            <!--end::Card body-->
+                                        </div>
+                                        <!--end::Card-->
+                                    </div>
+                                    <!--end::Content-->
+            
+                                
+                                </div>
+                                </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="closeBTN">Close</button>
+                                <button type="button" class="btn btn-primary" id="assignBTN" onclick="submitAssigned()">
+                                    <span class="indicator-label">
+                                        Assign New Series
+                                    </span>
+                                    <span class="indicator-progress">
+                                        Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                    </span>
+
+                                </button>
+
+                                <button type="button" style="display: none;" class="btn btn-primary" id="updateBTN" onclick="updateAssigned()">
+                                    <span class="indicator-label">
+                                        Update Assigned Series
+                                    </span>
+                                    <span class="indicator-progress">
+                                        Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                    </span>
+
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+                <!--end::Modals-->
+            </div>
+
+            
+
+            <%- include("../includes/footer", {pageName : "lrSeriesAssign" }) %>

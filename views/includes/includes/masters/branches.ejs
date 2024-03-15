@@ -1,0 +1,27 @@
+<% if(pageName === "manageBranches") {%> 
+    <script src="../../../assets/js/custom/masters/branches/table.js"></script>
+    <script src="../../../assets/js/custom/masters/branches/export-users.js"></script>
+    <script src="../../../assets/js/custom/masters/branches/add.js"></script>  
+    <script>
+   var input1 = document.querySelector("#managerEmail");
+   var input2 = document.querySelector("#managerMobile");
+   var input3 = document.querySelector("#managerName");
+   new Tagify(input1);
+
+   new Tagify(input2);
+
+   new Tagify(input3);
+   function allowOnlyNumbers(event) {
+  const inputValue = event.target.value;
+  const regex = /^[0-9]*$/;
+
+  if (!regex.test(inputValue)) {
+    // If the input value contains non-numeric characters, remove them
+    event.target.value = inputValue.replace(/[^0-9]/g, '');
+  }
+}
+
+    </script>
+        
+
+<%} %>

@@ -1,0 +1,614 @@
+<%- include("../../includes/header", {pageName : "ledgers" }) %>
+    <%- include("../../includes/sidebar", {pageName : "ledgers" }) %>
+        <%- include("../../includes/toolbar", {pageName : "Manage Ledgers" , pageHead : "Masters" }) %>
+
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_content_container" class="app-container  container-xxl ">
+              
+       
+                <div style="padding: 30px;" class="card card-p-0 card-flush">
+                  
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-3">
+                                <label for="form-label">Select Branch</label>
+                                <% if (user.role.roleType === "ADMIN") { %>
+                                <select name="branch" id="branch" form="findLRForm" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Branch">
+                                    <option></option>
+                                 
+                                </select>
+                                <% } else { %>
+                                <input disabled type="text" id="branch" form="findLRForm" name="branch" class="form-control form-control-solid" value="<%=user.branch.name%>">
+                                <% } %>
+                            </div>
+                
+                            <div class="col-xl-3">
+                                <label for="form-label">Select Date Range</label>
+                                <input class="form-control form-control-solid" name="dateRange" form="findLRForm" placeholder="Pick date range" id="searchRange" />
+                            </div>
+                
+                            <div class="col-xl-3">
+                                <button style="margin-top: 20px;" type="button" onclick="findLR()" class="btn btn-sm btn-primary">Find</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+             
+           
+            </div>
+        </div>
+
+        <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+             
+            <div id="kt_app_content_container" class="app-container  container-xxl ">
+             
+                <div style="padding: 30px;" class="card card-p-0 card-flush">
+                    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                        <div class="card-title">
+                            <!--begin::Search-->
+                            <div class="d-flex align-items-center position-relative my-1">
+                                <span class="svg-icon fs-1 position-absolute ms-4">
+                                    <i class="ki-duotone ki-magnifier fs-3">
+                                     <span class="path1"></span>
+                                     <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="Search Ledger" />
+                            </div>
+                            <!--end::Search-->
+                            <!--begin::Export buttons-->
+                            <div id="kt_datatable_example_1_export" class="d-none"></div>
+                            <!--end::Export buttons-->
+                        </div>
+                        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                            <button onclick="addNewLedgerBTN()" type="button" class="btn btn-primary btn-active-light-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_2">
+                                <i class="ki-duotone ki-plus-square fs-2">
+                                      <span class="path1"></span>
+                                      <span class="path2"></span>
+                                      <span class="path3"></span>
+                                </i>
+                                Add New Ledger
+                            </button>
+                  
+                            <!--begin::Export dropdown-->
+                            <button type="button" class="btn btn-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                Export Report
+                            </button>
+                            <!--begin::Menu-->
+                            <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                    Copy to clipboard
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                    Export as Excel
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                    Export as CSV
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                              
+                                <!--end::Menu item-->
+                            </div>
+                            <!--end::Menu-->
+                            <!--end::Export dropdown-->
+                
+                            <!--begin::Hide default export buttons-->
+                            <div id="kt_datatable_example_buttons" class="d-none"></div>
+                            <!--end::Hide default export buttons-->
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table align-middle  rounded table-row-dashed fs-6 g-5" id="kt_datatable_example">
+                            <thead>
+                                <!--begin::Table row-->
+                                <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                    <th class="min-w-250px">Action</th>
+                                    
+                                    <th class="min-w-100px">Ledger Name</th>
+                                    
+                                    <th class="min-w-75px">Under Group</th>
+                       
+                                </tr>
+                                <!--end::Table row-->
+                            </thead>
+                            <tbody id="lrDATA" class="fw-semibold text-gray-600">
+                                <% if(typeof data !== "undefined") {%> 
+
+                                    <% data.forEach(data=> {%> 
+
+                                        <tr class="odd">
+                                            <td>
+
+                                                <button onclick="viewLR('<%=data._id%>')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                    <i class="ki-duotone ki-eye fs-2">
+                                                     <span class="path1"></span>
+                                                     <span class="path2"></span>
+                                                     <span class="path3"></span>
+                                                    </i>
+                                                </button>
+                                                
+                                                <button onclick="editLedger('<%=data._id%>')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                    <i class="ki-duotone ki-pencil fs-2">
+                                                     <span class="path1"></span>
+                                                     <span class="path2"></span>
+                                                    </i>
+                                                </button>
+                                                <button onclick="setOpeningBalance('<%=data._id%>')" class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                    <i class="ki-duotone ki-calculator fs-2">
+                                                       <span class="path1"></span>
+                                                       <span class="path2"></span>
+                                                       <span class="path3"></span>
+                                                       <span class="path4"></span>
+                                                       <span class="path5"></span>
+                                                       <span class="path6"></span>
+                                                    </i>
+                                                </button>
+                                                <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                    <i class="ki-duotone ki-printer fs-2">
+                                                     <span class="path1"></span>
+                                                     <span class="path2"></span>
+                                                     <span class="path3"></span>
+                                                     <span class="path4"></span>
+                                                     <span class="path5"></span>
+                                                    </i>
+                                                </button>
+                                               
+                                                <button onclick="deleteLedgers('<%=data._id%>')" class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                                                    <i class="ki-duotone ki-trash-square fs-2">
+                                                     <span class="path1"></span>
+                                                     <span class="path2"></span>
+                                                     <span class="path3"></span>
+                                                     <span class="path4"></span>
+                                                    </i>
+                                                </button>
+
+                                            </td>
+                                            <td>
+                                                <%=data.name%>
+                                            </td>
+                                            
+                                            <td>
+                                             <%=data.group.name%>
+                                            </td>
+                                    
+                                        </tr>
+
+                                    <%}) %>
+
+                                <%} %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+              
+            </div>
+       </div>
+            <form id="addLedger">
+                <div class="modal bg-body  fade" tabindex="-1" id="kt_modal_2" data-bs-focus="false">
+                 <div class="modal-dialog modal-fullscreen">
+                     <div class="modal-content custom-modal shadow-none">
+                         <div class="modal-header">
+                             <h5 class="modal-title" id="title"></h5>
+             
+                             <!--begin::Close-->
+                             <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                 <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                             </div>
+                             <!--end::Close-->
+                         </div>
+             
+                         <div class="modal-body">
+                               <!--begin::Layout-->
+                         <div class="d-flex flex-column flex-lg-row">
+                             <!--begin::Content-->
+                             <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+                                 <!--begin::Card-->
+                                 <div class="card">
+                                     <!--begin::Card body-->
+                                     <div class="card-body p-12">
+                                         <!--begin::Form-->
+                                         
+                                             <!--begin::Wrapper-->
+                                             <div class="d-flex flex-column align-items-start flex-xxl-row">
+                                           
+                                    
+                                                 <div class="col-lg-4" style="margin-right: 10px;" id="gp">
+                                                    <input type="hidden" name="editID" id="editID">
+                                                    <input type="hidden" name="fieldType" id="fieldType">
+                                                    <label class="required fw-semibold fs-6 mb-2"> Select Group </label>
+                                                    <select tabindex="1" checkindex="1" name="group" id="group" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Group" data-dropdown-parent="#kt_modal_2">
+                                                        <option></option>
+
+                                                        <% groupData.forEach((group)=> {%>
+                                                            <option value="<%=group.id%>"><%=group.name%></option>
+                                                        <%}) %>
+                                                    </select>
+                                                 </div>
+     
+                                                 <div class="col-lg-4" style="margin-right: 10px;" id="op">
+                                                     <label for="openingBalance" class="form-label required">Opening Balance</label>
+                                                     <input oninput=" validateNumberWithDecimals(this)" tabindex="2" checkindex="2"disabled type="text" name="openingBalance" id="openingBalance" class="form-control form-control-solid" value="0" disabled>
+                                                 </div>
+                                                
+                                                 <div class="col-lg-4" id="opType">
+                                                    <label class="required fw-semibold fs-6 mb-2"> Select Opening Balance Type</label>
+                                                    <select disabled tabindex="3" checkindex="3" name="openingBalanceType" id="openingBalanceType" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Group" data-dropdown-parent="#kt_modal_2">
+                                                        <option></option>
+                                                        <option value="dr">Debit</option>
+                                                        <option value="cr">Credit</option>
+                                                      
+                                                    </select>
+                                                 </div>
+                                                 <div id="lowName" style="display: none;">
+                                                    <div class="col-lg-3" style="margin-left: 10px;">
+                                                        <label class="required fw-semibold fs-6 mb-2">Ledger Name</label>
+                                                         <input tabindex="4" checkindex="4" type="text" placeholder="Enter Ledger Name" name="ledgerNameLow" id="ledgerNameLow" class="form-control form-control-solid">
+                                                        
+                                                    </div>
+                                                </div>
+                                                 <!--end::Input group-->
+                                             </div>
+                                                <!--begin::Separator-->
+                                                <div class="separator separator-dashed my-10"></div>
+                                                <!--end::Separator-->
+                                             <div id="superhigh" style="display: none;">
+                                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                                    <div class="col-lg-4" style="margin-right: 10px;">
+                                                
+                                                        <label class="required fw-semibold fs-6 mb-2">Entity Type</label>
+                                                        <select tabindex="5" checkindex="5" name="entityType" id="entityType" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Entity Type" data-dropdown-parent="#kt_modal_2">
+                                                        
+                                                        <option></option>
+                                                            <option value="registered">Registered</option>
+                                                            <option value="unregistered">Unregistered</option>
+                                                            <option value="exempted">Exempted</option>
+                                                            <option value="rcr">RCR</option>
+                                                        </select>
+                                                            
+                                                    </div>
+                                                    <div class="col-lg-4" style="margin-right: 10px;">
+                                                
+                                                        <label id="gstNumberLabel" class="required fw-semibold fs-6 mb-2">GST Number</label>
+                                                        <input oninput="convertToUpper(this)" disabled tabindex="6" checkindex="6" type="text" placeholder="Enter GST Number" name="gstNumber" id="gstNumber" class="form-control form-control-solid">
+                                                        
+                                                    </div>
+
+                                                    <div class="col-lg-4" style="margin-right: 10px;">
+                                                
+                                                        <label id="gstNumberLabel" class="required fw-semibold fs-6 mb-2">Ledger Alias Name</label>
+                                                        <input tabindex="7" checkindex="7" type="text" placeholder="Enter Alias Name" name="aliasName" id="aliasName" class="form-control form-control-solid">
+                                                        
+                                                    </div>
+                                                  
+                                                </div>
+                                            </div>
+                                               
+                                             <div id="sundrydebtorscreditors" style="display: none;">
+                                               
+                                             
+                                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                                    
+                                                
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                        <label class="required fw-semibold fs-6 mb-2">PAN CARD NUMBER</label>
+                                                
+                                                        <input oninput="convertToUpper(this)" tabindex="8" checkindex="8" placeholder="Enter PAN Card Number" type="text" name="PAN" id="PAN" class="form-control form-control-solid">
+                                                       
+                                                    </div>
+
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                        <label class="required fw-semibold fs-6 mb-2">Ledger Name</label>
+                                                         <input tabindex="9" checkindex="9" type="text" placeholder="Enter Ledger Name" name="ledgerName" id="ledgerName" class="form-control form-control-solid">
+                                                        
+                                                    </div>
+
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                        <label class="required fs-6 mb-2">Address</label>
+                                                        <input tabindex="10" checkindex="10" placeholder="Enter Client Address" type="text" name="address" id="address" class="form-control form-control-solid">
+                                                       
+                                                    </div>
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                
+                                                        <label class="required fw-semibold fs-6 mb-2">State</label>
+                                                        <select tabindex="11" checkindex="11" name="state" id="state" class="form-select form-select-solid" data-control="select2" data-placeholder="Select State" data-dropdown-parent="#kt_modal_2">
+                                                        
+                                                        <option></option>
+                                                            <% stateData.forEach(data=> {%> 
+                                                        <option value="<%=data.id%>"><%=data.name%></option>    
+                                                        <%}) %>
+                                                        </select>
+                                                            
+                                                    </div>
+                                                    
+                                                  
+                                                
+                                                 
+                                                
+                                                </div>
+
+                                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                                    
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                
+                                                        <label class="required fw-semibold fs-6 mb-2">City</label>
+                                                        <select tabindex="12" checkindex="12" name="city" id="city" class="form-select form-select-solid" data-control="select2" data-placeholder="Select City" data-dropdown-parent="#kt_modal_2">
+                                                            <option></option>
+                                                            <% cityData.forEach(data=> {%> 
+                                                        <option value="<%=data.id%>"><%=data.cityName%></option>    
+                                                        <%}) %>
+                                                        </select>
+                                                           
+                                                    </div>
+                                                 
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                        <label class="required fw-semibold fs-6 mb-2">Contact Person</label>
+                                                         <input tabindex="13" checkindex="13" type="text" placeholder="Enter Contact Person Name" name="personName" id="personName" class="form-control form-control-solid">
+                                                        
+                                                    </div>
+                                                
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                        <label class="required fw-semibold fs-6 mb-2">Mobile</label>
+                                                         <input tabindex="14" checkindex="14" oninput="validateWholeNumber(this)" type="text" placeholder="Enter Client Mobile Number" name="mobile" id="mobile" class="form-control form-control-solid">
+                                                       
+                                                    </div>
+                                                
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                
+                                                        <label class="required fw-semibold fs-6 mb-2">Email</label>
+                                                        <input tabindex="15" checkindex="15" type="text" placeholder="Enter Client Email" name="email" id="email" class="form-control form-control-solid">
+                                                        
+                                                    </div>
+                                                   
+                                                </div>
+                                            </div>
+
+                                            <div id="bankAccounts" style="display: none;">
+
+                                                <div class="d-flex flex-column align-items-start flex-xxl-row"
+                                                    style="padding-top: 20px;">
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                        <label class="required fw-semibold fs-6 mb-2">Ledger Name</label>
+                                                         <input tabindex="16" checkindex="16" type="text" placeholder="Enter Ledger Name" name="ledgerNameMid" id="ledgerNameMid" class="form-control form-control-solid">
+                                                        
+                                                    </div>
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                        <label class="required fw-semibold fs-6 mb-2">Bank A/C No.</label>
+                                                        <input oninput="validateWholeNumber(this)" tabindex="17" checkindex="17" type="text"
+                                                            placeholder="Enter Bank A/C No."
+                                                            name="accountNumber" id="accountNumber"
+                                                            class="form-control form-control-solid">
+
+                                                    </div>
+
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                                        <label class="required fw-semibold fs-6 mb-2">IFSC Code</label>
+                                                        <input oninput="convertToUpper(this)" tabindex="18" checkindex="18"
+                                                             type="text"
+                                                            placeholder="Enter IFSC Code" name="ifsc"
+                                                            id="ifsc" class="form-control form-control-solid">
+
+                                                    </div>
+
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+
+                                                        <label class="required fw-semibold fs-6 mb-2">Bank Branch</label>
+                                                        <input tabindex="19" checkindex="19" type="text"
+                                                            placeholder="Enter Bank Branch Name" name="bankBranch" id="bankBranch"
+                                                            class="form-control form-control-solid">
+
+                                                    </div>
+                                                   
+                                                </div>
+                                                <div class="d-flex flex-column align-items-start flex-xxl-row"
+                                                    style="padding-top: 20px;">
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+
+                                                        <label class="required fw-semibold fs-6 mb-2">State</label>
+                                                        <select tabindex="20" checkindex="20" name="bankState" id="bankState"
+                                                            class="form-select form-select-solid"
+                                                            data-control="select2" data-placeholder="Select State"
+                                                            data-dropdown-parent="#kt_modal_2">
+
+                                                            <option></option>
+                                                            <% stateData.forEach(data=> {%>
+                                                                <option value="<%=data.id%>">
+                                                                    <%=data.name%>
+                                                                </option>
+                                                                <%}) %>
+                                                        </select>
+
+                                                    </div>
+                                                    <div class="col-lg-3" style="margin-right: 10px;">
+
+                                                        <label class="required fw-semibold fs-6 mb-2">City</label>
+                                                        <select tabindex="21" checkindex="21" name="bankCity" id="bankCity"
+                                                            class="form-select form-select-solid"
+                                                            data-control="select2" data-placeholder="Select City"
+                                                            data-dropdown-parent="#kt_modal_2">
+                                                            <option></option>
+                                                            <% cityData.forEach(data=> {%>
+                                                                <option value="<%=data.id%>">
+                                                                    <%=data.cityName%>
+                                                                </option>
+                                                                <%}) %>
+                                                        </select>
+
+                                                    </div>
+
+
+
+                                                 
+
+                                                </div>
+                                            </div>
+                                             <!--end::Top-->
+     
+                                        
+     
+                                         </form>
+                                         <!--end::Form-->
+                                     </div>
+                                     <!--end::Card body-->
+                                 </div>
+                                 <!--end::Card-->
+                             </div>
+                             <!--end::Content-->
+     
+                 
+                         </div>
+                         <!--end::Layout-->
+                         </div>
+             
+                         <div class="modal-footer">
+                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="modalCloseBTN">Close</button>
+                             <button type="button" class="btn btn-primary" onclick="newLedger()" id="newLedgerBTN">
+                                 <span class="indicator-label">
+                                     Create New Ledger
+                                 </span>
+                                 <span class="indicator-progress">
+                                     Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                 </span>
+                             </button>
+                             <button type="button" class="btn btn-primary" onclick="editLedgers()"  id="ledgerUpdateBTN">
+                                 <span class="indicator-label">
+                                     Update Ledger  
+                                 </span>
+                                 <span class="indicator-progress">
+                                     Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                 </span>
+                             </button>
+                         </div>
+                     </div>
+                 </div>
+                </div>
+             </form>
+             
+
+             <!--set opening balance-->
+             <form id="refForm">
+             <div class="modal fade" data-bs-focus="false" tabindex="-1" id="kt_modal_stacked_3" data-bs-backdrop="static">
+                <div class="modal-dialog custom-crossing modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="modalTitle"></h3>
+                
+                            <!--begin::Close-->
+                            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                            </div>
+                            <!--end::Close-->
+                        </div>
+                
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <input type="hidden" name="ledgerID" id="ledgerID">
+                                    <input type="hidden" id="openingBalanceStore" value="0">
+                                    <input type="hidden" id="openingBalanceTypeStore">
+                                    <label for="date" class="form-label">Date</label>
+                                    <input checkindex="1" tabindex="1" type="text" id="refDate" class="form-control form-control-solid">
+                                </div>
+                                <div class="col-lg-3">
+                                      <label for="date" class="form-label">Reference Name</label>
+                                    <input checkindex="2" tabindex="2" type="text" id="refName" placeholder="Enter Reference Name" class="form-control form-control-solid">
+                                </div>
+                                <div class="col-lg-2">
+                                      <label for="date" class="form-label">Credit Days</label>
+                                    <input value="0" checkindex="3" tabindex="3" type="text" id="refDue" oninput="validateWholeNumber(this)" class="form-control form-control-solid">
+                                </div>
+                                <div class="col-lg-2">
+                                      <label for="date" class="form-label">Amount</label>
+                                    <input value="0" oninput="validateNumberWithDecimals(this)" checkindex="4" tabindex="4" type="text" id="refAmount" class="form-control form-control-solid">
+                                </div>
+                                <div class="col-lg-2">
+                                      <label for="date" class="form-label">Dr / Cr</label>
+                                        <select tabindex="5" checkindex="5" data-control="select2" data-placeholder="Select Balance Type" data-dropdown-parent="#kt_modal_stacked_3" id="refType" class="form-select form-select-solid">
+                                            <option></option>
+                                            <option value="dr">Dr</option>
+                                            <option value="cr">Cr</option>
+                                        </select>
+                                </div>
+                            </div>
+                            <div class="separator border-primary my-10"></div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr  class="fw-bold fs-6 text-gray-800">
+                                            <th>Date</th>
+                                            <th>Name</th>
+                                             <th>Credit Days</th>
+                                            <th>Amount</th>
+                                            <th>Dr / Cr</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="setRefTbody">
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="fw-bold fs-6 text-gray-800">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="display: none;" id="netText"></td>
+                                            <td>
+                                                <input name="total" disabled style="display: none;" type="text" class="form-control form-control-solid" id="netAmt">
+                                            </td>
+                                            <td id="netTyp2">
+                                                <input disabled style="display: none;" type="text" class="form-control form-control-solid" id="netType">
+                                            </td>
+                                        </tr>
+                                        <tr class="fw-bold fs-6 text-gray-800">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="display: none;" id="netText1"></td>
+                                            <td>
+                                                <input name="onAccount" disabled style="display: none;" type="text" class="form-control form-control-solid" id="netAmt1">
+                                            </td>
+                                            <td id="netTyp2">
+                                                <input name="onAccountType" disabled style="display: none;" type="text" class="form-control form-control-solid" id="netType1">
+                                            </td>
+                                        </tr>
+                                        <tr class="fw-bold fs-6 text-gray-800">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td style="display: none;" id="netText2"></td>
+                                            <td>
+                                                <input name="netBalance" disabled style="display: none;" type="text" class="form-control form-control-solid" id="netAmt2">
+                                            </td>
+                                            <td id="netTyp2">
+                                                <input disabled style="display: none;" type="text" class="form-control form-control-solid" id="netType2">
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                            <button type="button" onclick="submitReferences()" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </form>
+
+            <%- include("../../includes/footer", {pageName : "ledgers" }) %>

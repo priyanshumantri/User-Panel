@@ -1,0 +1,154 @@
+<%- include("../../includes/header", {pageName : "branches" }) %>
+    <%- include("../../includes/sidebar", {pageName : "branches" }) %>
+    <%- include("../../includes/toolbar", { pageName: "Edit Branch - " + data.name, pageHead: "Masters" }) %>
+
+
+
+
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                    <div class="card" style="padding: 30px;">
+                        <form id = "editBranchForm">
+                            <div class="card-header border-0 pt-6">
+                               
+
+                                <input type="hidden" name="id" value="<%=data.id%>">
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Branch Name</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.name%>" placeholder="Enter new Branch Name" type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <label class="required fw-semibold fs-6 mb-2">Branch Serial</label>
+        
+                                     <input value="<%=data.serial%>" placeholder="Enter Branch Serial" type="text" name="serial" class="form-control form-control-solid mb-3 mb-lg-0">
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">STD</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.std%>" type="text" placeholder="Enter Branch STD Code" name="std" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Landline No.</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.landline%>" type="text" placeholder="Enter Branch Landline No." name="landline" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Address</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.address%>" type="text" placeholder="Enter Branch Address" name="address" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Email</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.branchEmail%>" type="text" placeholder="Enter Branch Email" name="email" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Manager Name</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.managerName%>" placeholder="Enter Branch Manger Name" type="text" id="managerName" name="managerName" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Manager Email</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.managerEmail%>" placeholder="Enter Branch Manager Email" type="text" id="managerEmail" name="managerEmail" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Manager Mobile</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.managerMobile%>" placeholder="Enter Branch Manager Mobile" type="text" id="managerMobile" name="managerMobile" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <button onclick="editBranch()" type="button" class="btn btn-primary">Update Branch</button>
+                        </form>
+                        <!--end::Card-->
+                    </div>
+                </div>
+                <!--end::Content container-->
+            </div>
+
+          
+
+            <%- include("../../includes/footer", {pageName : "editBranch" }) %>

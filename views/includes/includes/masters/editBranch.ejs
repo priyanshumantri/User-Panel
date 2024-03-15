@@ -1,0 +1,39 @@
+<% if(pageName==="editBranch" ) { %>
+
+
+    <script>
+        function editBranch() {
+
+            const editBranch = document.getElementById("editBranchForm")
+            const data = new URLSearchParams();
+            for (const pair of new FormData(editBranch)) {
+                data.append(pair[0], pair[1]);
+            }
+            fetchPostRequest("/masters/branches/edit", data, "Branch Updated Successfully")
+
+          
+        }
+    </script>
+
+    <script>
+        var input1 = document.querySelector("#managerEmail");
+        var input2 = document.querySelector("#managerMobile");
+        var input3 = document.querySelector("#managerName");
+        new Tagify(input1);
+
+        new Tagify(input2);
+
+        new Tagify(input3);
+        function allowOnlyNumbers(event) {
+            const inputValue = event.target.value;
+            const regex = /^[0-9]*$/;
+
+            if (!regex.test(inputValue)) {
+                // If the input value contains non-numeric characters, remove them
+                event.target.value = inputValue.replace(/[^0-9]/g, '');
+            }
+        }
+
+    </script>
+
+    <%} %>

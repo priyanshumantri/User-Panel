@@ -1,0 +1,44 @@
+<% if(pageName === "subLedgers") {%> 
+    <script src="/../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+    <script src="/../../../assets/js/custom/masters/sub-ledgers/new.js"></script>
+    <script src="/../../../assets/js/custom/masters/sub-ledgers/edit.js"></script>
+    <script>
+        function deleteSubLedger(id) {
+            Swal.fire({
+                        text: "Are you sure you would like to cancel?",
+                        icon: "warning",
+                        showCancelButton: !0,
+                        buttonsStyling: !1,
+                        confirmButtonText: "Yes, delete itt!",
+                        cancelButtonText: "No, return",
+                        customClass: {
+                            confirmButton: "btn btn-primary",
+                            cancelButton: "btn btn-active-light"
+                        }
+                    }).then((data)=> {
+                        if(data.isConfirmed) {
+                            const data = new URLSearchParams();
+                            data.append("id", id)
+                            fetchPostRequest("/masters/sub-ledgers/delete", data, "Sub Ledger Deleted Successfully")
+                        }
+                    })
+        }
+    </script>
+    <script>
+        function editSubLedger(id, name, underID, openingBalance, openingBalanceType) {
+            $("#id").val(id)
+            $("#openingBalance").val(openingBalance)
+            $("#openingBalanceType").val(openingBalanceType).select2()
+            const underElement =  document.getElementById("underLedger")
+         for(let i = 0; i < underElement.options.length; i++) {
+              if(underElement.options[i].value == underID) {
+                underElement.options[i].selected = true;
+              }
+         }
+
+         $("#underLedger").select2()
+         $("#subLedger").val(name)
+            $("#kt_modal_update_permission").modal("show")
+        }
+    </script>
+<%} %>

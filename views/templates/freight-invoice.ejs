@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;   
+        }
+
+        .container1 {
+            max-width: 100%;
+            /* Set your desired maximum width */
+            margin: 0 auto;
+            overflow: hidden;
+            border: 2px solid black;
+            margin: 10px;
+        }
+
+        .td {
+            border: 2px solid black;
+            font-size: small;
+        }
+
+        table>tbody>tr>td {
+            border-bottom: 0 !important;
+            border-top: 0 !important;
+            border-left: 0 !important;
+
+        }
+    </style>
+</head>
+<% 
+//calculating total of each freight type
+const totalFreight = data.lr.reduce((acc, curr) => {
+    return acc + curr.freight;
+}, 0);
+
+const totalCollection = data.lr.reduce((acc, curr) => {
+    return acc + curr.collectionCharges;
+}, 0);
+
+const totalDelivery = data.lr.reduce((acc, curr) => {
+    return acc + curr.delivery;
+}, 0);
+
+const totalLabour = data.lr.reduce((acc, curr) => {
+    return acc + curr.labour;
+}, 0);
+
+const totalRebooking = data.lr.reduce((acc, curr) => {
+    return acc + curr.rebooking;
+}, 0);
+
+const totalLoadingDetention = data.lr.reduce((acc, curr) => {
+    return acc + curr.loadingDetention;
+}, 0);
+
+const totalUnloadingDetention = data.lr.reduce((acc, curr) => {
+    return acc + curr.unloadingDetention;
+}, 0);
+
+const totalDemmurage = data.lr.reduce((acc, curr) => {
+    return acc + curr.demmurage;
+}, 0);
+
+const totalUnloading = data.lr.reduce((acc, curr) => {
+    return acc + curr.unloading;
+}, 0);
+
+const totalExtraWeight = data.lr.reduce((acc, curr) => {
+    return acc + curr.exWeight;
+}, 0);
+
+const totalExtraHeight = data.lr.reduce((acc, curr) => {
+    return acc + curr.exHeight;
+}, 0);
+
+const totalOthers = data.lr.reduce((acc, curr) => {
+    return acc + curr.others;
+}, 0);
+
+const totalST = data.lr.reduce((acc, curr) => {
+    return acc + curr.st;
+}, 0);
+
+const totalCGST = data.lr.reduce((acc, curr) => {
+    return acc + curr.cgst;
+}, 0);
+
+const totalSGST = data.lr.reduce((acc, curr) => {
+    return acc + curr.sgst;
+}, 0);
+
+const totalIGST = data.lr.reduce((acc, curr) => {
+    return acc + curr.igst;
+}, 0);
+
+const netFreight = totalFreight + totalCollection + totalDelivery + totalLabour + totalRebooking + totalLoadingDetention + totalUnloadingDetention + totalDemmurage + totalUnloading + totalExtraWeight + totalExtraHeight + totalOthers + totalST + totalCGST + totalSGST + totalIGST;
+let headColSpan = 10;
+let netAddition = 0;
+if(totalRebooking > 0) {
+    headColSpan = headColSpan + 1;
+    netAddition = netAddition + 1
+}
+
+if(totalLoadingDetention > 0) {
+    headColSpan = headColSpan + 1;
+    netAddition = netAddition + 1
+}
+
+if(totalUnloadingDetention > 0) {
+    headColSpan = headColSpan + 1;
+    netAddition = netAddition + 1
+}
+
+if(totalDemmurage > 0) {
+    headColSpan = headColSpan + 1;
+    netAddition = netAddition + 1
+}
+
+if(totalUnloading > 0) {
+    headColSpan = headColSpan + 1;
+    netAddition = netAddition + 1
+}
+
+if(totalExtraWeight > 0) {
+    headColSpan = headColSpan + 1;
+    netAddition = netAddition + 1
+}
+
+if(totalExtraHeight > 0) {
+    headColSpan = headColSpan + 1;
+    netAddition = netAddition + 1
+}
+
+
+let addRows = 0
+if(data.lr.length < 8) {
+ addRows = 14 - data.lr.length
+}
+
+%>
+<body>
+    <div class="container1">
+        <div style="margin-top: 10px;" class="row">
+            <img style="padding: 10px; height: 108px; width: 576px; margin-left: auto; margin-right: auto;"
+                src="https://i.postimg.cc/L88tRT7g/img.png" alt="NA">
+            <p style="font-weight: 600; text-align: center; margin-left: 20px; margin-right: 20px;"><%=user.branch.address%> <br> Mob No. - <%=user.branch.managerMobile[0]%>. <br> Email -
+                <%=user.branch.branchEmail%></p>
+        </div>
+        <table style="border-top: 2px solid black; border-bottom: 2px solid black;">
+            <td class="td" style="border-right: 0; width: 100vh;"><span
+                    style=" margin-left: 10px; font-weight: 700;">PAN NO. - <%=company.panCard%></span></td>
+            <td class="td"
+                style=" border-left: 0; border-right: 0; width: 100vh; text-align: center; font-weight: 800;">Invoice
+            </td>
+            <td class="td"
+                style="border-right: 0 !important; border-left: 0; width: 100vh; text-align: right; padding-right: 20px; font-weight: 700;">
+                GST - 29GNLPM9619BZ</td>
+        </table>
+
+        <table>
+            <td class="td" style=" width: 100vh;"><span style=" margin-left: 10px; font-weight: 700; text-transform: uppercase;">
+                    M/s. <%=data.ledger.name%>
+                </span> <br>
+                <span style=" margin-left: 10px; "><%=data.ledger.address%></span> <br>
+                <span style="font-weight: 800; margin-left: 10px; padding-top: 30px;">GST No. - <%=data.ledger.taxation.GST%></span>
+            </td>
+            <td class="td" colspan="4"
+                style="border-right: 0 !important; padding-left: 10px; width: 100vh; text-align: left; font-weight: 800;">
+                Invoice No. - <%=data.billNumber%> <br> Invoice Date: - <%=data.date%> <br> SAC Code: - 996791</td>
+        </table>
+
+        <table style="width: 100%;">
+            <thead>
+                <th style="border-left: 0; width: 70px; text-align: center;" class="td"><span>Sr No.</span></th>
+                <th style=" text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">LR Date</span></th>
+                <th style=" text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">LR No.</span></th>
+                <th style=" text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">From</span></th>
+                <th style=" text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">To</span></th>
+                <th style=" text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">Invoice No.</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">PKGs</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">Weight</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">Rate</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">Freight</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">Labour</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">L/C</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">DD</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">Other</span></th>
+                <th style="text-align: center;" class="td"> <span style="margin-left: 5px !important; margin-right: 5px !important;">ST</span></th>
+
+                <% if(totalRebooking > 0) {%> 
+                    <th style="text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">Rebooking</span></th>
+                <%} %>
+                <% if(totalLoadingDetention > 0) {%> 
+                    <th style="text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important; text-align: center;">Loading <br> Detention</span></th>    
+                <%} %>
+                <% if(totalUnloadingDetention > 0) {%> 
+                
+                    <th style="text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important; text-align: center;">Unloading Detention</span></th>
+                    <%} %>
+                <% if(totalDemmurage > 0 ) {%> 
+                    <th style="text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">Demmurage</span></th>    
+                <%}  %>
+                <% if(totalUnloading > 0) {%> 
+                    <th style="text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">Unloading</span></th>
+                    <%} %>
+                <% if(totalExtraWeight > 0) {%> 
+                    <th style="text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">Extra Weight</span></th>    
+                <%} %>
+                <% if(totalExtraHeight) {%>  
+                    <th style="text-align: center;" class="td"><span style="margin-left: 5px !important; margin-right: 5px !important;">Extra Height</span></th>
+                    <%} %>
+                <th style="text-align: center; border-right: 0;" class="td"><span>Total</span></th>
+            </thead>
+
+            <tbody>
+                <% let unCollectedGST = 0 %>
+             <% data.lr.forEach((info, index)=> {%> 
+                <% let totalLRFreight = info.freight + info.collectionCharges + info.delivery + info.labour + info.rebooking + info.loadingDetention + info.unloadingDetention + info.demmurage + info.unloading + info.exWeight + info.exHeight + info.others + info.st
+                         
+                %>
+                <tr>
+                    <td style="text-align: center;" class="td"><%=index+1%></td>
+                    <td style="text-align: center;" class="td"><%=info.lrNumber.date%></td>
+                    <td style="text-align: center;" class="td"><%=info.lrNumber.lrNumber%></td>
+                    <td style="text-align: center;" class="td"><%=info.lrNumber.from.cityName%></td>
+                    <td style="text-align: center;" class="td"><%=info.lrNumber.to.cityName%></td>
+                    <td style="text-align: center;" class="td"><%=info.lrNumber.ewayBill[0].invoiceNumber%></td>
+                    <td style="text-align: center;" class="td"><%=info.lrNumber.total.qty%></td>
+                    
+                    <td style="text-align: center;" class="td"><%=info.lrNumber.total.chargedWeight%></td>
+                    <td style="text-align: center;" class="td">TBD</td>
+                    <td style="text-align: center;" class="td"><%=info.freight%></td>
+                    <td style="text-align: center;" class="td"><%=info.labour%></td>
+                    <td style="text-align: center;" class="td"><%=info.collectionCharges%></td>
+                    <td style="text-align: center;" class="td"><%=info.delivery%></td>
+                    <td style="text-align: center;" class="td"><%=info.others%></td>
+                    <td style="text-align: center;" class="td"><%=info.st%></td>
+                
+                    <% if(totalRebooking > 0) {%> 
+                        <td style="text-align: center;" class="td"><%=info.rebooking%></td>
+                        <%} %>  
+               
+                    <% if(totalLoadingDetention > 0) {%>  
+                        <td style="text-align: center;" class="td"><%=info.loadingDetention%></td>
+                        <%} %>
+                    <% if(totalUnloadingDetention > 0) {%> 
+                        <td style="text-align: center;" class="td"><%=info.unloadingDetention%></td>
+                        <%} %>
+                    <% if(totalDemmurage > 0) {%>
+                        <td style="text-align: center;" class="td"><%=info.demmurage%></td>
+                        <%} %>
+                        <% if(totalUnloading > 0 ) {%> 
+                            <td style="text-align: center;" class="td"><%=info.unloading%></td>
+                            <%} %>
+                    <% if(totalExtraWeight > 0) {%> 
+                        <td style="text-align: center;" class="td"><%=info.exWeight%></td>
+                        <%} %>
+                   <% if(totalExtraHeight > 0 ) {%> 
+                    <td style="text-align: center;" class="td"><%=info.exHeight%></td>
+                    <%} %>
+                    <td style="text-align: center; border-right: 0 !important;" class="td"><%=totalLRFreight%></td>
+                </tr>  
+                
+                <% 
+                    if(info.cgst == 0 && info.sgst == 0 && info.igst == 0) {
+                        unCollectedGST = (totalLRFreight * 5) / 100;
+                    }
+                %>
+                
+            <%}) %>
+               
+              
+               
+               <% for(i=0; i<addRows; i++) {%> 
+
+                <tr>
+                    <td style="text-align: center; visibility: hidden;" class="td">1</td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <td style="text-align: center;" class="td"></td>
+                    <% if(totalRebooking > 0) {%> 
+                        <td style="text-align: center;" class="td"></td>
+                        <%} %>  
+               
+                    <% if(totalLoadingDetention > 0) {%>  
+                        <td style="text-align: center;" class="td"></td>
+                        <%} %>
+                    <% if(totalUnloadingDetention > 0) {%> 
+                        <td style="text-align: center;" class="td"></td>
+                        <%} %>
+                    <% if(totalDemmurage > 0) {%>
+                        <td style="text-align: center;" class="td"></td>
+                        <%} %>
+                        <% if(totalUnloading > 0 ) {%> 
+                            <td style="text-align: center;" class="td"></td>
+                            <%} %>
+                    <% if(totalExtraWeight > 0) {%> 
+                        <td style="text-align: center;" class="td"></td>
+                        <%} %>
+                   <% if(totalExtraHeight > 0 ) {%> 
+                    <td style="text-align: center;" class="td"></td>
+                    <%} %>
+                    <td style="text-align: center; border-right: 0 !important;" class="td"></td>
+                </tr>
+                
+            <%} %>
+               
+               
+               
+
+
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="<%=headColSpan%>" style=" border-top: 2px solid black !important; width: 100%;">Rupees: Nine Thousand
+                        Four Hundred Fifty Only</td>
+                    <td colspan="5"
+                        style=" border-left: 2px solid black !important; border-top: 2px solid black !important; text-align: right; padding-right: 20px !important; font-weight: 700; border-right: 2px solid black !important;">
+                        SGST / UTGST</td>
+                    <td style="border-top: 2px solid black !important; padding: 10px !important;"><%=totalSGST%></td>
+                </tr>
+
+                <tr>
+                    <td colspan="<%=headColSpan%>" style="font-weight: 700; border-top: 2px solid black !important;">Account
+                        Name:MEGHA CARGO SERVICE <br>
+                        Bank Name: ICICI Bank A/C No: 017905502327 <br>
+                        IFSC Code: ICIC0000179 Branch:Vapi</td>
+                    <td colspan="5"
+                        style=" border-left: 2px solid black; border-top: 2px solid black !important; text-align: right; padding-right: 20px !important; font-weight: 700; border-right: 2px solid black !important;">
+                        CGST <br>
+                        IGST
+                    </td>
+                    <td style="border-top: 2px solid black !important; padding: 10px !important;"><%=totalCGST%> <br> <%=totalIGST%></td>
+                </tr>
+
+                <tr>
+                    <td colspan="<%=headColSpan%>" style="font-weight: 700; border-top: 2px solid black !important;">Remarks: </td>
+                    <td colspan="5"
+                        style=" border-left: 2px solid black; border-top: 2px solid black !important; text-align: right; padding-right: 20px !important; font-weight: 700; border-right: 2px solid black !important;">
+                        Total
+                    </td>
+                    <td style="border-top: 2px solid black !important; padding: 10px !important;"><%=netFreight%></td>
+                </tr>
+
+                <tr>
+                    <td colspan="24" style="font-weight: 700; border-top: 2px solid black !important;">
+                      <div style="float: left;">
+                        1) 24 % Interest Will be charged on all accounts remaining unpaid IO Day after submission. <br>
+                        2) All Subject TO Vapi Jurisdiction. <br>
+                        3) @2.5% + SGST @2.5%/ IGST @5% PAYABLE BY PARTY UNDER RCM.
+                    </div>
+                    <div style="float: right;">
+                        GST TO BE PAID BY PARTY NOT INCLUDED IN INVOICE ₹ <%=unCollectedGST %> <br> <br>
+                        <div style="margin-left: 50px; text-align: center;">
+                            <span style="margin-left: 180px;">For MEGHA CARGO SERVICE</span> <br> <br> <br>
+                        <span style="margin-left: 180px;"> Authorised Signatory</span>
+                        </div>
+                       
+                    </div>
+                </td>
+                  
+                </tr>
+            </tfoot>
+        </table>
+
+
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

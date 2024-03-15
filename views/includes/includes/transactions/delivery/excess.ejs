@@ -1,0 +1,342 @@
+<% if(pageName === "excess") {%> 
+
+<script>
+  const datatable =   $("#kt_permissions_table").DataTable({
+                "info": true,
+                'order': [],
+                'pageLength': 10,
+                'scrollX': true, // Set the height of the scrollable area (adjust as needed)
+                'fixedColumns': {
+                    leftColumns: 2, // Number of columns to freeze on the left
+                },
+            });
+            const filterSearch = document.querySelector('[data-kt-permissions-table-filter="search"]');
+            filterSearch.addEventListener('keyup', function (e) {
+                datatable.search(e.target.value).draw();
+            });
+</script> 
+
+<script>
+    $("#lorryArrival").on("change", function(){
+        fetch(`/transactions/delivery/excess/get-arrival-detail?id=${$(this).val()}`, { 
+            method: 'GET',
+        }).then(response => {
+            return response.json().then(data=> {
+                $("#challanNumber").val(data.challanNumber)
+                $("#lr").empty()
+                const emptyOption = `<option value="">Select LR</option>`
+                $("#lr").append(emptyOption)
+
+                data.lrData.forEach(lr=> {
+                    const option = `<option value="${lr.lrId}">${lr.lrNumber}</option>`
+                    $("#lr").append(option)
+                })
+                
+                $("#lr").prop("disabled", false).select2()
+                setTimeout(() => {
+                    $("#lr").focus()
+                }, 100)
+            })  
+        } )
+    })
+</script>
+<script>
+    $("#lr").on("change", function() {
+        fetch(`/transactions/delivery/excess/get-lr-detail?id=${$(this).val()}&la=${$("#lorryArrival").val()}`, { 
+            method: 'GET',
+        }).then(response => {
+            return response.json().then(data=> {
+                $("#maxQty").val(data.qty)
+                $("#maxActualWeight").val(data.actualWeight)
+                $("#maxChargedWeight").val(data.chargedWeight)
+                $("#qty").prop("disabled", false)
+                $("#chargedWeight").prop("disabled", false)
+                $("#lorryArrival").prop("disabled", true)
+                $("#lr").prop("disabled", true)
+                $("#qty").focus()
+
+            })  
+        } )
+
+    })
+</script>
+
+<script>
+    $("#qty").on("input", function() {
+        if(parseInt($(this).val()) > $("#maxQty").val()) {
+            $(this).val($("#maxQty").val())
+            $("#actualWeight").val($("#maxActualWeight").val())
+            $("#chargedWeight").val($("#maxChargedWeight").val())
+        } 
+
+        const calculatedActualWeight = (parseInt($("#maxActualWeight").val()) / parseInt($("#maxQty").val())) * (parseInt($(this).val()))
+        $("#actualWeight").val(customRound(calculatedActualWeight, 2))
+    })
+    $("#actualWeight").on("input", function() {
+        const calculatedWeight = $(this).val() / $("#`qty`").val()
+        if($(this).val() > $("#maxActualWeight").val()) {
+            $(this).val($("#maxActualWeight").val())
+        }
+    })
+    $("#chargedWeight").on("input", function() {
+        if($(this).val() > $("#maxChargedWeight").val()) {
+            $(this).val($("#maxChargedWeight").val())
+        }
+    })
+</script>
+<script>
+    function addNewExcess() {
+        $("#newExcess").attr("data-kt-indicator", "on").prop("disabled", true)
+        $("#closeBTN").prop("disabled", true)
+
+       if($("#lorryArrival").val() === "") {
+           showError("Please select Lorry Arrival")
+       } else if($("#challanNumber").val() === "") {
+        showError("Please enter Challan Number")
+       } else if($("#lr").val() === "") {
+        showError("Please select LR")
+       } else if(parseInt($("#qty").val() < 1)) {
+        showError("Please enter valid quantity")
+       } else if(parseInt($("#actualWeight").val()) < 1) {
+        showError("Please enter valid actual weight")
+       } else if(parseInt($("#chargedWeight").val()) < 1) {
+        showError("Please enter valid charged weight")
+       } else {
+        const data = {
+            lorryArrival: $("#lorryArrival").val(),
+            challanNumber: $("#challanNumber").val(),
+            lr: $("#lr").val(),
+            qty: $("#qty").val(),
+            actualWeight: $("#actualWeight").val(),
+            chargedWeight: $("#chargedWeight").val()
+        }
+        fetch("/transactions/delivery/excess/new", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        }).then(data=> {
+            if(data.status === 200) {
+                                  Swal.fire({
+                                text: "Successfully added new excess!",
+                                icon: "success",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((response) => {
+                                if (response.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                } else if(data.status === 500) {
+                   Swal.fire({
+                       icon: 'error',
+                       title: 'Error',
+                       text: data.message,
+                       showConfirmButton: false,
+                       timer: 1500
+                   }).then(response=> {
+                       if(response.isConfirmed) {
+                           location.reload()
+                       }
+                   })
+                } else if(data.status === 400) {
+                   return response.json().then(data=> {
+                    showError(data.message)
+                    $("#newExcess").attr("data-kt-indicator", "off").prop("disabled", false)
+                    $("#closeBTN").prop("disabled", false)
+                   })
+                } else if(data.status === 401) {
+                    showError("You are not authorized to perform this action")
+                    $("#newExcess").attr("data-kt-indicator", "off").prop("disabled", false)
+                    $("#closeBTN").prop("disabled", false)
+                }
+           
+        })
+       }
+    }
+</script>
+<script>
+    function deleteExcess(id) {
+
+            Swal.fire({
+            text: "Are you sure you want to delete this Excess Request?",
+            icon: "warning",
+            showCancelButton: !0,
+            buttonsStyling: !1,
+            confirmButtonText: "Yes, delete!",
+            cancelButtonText: "No, cancel",
+            customClass: {
+                confirmButton: "btn fw-bold btn-danger",
+                cancelButton: "btn fw-bold btn-active-light-primary"
+            }
+        }).then(response => {
+            if (response.isConfirmed) {
+                // Send the form data to the server
+
+                fetch(`/transactions/delivery/excess/delete?id=${id}`, {
+                    method: "GET"
+                }).then((data) => {
+                    if (data.status === 400) {
+
+                        return data.json().then((message) => {
+                            Swal.fire({
+                                text: message.message,
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            })
+                        })
+
+                    } else if (data.status === 200) {
+                        Swal.fire({
+                            text: "Lorry Arrival Deleted Successfully",
+                            icon: "success",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((response) => {
+                            if (response.isConfirmed) {
+                                location.reload()
+                            }
+                        })
+                    } else if (data.status === 401) {
+                        Swal.fire({
+                            text: "You are not authorized to perform this action",
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((data) => {
+                            if (data.isConfirmed) {
+                                i.setAttribute("data-kt-indicator", "off")
+                                i.disabled = 0
+                                n.hide()
+                                e.reset()
+                            }
+                        })
+                    }
+                })
+            }
+        })
+
+     
+    }
+</script>
+
+<script>
+    function actionExcess(id, qty, actualWeight, chargedWeight) {
+       
+        $("#excessID").val(id)
+        $("#excessQty").val(qty)
+        $("#excessMaxQty").val(qty)
+        $("#excessMaxActualWeight").val(actualWeight)
+        $("#excessActualWeight").val(actualWeight)
+        $("#excessMaxChargedWeight").val(chargedWeight)
+        $("#excessChargedWeight").val(chargedWeight)
+        $("#excessAction").modal("show")
+    }
+</script>
+
+<script>
+    $("#excessQty").on("input", function() {
+        if(parseInt($(this).val()) > $("#excessMaxQty").val()) {
+            $(this).val($("#excessMaxQty").val())
+            $("#excessActualWeight").val($("#excessMaxActualWeight").val())
+            $("#excessChargedWeight").val($("#excessMaxChargedWeight").val())
+        } 
+
+        const calculatedActualWeight = (parseInt($("#excessMaxActualWeight").val()) / parseInt($("#excessMaxQty").val())) * (parseInt($(this).val()))
+        $("#excessActualWeight").val(customRound(calculatedActualWeight, 2))
+    })
+    $("#excessActualWeight").on("input", function() {
+        const calculatedWeight = $(this).val() / $("#`qty`").val()
+        if(parseInt($(this).val()) > $("#excessMaxActualWeight").val()) {
+            $(this).val($("#excessMaxActualWeight").val())
+        }
+    })
+    $("#excessChargedWeight").on("input", function() {
+        if(parseInt($(this).val()) > $("#excessMaxChargedWeight").val()) {
+            $(this).val($("#excessMaxChargedWeight").val())
+        }
+    })
+</script>
+
+
+<script>
+    function actionOnExcess() {
+        if(parseInt($("#excessQty").val()) < 1) {
+            showError("Please enter valid quantity")
+        } else if(parseInt($("#excessActualWeight").val()) < 1) {
+            showError("Please enter valid actual weight")
+        } else if(parseInt($("#excessChargedWeight").val()) < 1) {
+            showError("Please enter valid charged weight")
+        } else {
+            $("#actionSubmitBTN").attr("data-kt-indicator", "on").prop("disabled", true)
+            $("#excessCloseBTN").prop("disabled", true)
+            const data = {
+                id: $("#excessID").val(),
+                qty: $("#excessQty").val(),
+                actualWeight: $("#excessActualWeight").val(),
+                chargedWeight: $("#excessChargedWeight").val()
+            }
+            fetch("/transactions/delivery/excess/action", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }).then(data=> {
+                if(data.status === 200) {
+                    Swal.fire({
+                                text: "Successfully updated excess!",
+                                icon: "success",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((response) => {
+                                if (response.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                } else if(data.status === 500) {
+                   Swal.fire({
+                       icon: 'error',
+                       title: 'Error',
+                       text: data.message,
+                       showConfirmButton: false,
+                       timer: 1500
+                   }).then(response=> {
+                       if(response.isConfirmed) {
+                           location.reload()
+                       }
+                   })
+                } else if(data.status === 400) {
+                   return response.json().then(data=> {
+                    showError(data.message)
+                    $("#excessActionBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                    $("#excessCloseBTN").prop("disabled", false)
+                   })
+                } else if(data.status === 401) {
+                    showError("You are not authorized to perform this action")
+                    $("#excessActionBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                    $("#excessCloseBTN").prop("disabled", false)
+                }
+            })
+        }
+    }
+</script>
+    
+<% } %>

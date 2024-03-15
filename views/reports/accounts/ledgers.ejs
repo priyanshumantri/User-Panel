@@ -1,0 +1,212 @@
+<%- include("../../includes/header", {pageName : "reportsLedgers" }) %>
+    <%- include("../../includes/sidebar", {pageName : "reportsLedgers" }) %>
+
+
+
+
+    <form id="ledgerForm">
+
+        <div id="kt_app_content_container" class="app-container  container-xxl "
+            style="margin-bottom: 30px; margin-top: 30px;">
+
+            <div style="padding: 30px;" class="card card-p-0 card-flush">
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <label class="form-label">Select Date</label>
+                                    <input class="form-control form-control-solid" placeholder="Pick date range"
+                                        id="kt_daterangepicker_4" name="date" />
+                                </div>
+                                <div class="col-lg-5">
+                                    <label class="form-label">Select Ledger Name</label>
+                                    <select class="form-select form-select-solid" data-control="select2"
+                                        data-placeholder="Select Ledger Name" name="ledgerName" id="ledgerName">
+                                        <option></option>
+                                        <% ledgerData.forEach((info)=> {%>
+                                            <option value="<%=info.id%>">
+                                                <%=info.name%>
+                                            </option>
+                                            <%}) %>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="form-label">Narration</label>
+                                    <select class="form-select form-select-solid" name="narration" id="narration" data-control="select2" data-placeholder="Select Narration">
+                                        <option></option>
+                                        <option value="true">Yes</option>
+                                        <option value="false" selected>No</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="form-label" for="" style="visibility: hidden;">.</label> <br>                                    
+                                    <button type="button" onclick="getLedgerReport()"
+                                        class="btn btn-sm btn-primary">Preview</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+
+        </div>
+
+
+        </form>
+
+        <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+            <div id="kt_app_content_container" class="app-container  container-xxl ">
+
+                <div style="padding: 30px;" class="card card-p-0 card-flush">
+                    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                        <div class="card-title">
+                            <!--begin::Search-->
+                            <div class="d-flex align-items-center position-relative my-1">
+                                <span class="svg-icon fs-1 position-absolute ms-4">
+                                    <i class="ki-duotone ki-magnifier fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <input type="text" data-kt-filter="search"
+                                    class="form-control form-control-solid w-250px ps-14"
+                                    placeholder="Search Entry" />
+                            </div>
+                            <!--end::Search-->
+                            <!--begin::Export buttons-->
+                            <div id="kt_datatable_example_1_export" class="d-none"></div>
+                            <!--end::Export buttons-->
+                        </div>
+                        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                            <!--begin::Export dropdown-->
+                            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
+                                data-kt-menu-placement="bottom-end">
+                                <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
+                                        class="path2"></span></i>
+                                Export Report
+                            </button>
+                            <!--begin::Menu-->
+                            <div id="kt_datatable_example_export_menu"
+                                class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                                data-kt-menu="true">
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                        Copy to clipboard
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#excel" class="menu-link px-3" data-kt-export="excel">
+                                        Export as Excel
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                        Export as CSV
+                                    </a>
+                                </div>
+                                <div class="menu-item px-3">
+                                    <a id="pdf" class="menu-link px-3" data-kt-export="pdf">
+                                        Export as PDF
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                <!--begin::Menu item-->
+
+                                <!--end::Menu item-->
+                            </div>
+                            <!--end::Menu-->
+                            <!--end::Export dropdown-->
+
+                            <!--begin::Hide default export buttons-->
+                            <div id="kt_datatable_example_buttons" class="d-none"></div>
+                            <!--end::Hide default export buttons-->
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <style>
+                            /* For border-top */
+table tbody tr:last-child td:nth-child(5),
+table tbody tr:last-child td:nth-child(6),
+.third-last-row td:nth-child(5),
+.third-last-row td:nth-child(6){
+    border-top: 0.2px solid black !important;
+}
+
+/* For font-weight and color */
+table tbody tr:last-child td:nth-child(4),
+table tbody tr:last-child td:nth-child(5),
+table tbody tr:last-child td:nth-child(6),
+.third-last-row td:nth-child(4),
+.third-last-row td:nth-child(5),
+.third-last-row td:nth-child(6),
+.two-last-row td:nth-child(4),
+.two-last-row td:nth-child(5),
+.two-last-row td:nth-child(6){
+    font-weight: 700 !important;
+    color: black !important;
+    text-align: center;
+}
+
+
+/* For border-top */
+[data-bs-theme="dark"] table tbody tr:last-child td:nth-child(5),
+[data-bs-theme="dark"] table tbody tr:last-child td:nth-child(6),
+[data-bs-theme="dark"] .third-last-row td:nth-child(5),
+[data-bs-theme="dark"] .third-last-row td:nth-child(6) {
+    border-top: 0.2px solid #e0e0e0 !important;
+}
+
+/* For font-weight and color */
+[data-bs-theme="dark"] table tbody tr:last-child td:nth-child(4),
+[data-bs-theme="dark"] table tbody tr:last-child td:nth-child(5),
+[data-bs-theme="dark"] table tbody tr:last-child td:nth-child(6),
+[data-bs-theme="dark"] .third-last-row td:nth-child(4),
+[data-bs-theme="dark"] .third-last-row td:nth-child(5),
+[data-bs-theme="dark"] .third-last-row td:nth-child(6),
+[data-bs-theme="dark"] .two-last-row td:nth-child(4),
+[data-bs-theme="dark"] .two-last-row td:nth-child(5),
+[data-bs-theme="dark"] .two-last-row td:nth-child(6){
+    font-weight: 700 !important;
+    color: white !important;
+    text-align: center;
+}
+
+
+                          </style>
+                        <table class="table align-middle  rounded table-row-dashed fs-6 g-5" id="kt_datatable_example">
+                            <thead>
+                                <!--begin::Table row-->
+                                <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                    <th class="min-w-100px">Date</th>
+
+                                    <th class="min-w-500px">Particulars</th>
+
+                                    <th class="min-w-75px">Vch Type</th>
+                                    <th class="min-w-150px">Vch No.</th>
+                                    <th class="min-w-100px">Debit</th>
+                                    <th class="min-w-100px">Credit</th>
+                                    <th class="min-w-100px">Balance</th>
+                                </tr>
+                                <!--end::Table row-->
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+                              
+                            </tbody>
+                            
+                           
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <%- include("../../includes/footer", {pageName : "reportsLedgers" }) %>

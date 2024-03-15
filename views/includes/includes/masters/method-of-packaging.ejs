@@ -1,0 +1,46 @@
+<% if(pageName === "method-of-packaging") {%> 
+
+    <script src="../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+    <script src="../../../assets/js/custom/masters/method-of-packaging/mop.js"></script>
+    <script src="../../../assets/js/custom/masters/method-of-packaging/editMop.js"></script>
+
+    <script>
+         function deleteMethodOfPackaging(id, name) {
+            Swal.fire({
+                text: "Are You Sure You Want To Delete " + name + "method of packaging?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = new URLSearchParams();
+                    data.append('id', id);// Define the data to send in the request body
+                    fetchPostRequest("/masters/method-of-packaging/delete", data, "Delete Method of Packaging")
+                   
+                 
+                } else {
+                    // Handle the cancel action here
+                }
+            });
+        }
+
+        function editMethodOfPackaging(id, name) {
+            const editModal = document.getElementById('kt_modal_update_permission');
+            const methodOfPackagingInput = document.querySelector('#kt_modal_update_permission input[name="editMethodOfPackaging"]');
+            const methodOfPackagingID = document.querySelector('#kt_modal_update_permission input[name="id"]');
+
+            methodOfPackagingID.value = id
+            methodOfPackagingInput.value = name
+
+            $(editModal).modal('show');
+        }
+
+    </script>
+
+    <% } %>

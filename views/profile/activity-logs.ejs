@@ -1,0 +1,136 @@
+<%- include("../includes/header", {pageName : "overview" }) %>
+    <%- include("../includes/sidebar", {pageName : "overview" }) %>
+        <%- include("../includes/toolbar", {pageName : "Overview" , pageHead : "Activity" }) %>
+            <%- include("navbar", {pageName : "activityLogs" }) %>
+                <div class="card card-docs flex-row-fluid mb-2" id="kt_docs_content_card">
+                    <!--begin::Card Body-->
+                    <div class="card-body fs-6 py-15 px-10 py-lg-15 px-lg-15 text-gray-700">
+                        <!--begin::Section-->
+                        <div class="py-5">
+                            <!--begin::Card-->
+                            <div class="card card-p-0 card-flush border-0 bg-transparent">
+                                <!--begin::Card header-->
+                                <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                                    <!--begin::Card title-->
+                                    <div class="card-title">
+                                        <!--begin::Search-->
+                                        <div class="d-flex align-items-center position-relative my-1">
+                                            <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-4"><span
+                                                    class="path1"></span><span class="path2"></span></i> <input
+                                                type="text" data-kt-filter="search"
+                                                class="form-control form-control-solid w-250px ps-14"
+                                                placeholder="Search Report">
+                                        </div>
+                                        <!--end::Search-->
+                                    </div>
+                                    <!--end::Card title-->
+
+
+                                    <!--begin::Card body-->
+                                    <div class="card-body">
+
+                                        <!--begin::Table-->
+                                        <div id="kt_datatable_example_wrapper"
+                                            class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                            <div class="table-responsive">
+                                                <table
+                                                    class="table align-middle border rounded table-row-dashed fs-6 g-5 gs-5 dataTable no-footer"
+                                                    id="kt_datatable_example">
+                                                    <thead>
+                                                        <tr
+                                                            class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                                            <th class="min-w-600px sorting" tabindex="0"
+                                                                aria-controls="kt_datatable_example" rowspan="1"
+                                                                colspan="1"
+                                                                aria-label="Customer Name: activate to sort column ascending"
+                                                                style="width: 156.438px;">Activity</th>
+                                                            <th class="min-w-100px sorting" tabindex="0"
+                                                                aria-controls="kt_datatable_example" rowspan="1"
+                                                                colspan="1"
+                                                                aria-label="Email: activate to sort column ascending"
+                                                                style="width: 199.391px;">Date</th>
+                                                                <th class="min-w-100px sorting" tabindex="0"
+                                                                aria-controls="kt_datatable_example" rowspan="1"
+                                                                colspan="1"
+                                                                aria-label="Email: activate to sort column ascending"
+                                                                style="width: 199.391px;">Time</th>
+                                                                <th class="min-w-150px sorting" tabindex="0"
+                                                                aria-controls="kt_datatable_example" rowspan="1"
+                                                                colspan="1"
+                                                                aria-label="Date Joined: activate to sort column ascending"
+                                                                style="width: 211.156px;">Action</th>
+                                                            <th class="min-w-100px sorting" tabindex="0"
+                                                                aria-controls="kt_datatable_example" rowspan="1"
+                                                                colspan="1"
+                                                                aria-label="Status: activate to sort column ascending"
+                                                                style="width: 124.562px;">Status</th>
+                                                           
+                                                           
+                                                          
+                                                          
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="fw-semibold text-gray-600">
+                                                        <% const newData = data.slice(-100).reverse() %>
+                                                      <%newData.forEach((data)=> {%> 
+                                                          <tr class="odd">
+                                                            <td>
+                                                                <a href="#" class="text-dark text-hover-primary"><%=data.activity%></a>
+                                                            </td>
+                                                            <% 
+                                                                const timestamp = new Date(data.timestamp);
+                                                                const formattedDate = timestamp.toLocaleDateString();
+                                                                const formattedTime = timestamp.toLocaleTimeString();
+                                                                %>
+                                                                 <td><%=formattedDate,  +  formattedTime%> </td>
+
+                                                            <td><%=formattedTime%></td>
+                                                           
+                                                                 <td>
+                                                                    <form action="/profile/activity-logs" method="POST">
+                                                                        <input type="hidden" name="token" value="<%=data.sessionToken%>">
+                                                                        <button type="submit" class="btn btn-primary btn-sm">Session Activity</button>
+                                                                    </form>
+                                                            
+                                                                 </td>
+
+                                                                 <td>
+                                                                    <%if(data.status === "200"){%> 
+                                                                        <div class="badge badge-light-success">200</div>
+                                                                        <%} else if(data.status === "400"){%>  
+                                                                            
+                                                                            <div class="badge badge-light-warning">400</div>
+                                                                            <%} else {%>
+                                                                                <div class="badge badge-light-danger">500</div>
+                                                                                <%}%>
+                                                                </td>
+                                                            
+                                                            
+                                                            
+                                                        </tr>
+                                                        
+                                                        <%})%>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                        <!--end::Table-->
+                                    </div>
+                                    <!--end::Card body-->
+                                </div>
+                                <!--end::Card-->
+                            </div>
+                            <!--end::Block-->
+
+
+                        </div>
+                        <!--end::Section-->
+                    </div>
+                    <!--end::Card Body-->
+                </div>
+                <!--end::Card-->
+
+                </div>
+                <%- include("../includes/footer", {pageName : "activity-logs" }) %>

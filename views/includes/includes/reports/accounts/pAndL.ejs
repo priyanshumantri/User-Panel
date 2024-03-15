@@ -1,0 +1,327 @@
+<% if(pageName==="profitAndLoss" ) {%>
+    <script>
+        // Function to initialize DataTable
+        function initializeDataTable() {
+            // Set date data order
+            const tableRows = table.querySelectorAll('tbody tr');
+
+            tableRows.forEach(row => {
+                const dateRow = row.querySelectorAll('td');
+                const realDate = moment(dateRow[3].innerHTML, "DD MMM YYYY, LT").format(); // select date from 4th column in table
+                dateRow[3].setAttribute('data-order', realDate);
+            });
+
+            // Init datatable --- more info on datatables: https://datatables.net/manual/
+            datatable = $(table).DataTable({
+                "info": false,
+                'order': [],
+                'paging': false, // Set the initial value
+                'scrollX': true, // Set the height of the scrollable area (adjust as needed)
+                'fixedColumns': {
+                    leftColumns: 2, // Number of columns to freeze on the left
+                },
+            });
+
+            // Hook export buttons
+            const documentTitle = 'Ledger';
+            var buttons = new $.fn.dataTable.Buttons(table, {
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        title: documentTitle
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        title: documentTitle,
+                        customize: function (xlsx) {
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            // Find the rows to add borders
+                            $('row', sheet).each(function (index) {
+                                if (index > ($('row', sheet).length - 4)) { // Selecting last three rows
+                                    $('c[r^="F"], c[r^="E"], c[r^="D"]', this).each(function () { // Selecting specific columns (adjust the column indexes accordingly)
+                                        $(this).attr('s', '2');
+                                         // Applying style (assuming 's' is the index of the border style)
+                                    });
+                                }
+                            });
+                        }
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        title: documentTitle
+                    }
+
+                ]
+            }).container().appendTo($('#kt_datatable_example_buttons'));
+
+            // Hook dropdown menu click event to datatable export buttons
+            const exportButtons = document.querySelectorAll('#kt_datatable_example_export_menu [data-kt-export]');
+            exportButtons.forEach(exportButton => {
+                exportButton.addEventListener('click', e => {
+                    e.preventDefault();
+
+                    // Get clicked export value
+                    const exportValue = e.target.getAttribute('data-kt-export');
+                    const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                    // Trigger click event on hidden datatable export buttons
+                    target.click();
+                });
+            });
+
+            // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
+            const filterSearch = document.querySelector('[data-kt-filter="search"]');
+            filterSearch.addEventListener('keyup', function (e) {
+                datatable.search(e.target.value).draw();
+            });
+        }
+
+        // Initialize DataTable on document ready
+        KTUtil.onDOMContentLoaded(function () {
+            table = document.querySelector('#kt_datatable_example');
+            if (table) {
+                initializeDataTable();
+            }
+        });
+    </script>
+
+    <script>
+        $("#pdf").on("click", function () {
+          
+            if($("#pAndL").css("display") === "none") {
+                showError("Please generate the report first")
+                return
+            }
+
+
+            fetch("/export/pdf", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    data: tableData,
+                    ledger :  $("#ledgerName").val()
+                })
+            }).then((res) => {
+                if(res.status === 200) {
+                    return res.json().then((data) => {
+                        
+                        window.open(data.message, '_blank');
+
+
+                    })
+                }
+            })
+        })
+    </script>
+    <script>
+        const html = $("#pAndL").html()
+        localStorage.setItem("pAndL", html)
+    </script>
+
+    <script>
+        function setFinancialYearRange(financialYear) {
+            var financialYearParts = financialYear.split('-');
+            var startYear = parseInt(financialYearParts[0]);
+            var endYear = parseInt(financialYearParts[1]);
+
+            var startFinancialYear = moment().month(3).date(1).year(startYear); // April 1st of the specified financial year
+            var endFinancialYear = moment().month(2).date(31).year(endYear); // March 31st of the specified financial year
+
+            var today = moment();
+
+            function cb(start, end) {
+                $("#kt_daterangepicker_4").html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"));
+            }
+
+            $("#kt_daterangepicker_4").daterangepicker({
+                startDate: today,
+                endDate: today,
+                minDate: startFinancialYear,
+                maxDate: endFinancialYear,
+                ranges: {
+                    "Today": [moment(), moment()],
+                    "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
+                    "Last 7 Days": [moment().subtract(6, "days"), moment()],
+                    "Last 30 Days": [moment().subtract(29, "days"), moment()],
+                    "This Month": [moment().startOf("month"), moment().endOf("month")],
+                    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+                }, locale: {
+                    format: 'DD/MM/YYYY',
+                    separator: ' - ',
+                    applyLabel: 'Apply',
+                    cancelLabel: 'Cancel',
+                    fromLabel: 'From',
+                    toLabel: 'To',
+                    customRangeLabel: 'Custom',
+                    weekLabel: 'W',
+                    daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                    firstDay: 1
+                }
+            }, cb);
+
+            cb(today, today);
+        }
+
+        // Example usage:
+        setFinancialYearRange("<%=financialYear.fy%>");
+    </script>
+
+    <script>
+        function getPAndL() {
+            const form = document.getElementById('ledgerForm');
+            const formData = new FormData(form);
+            const data = new URLSearchParams();
+
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]); // Add '=' between key and value
+            }
+
+            $("#previewBTN").attr("data-kt-indicator", "on").prop("disabled", true)
+            fetch("/reports/accounts/profit-and-loss", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: data
+            }).then((data) => {
+                if (data.status === 400) {
+
+                    return data.json().then((message) => {
+                        Swal.fire({
+                            text: message.message,
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((response) => {
+                            if (response.isConfirmed) {
+                                $("#newLedgerBTN").attr("data-kt-indicator", "off")
+                                $("#newLedgerBTN").attr("disabled", false)
+                            }
+                        })
+                    })
+
+                } else if (data.status === 200) {
+                    return data.json().then((info) => {
+                        const html = localStorage.getItem("pAndL")
+                        $("#pAndL").html(html)
+                        $("#previewBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                        $("#purchase").text(info.purchase)
+                        $("#sales").text(info.sales)
+                        $("#directExpenses").text(info.directExpenses)
+                        $("#directIncome").text(info.directIncome)
+                        $("#pAndL").css("display", "flex")
+                        let grossDiff = 0
+                        let grossLoss = false
+                        if((info.sales + info.directIncome) < (info.purchase + info.directExpenses)) {
+                            $("#grossLossText").css("visibility", "visible").css("display", "")
+                            $("#grossLossAmt").text(info.purchase + info.directExpenses - info.sales)
+                            $("#grossProfitText").css("visibility", "hidden")
+                            $("#grossProfitAmt").text(0).css("visibility", "hidden").css("display", "")
+                            grossDiff = info.purchase + info.directExpenses - info.sales - info.directIncome
+                            grossLoss = true
+                        } else if((info.sales + info.directIncome) > (info.purchase + info.directExpenses)){
+                            $("#grossProfitText").css("visibility", "visible")
+                            $("#grossLossText").css("visibility", "hidden")
+                            $("#grossProfitAmt").text((info.sales + info.directIncome) - (info.purchase + info.directExpenses))
+                            grossDiff = (info.sales + info.directIncome) - (info.purchase + info.directExpenses)
+                        } else {
+                            // no profit or loss
+                            $("#grossProfitText").css("display", "none")
+                            $("#grossLossText").css("display", "none").css("visibility", "hidden")
+                            $("#grossProfitAmt").text(0).css("display", "none")
+                            $("#grossLossAmt").text(0).css("display", "none")
+                            grossLoss = null
+                        }
+                        
+
+                        $("#indirectExpenses").text(info.indirectExpenses)
+                        $("#indirectIncome").text(info.indirectIncome)
+                
+                        if( grossLoss === true) {
+                            $("#grossTotalRight").text(info.purchase + info.directExpenses).css("visibility", "visible")
+                            $("#grossTotalLeft").text(info.sales + info.directIncome  + grossDiff).css("visibility", "visible")
+                            $("#grossLossBFText").css("visibility", "visible")
+                            $("#grossProfitBFText").css("visibility", "hidden")
+                            $("#grossLossBFAmt").text(grossDiff).css("visibility", "visible")
+                        } else if( grossLoss === false) {
+                            $("#grossTotalRight").text(info.sales + info.directIncome ).css("visibility", "visible")
+                            $("#grossTotalLeft").text(info.purchase + info.directExpenses + grossDiff).css("visibility", "visible")
+                            $("#grossProfitBFText").css("visibility", "visible")
+                            $("#grossLossBFText").css("visibility", "hidden")
+                            $("#grossProfitBFAmt").text(grossDiff)
+                        } else {
+                            $("#grossTotalLeft").text(info.purchase + info.directExpenses).css("visibility", "visible")
+                            $("#grossTotalRight").text(info.sales + info.directIncome).css("visibility", "visible")
+                            $("#grossProfitBFText").css("visibility", "hidden")
+                            $("#grossLossBFText").css("visibility", "hidden")
+                        }   
+
+                        let netAmt = 0
+                        if(grossLoss && grossLoss === true) {
+                           alert($("#grossLossBFAmt").text())
+                            alert($("#indirectExpenses").text())
+                            alert($("#indirectIncome").text())
+                           netAmt =  ((parseFloat($("#grossLossBFAmt").text()) ? parseFloat($("#grossLossBFAmt").text())*-1 : 0) + parseFloat($("#indirectExpenses").text())*-1) + parseFloat($("#indirectIncome").text())
+                           alert(netAmt)
+                        } else if(grossLoss && grossLoss === false) {
+                            netAmt =  ((parseFloat($("#grossProfitBFAmt").text()) ? parseFloat($("#grossProfitBFAmt").text()) : 0) + parseFloat($("#indirectIncome").text()) - parseFloat($("#indirectExpenses").text()))
+                        } else {
+                            netAmt = parseFloat($("#indirectIncome").text()) - parseFloat($("#indirectExpenses").text())
+                        }
+                        if(netAmt < 0) {
+                            $("#netLossText").css("visibility", "visible")
+                            $("#netProfitText").css("visibility", "hidden")
+                            $("#netLossAmt").text(Math.abs(netAmt))
+                            const total = parseFloat($("#netLossAmt").text()) + parseFloat($("#indirectIncome").text())
+                            $("#totalLeft").text(Math.abs(total))
+                            $("#totalRight").text(Math.abs(total))
+
+                          } else if(netAmt > 0) {
+                            $("#netProfitText").css("visibility", "visible")
+                            $("#netLossText").css("visibility", "hidden")
+                            $("#netProfitAmt").text(netAmt)
+                            const total = parseFloat($("#netProfitAmt").text()) + parseFloat($("#indirectExpenses").text())
+                            $("#totalLeft").text(Math.abs(total))
+                            $("#totalRight").text(Math.abs(total))
+                          } else {
+                            $("#netProfitText").css("display", "none")
+                            $("#netLossText").css("display", "none").css("visibility", "hidden")
+                            $("#netProfitAmt").text(0).css("display", "none")
+                            $("#netLossAmt").text(0).css("display", "none")
+                            $("#totalLeft").text(0)
+                            $("#totalRight").text(0)
+                          }
+                         
+                         
+                    })
+                } else if (data.status === 401) {
+                    Swal.fire({
+                        text: "You are not authorized to perform this action",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((data) => {
+                        if (data.isConfirmed) {
+                            $("#newLedgerBTN").attr("data-kt-indicator", "off")
+                            $("#newLedgerBTN").attr("disabled", false)
+
+                        }
+                    })
+                }
+            })
+
+        }
+    </script>
+
+
+
+    <%} %>

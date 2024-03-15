@@ -1,0 +1,857 @@
+<!--begin::Sidebar-->
+<div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar"
+	data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px"
+	data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
+	<!--begin::Logo-->
+	<div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
+		<!--begin::Logo image-->
+		<a href="/">
+			<img alt="Logo" src="/../../../uploads/profile/<%= company.companyLogo %>"
+				class="h-25px app-sidebar-logo-default" />
+			<img alt="Logo" src="/../../../uploads/profile/<%= company.companyLogo %>"
+				class="h-20px app-sidebar-logo-minimize" />
+		</a>
+		<!--end::Logo image-->
+		<!--begin::Sidebar toggle-->
+		<!--begin::Minimized sidebar setup:
+	if (isset($_COOKIE["sidebar_minimize_state"]) && $_COOKIE["sidebar_minimize_state"] === "on") {
+		1. "src/js/layout/sidebar.js" adds "sidebar_minimize_state" cookie value to save the sidebar minimize state.
+		2. Set data-kt-app-sidebar-minimize="on" attribute for body tag.
+		3. Set data-kt-toggle-state="active" attribute to the toggle element with "kt_app_sidebar_toggle" id.
+		4. Add "active" class to to sidebar toggle element with "kt_app_sidebar_toggle" id.
+	}
+-->
+		<div id="kt_app_sidebar_toggle"
+			class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary body-bg h-30px w-30px position-absolute top-50 start-100 translate-middle rotate"
+			data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body"
+			data-kt-toggle-name="app-sidebar-minimize">
+			<i class="ki-duotone ki-double-left fs-2 rotate-180">
+				<span class="path1"></span>
+				<span class="path2"></span>
+			</i>
+		</div>
+		<!--end::Sidebar toggle-->
+	</div>
+	<!--end::Logo-->
+	<!--begin::sidebar menu-->
+	<div class="app-sidebar-menu overflow-hidden flex-column-fluid">
+		<!--begin::Menu wrapper-->
+		<div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper hover-scroll-overlay-y my-5"
+			data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto"
+			data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
+			data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
+			<!--begin::Menu-->
+			<div class="menu menu-column menu-rounded menu-sub-indention px-3" id="#kt_app_sidebar_menu"
+				data-kt-menu="true" data-kt-menu-expand="false">
+
+				<!--Dashboard-->
+				<div class="menu-item"><!--begin:Menu link-->
+
+					<a class="menu-link <% if(pageName === " dashboard") {%> active <%}%>" href="/dashboard">
+							<span class="menu-icon">
+								<i class="ki-duotone ki-element-11 fs-2">
+									<span class="path1"></span>
+									<span class="path2"></span>
+									<span class="path3"></span>
+									<span class="path4"></span>
+								</i>
+							</span>
+							<span class="menu-title">
+								Dashboard
+							</span>
+					</a><!--end:Menu link-->
+				</div>
+				<!--USER MANAGEMENT-->
+
+				<div data-kt-menu-trigger="click" class="menu-item <% if(pageName === "manageUsers" || pageName==="manageRoles" || pageName==="managePermissions" ) {%> here show<%} %> menu-accordion">
+						<!--begin:Menu link-->
+						<span class="menu-link">
+							<span class="menu-icon">
+								<i class="ki-duotone ki-user">
+									<span class="path1"></span>
+									<span class="path2"></span>
+								</i>
+							</span>
+							<span class="menu-title">User Management</span>
+							<span class="menu-arrow"></span>
+						</span>
+						<!--end:Menu link-->
+						<!--begin:Menu sub-->
+						<div class="menu-sub menu-sub-accordion">
+							<!--begin:Menu item-->
+							<div class="menu-item">
+								<!--begin:Menu link-->
+								<a class="menu-link <% if(pageName === "manageUsers") {%> active <%} %>"
+										href="/user-management/manage-users">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Users</span>
+								</a>
+								<!--end:Menu link-->
+							</div>
+							<!--end:Menu item-->
+							<!--begin:Menu item-->
+							<div class="menu-item">
+								<!--begin:Menu link-->
+								<a class="menu-link <% if(pageName === "manageRoles") {%> active <%} %>"
+										href="/user-management/roles">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Roles</span>
+								</a>
+								<!--end:Menu link-->
+							</div>
+							<!--end:Menu item-->
+							<!--begin:Menu item-->
+							<div class="menu-item">
+								<!--begin:Menu link-->
+								<a class="menu-link <% if(pageName === "managePermissions") {%> active <%} %>"
+										href="/user-management/permissions">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Permissions</span>
+								</a>
+								<!--end:Menu link-->
+							</div>
+							<!--end:Menu item-->
+						</div>
+						<!--end:Menu sub-->
+				</div>
+
+				<!--MASTERS-->
+
+				<div data-kt-menu-trigger="click" class="menu-item <% if( pageName === "groups" || pageName === "ledgers" || pageName ===  "subLedgers" || pageName === "brokers" || pageName === "rateMaster" || pageName === "rateON" || pageName === "default-rates-clients-new" || pageName === "godowns" || pageName === "countries" || pageName === "zones" || pageName === "method-of-packaging" || pageName === "cities" || pageName==="states" || pageName === "branches" || pageName === "clients" || pageName === "goodsDescription" || pageName === "vehicles" || pageName === "owners" || pageName === "drivers") {%> here show<%} %> menu-accordion">
+						<!--begin:Menu link-->
+						<span class="menu-link">
+							<span class="menu-icon">
+								<i class="ki-duotone ki-element-8 fs-2">
+									<span class="path1"></span>
+									<span class="path2"></span>
+								</i>
+							</span>
+							<span class="menu-title">Masters</span>
+							<span class="menu-arrow"></span>
+						</span>
+						<!--end:Menu link-->
+						<!--begin:Menu sub-->
+						<div class="menu-sub menu-sub-accordion">
+							<!--begin:Menu item-->
+							<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "countries" || pageName === "godowns" || pageName ==="zones" || pageName === "states" || pageName === "cities" || pageName === "branches") {%> here hover show<%} %>">
+
+								<!--begin:Menu link-->
+								<span class="menu-link">
+									<span class="menu-bullet">
+										<span class="bullet bullet-dot"></span>
+									</span>
+									<span class="menu-title">Locations</span>
+									<span class="menu-arrow"></span>
+								</span>
+								<!--end:Menu link--><!--begin:Menu sub-->
+								<div class="menu-sub menu-sub-accordion <% if(pageName === "countries" || pageName === "godowns" || pageName === "zones" || pageName === "states" || pageName === "cities" || pageName === "branches") {%> show <%} %>" kt-hidden-height="83">
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "countries"){%> active <%} %>" href="/masters/locations/countries">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Country</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--begin:Menu item-->
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "zones"){%> active <%} %>" href="/masters/locations/zones">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Zones</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--end:Menu item-->
+									<!--begin:Menu item-->
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "states"){%> active <%} %>" href="/masters/states">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">States</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--end:Menu item-->
+									<!--begin:Menu item-->
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "cities") {%> active <%}%>" href="/masters/cities">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Cities</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "branches") {%> active <%}%>" href="/masters/branches">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Branches</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "godowns") {%> active <%}%>" href="/masters/godowns">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Godowns</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--end:Menu item-->
+								</div><!--end:Menu sub-->
+							</div>
+
+							<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "groups" || pageName === "ledgers" || pageName ==="subLedgers" ) {%> here hover show<%} %>">
+
+								<!--begin:Menu link-->
+								<span class="menu-link">
+									<span class="menu-bullet">
+										<span class="bullet bullet-dot"></span>
+									</span>
+									<span class="menu-title">Accounts</span>
+									<span class="menu-arrow"></span>
+								</span>
+								<!--end:Menu link--><!--begin:Menu sub-->
+								<div class="menu-sub menu-sub-accordion <% if(pageName === "groups" || pageName === "ledgers" || pageName === "subLedgers") {%> show <%} %>" kt-hidden-height="10">
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "groups"){%> active <%} %>" href="/masters/groups">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Groups</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--begin:Menu item-->
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "ledgers"){%> active <%} %>" href="/masters/ledgers">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Ledgers</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--end:Menu item-->
+									<!--begin:Menu item-->
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "subLedgers"){%> active <%} %>" href="/masters/sub-ledgers">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Sub Ledgers</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--end:Menu item-->
+									
+								</div><!--end:Menu sub-->
+							</div>
+
+							<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "brokers" || pageName === "vehicles" || pageName === "drivers" || pageName === "owners") {%> here hover show<%} %>">
+
+								<!--begin:Menu link-->
+								<span class="menu-link">
+									<span class="menu-bullet">
+										<span class="bullet bullet-dot"></span>
+									</span>
+									<span class="menu-title">Vehicles</span>
+									<span class="menu-arrow"></span>
+								</span>
+								<!--end:Menu link--><!--begin:Menu sub-->
+								<div class="menu-sub menu-sub-accordion <% if(pageName === "vehicles" || pageName === "drivers" || pageName === "owners" || pageName === "brokers") {%> show <%} %>" kt-hidden-height="83">
+									<!--begin:Menu item-->
+									
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "brokers"){%> active <%} %>" href="/masters/brokers">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Manage Brokers</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "vehicles"){%> active <%} %>" href="/masters/vehicles">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Manage Vehicles</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--end:Menu item-->
+									<!--begin:Menu item-->
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "owners") {%> active <%}%>" href="/masters/vehicles/owners">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Vehcile Owners</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link <% if(pageName === "drivers") {%> active <%}%>" href="/masters/vehicles/drivers">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Vehcile Drivers</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--end:Menu item-->
+								</div><!--end:Menu sub-->
+							</div>
+
+
+							<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "goodsDescription" || pageName === "method-of-packaging" ) {%> here hover show<%} %>">
+
+								<!--begin:Menu link-->
+								<span class="menu-link">
+									<span class="menu-bullet">
+										<span class="bullet bullet-dot"></span>
+									</span>
+									<span class="menu-title">Packaging</span>
+									<span class="menu-arrow"></span>
+								</span>
+								<!--end:Menu link--><!--begin:Menu sub-->
+								<div class="menu-sub menu-sub-accordion <% if(pageName === "goodsDescription" || pageName === "method-of-packaging") {%> show <%} %>" kt-hidden-height="83">
+									<div class="menu-item">
+										<a class="menu-link <% if(pageName === "method-of-packaging"){%> active <%} %>" href="/masters/method-of-packaging">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Method Of Packaging</span>
+										</a>
+									</div>
+									<div class="menu-item">
+										<a class="menu-link <% if(pageName === "goodsDescription") {%> active <%} %>"
+												href="/masters/goods-description">
+												<span class="menu-bullet">
+													<span class="bullet bullet-dot"></span>
+												</span>
+												<span class="menu-title">Goods Description</span>
+										</a>
+									</div>
+								</div>
+							</div>
+
+							<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "rateON" || pageName === "rateMaster") {%> here hover show<%} %>">
+
+								<!--begin:Menu link-->
+								<span class="menu-link">
+									<span class="menu-bullet">
+										<span class="bullet bullet-dot"></span>
+									</span>
+									<span class="menu-title">Rates</span>
+									<span class="menu-arrow"></span>
+								</span>
+								<!--end:Menu link--><!--begin:Menu sub-->
+								<div class="menu-sub menu-sub-accordion <% if(pageName === "rateON") {%> show <%} %>" kt-hidden-height="83">
+									<div class="menu-item">
+										<a class="menu-link <% if(pageName === "rateON"){%> active <%} %>" href="/masters/rates/rate-on">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Rate ON</span>
+										</a>
+									</div>
+								</div>
+
+								<div class="menu-sub menu-sub-accordion <% if(pageName === "rateMaster") {%> show <%} %>" kt-hidden-height="83">
+									<div class="menu-item">
+										<a class="menu-link <% if(pageName === "rateMaster"){%> active <%} %>" href="/masters/rates/rate-master">
+											<span class="menu-bullet">
+												<span class="bullet bullet-dot"></span>
+											</span>
+											<span class="menu-title">Rate Master</span>
+										</a>
+									</div>
+								</div>
+
+							</div>
+						
+							
+						</div>
+						<!--end:Menu sub-->
+				</div>
+				<div data-kt-menu-trigger="click" class="menu-item <% if(pageName === "freightMemo" || pageName === "LR" || pageName === "challan" || pageName === "lorryArrival" || pageName === "deliveryChallan" || pageName === "freightInvoice" || pageName === "excess" || pageName === "crossingChallan" || pageName === "LC") {%> here show<%} %> menu-accordion">
+					<!--begin:Menu link-->
+					<span class="menu-link">
+						<span class="menu-icon">
+						<i class="ki-duotone ki-delivery-3 fs-2">
+						 <span class="path1"></span>
+						 <span class="path2"></span>
+						 <span class="path3"></span>
+						</i>
+						</span>
+						<span class="menu-title">Transactions</span>
+						<span class="menu-arrow"></span>
+					</span>
+					<!--end:Menu link-->
+					<!--begin:Menu sub-->
+					<div class="menu-sub menu-sub-accordion">
+					
+
+						<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "LR" || pageName === "challan" || pageName === "LC") {%> here hover show<%} %>">
+
+							<!--begin:Menu link-->
+							<span class="menu-link">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Booking</span>
+								<span class="menu-arrow"></span>
+							</span>
+							<!--end:Menu link--><!--begin:Menu sub-->
+							<div class="menu-sub menu-sub-accordion <% if(pageName === "LR" || pageName === "challan" || pageName === "LC") {%> show <%} %>" kt-hidden-height="83">
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "LR") {%> active <%}%>" href="/transactions/booking/lorry-reciepts">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Lorry Reciepts</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "challan") {%> active <%}%>" href="/transactions/booking/challan">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Challans</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "LC") {%> active <%}%>" href="/transactions/booking/local-collection-challan">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Local Collection</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+								<!--end:Menu item-->
+							</div><!--end:Menu sub-->
+						</div>
+						<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "lorryArrival" || pageName === "deliveryChallan" || pageName === "excess" || pageName === "crossingChallan") {%> here hover show<%} %>">
+
+							<!--begin:Menu link-->
+							<span class="menu-link">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Delivery</span>
+								<span class="menu-arrow"></span>
+							</span>
+							<!--end:Menu link--><!--begin:Menu sub-->
+							<div class="menu-sub menu-sub-accordion <% if(pageName === "lorryArrival" || pageName === "deliveryChallan" || pageName === "excess" || pageName === "crossingChallan") {%> show <%} %>" kt-hidden-height="83">
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "lorryArrival"){%> active <%} %>" href="/transactions/delivery/lorry-arrival">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Lorry Arrival</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+								<!--end:Menu item-->
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "deliveryChallan") {%> active <%}%>" href="/transactions/delivery/delivery-challan">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Delivery Challan</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "crossingChallan") {%> active <%}%>" href="/transactions/delivery/crossing-challan">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Crossing Challan</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "excess") {%> active <%}%>" href="/transactions/delivery/excess">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Excess</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+
+								<!--end:Menu item-->
+							</div><!--end:Menu sub-->
+						</div>
+						<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "freightInvoice" || pageName === "freightMemo") {%> here hover show<%} %>">
+
+							<!--begin:Menu link-->
+							<span class="menu-link">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Accounts</span>
+								<span class="menu-arrow"></span>
+							</span>
+							<!--end:Menu link--><!--begin:Menu sub-->
+							<div class="menu-sub menu-sub-accordion <% if(pageName === "freightInvoice" || pageName === "freightMemo") {%> show <%} %>" kt-hidden-height="83">
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "freightInvoice"){%> active <%} %>" href="/transactions/accounts/freight-invoice">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Freight Invoice</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+								<!--end:Menu item-->
+								<!--begin:Menu item-->
+								<div class="menu-item">
+									<!--begin:Menu link-->
+									<a class="menu-link <% if(pageName === "freightMemo") {%> active <%}%>" href="/transactions/accounts/freight-memo">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Freight Memo</span>
+									</a>
+									<!--end:Menu link-->
+								</div>
+								
+								
+								<!--end:Menu item-->
+							</div><!--end:Menu sub-->
+						</div>
+
+					</div>
+					<!--end:Menu sub-->
+			</div>
+		
+			<div data-kt-menu-trigger="click" class="menu-item <% if(pageName === "reciepts" ) {%> here show<%} %> menu-accordion">
+				<!--begin:Menu link-->
+				<span class="menu-link">
+					<span class="menu-icon">
+						<i class="ki-duotone ki-bill fs-2">
+							<span class="path1"></span>
+							<span class="path2"></span>
+							<span class="path3"></span>
+ 							<span class="path4"></span>
+ 							<span class="path5"></span>
+ 							<span class="path6"></span>
+						</i>
+					</span>
+					<span class="menu-title">Accounts</span>
+					<span class="menu-arrow"></span>
+				</span>
+				<!--end:Menu link-->
+				<!--begin:Menu sub-->
+				<div class="menu-sub menu-sub-accordion">
+					<!--begin:Menu item-->
+
+					<!--end:Menu item-->
+					<!--begin:Menu item-->
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link <% if(pageName === "reciepts") {%> active <%} %>"
+								href="/accounts/reciepts">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Reciepts</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link <% if(pageName === "payments") {%> active <%} %>"
+								href="/accounts/payments">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Payment</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+					<!--end:Menu item-->
+					<!--begin:Menu item-->
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link <% if(pageName === "journal") {%> active <%} %>"
+								href="/accounts/journal">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Journal</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link <% if(pageName === "contra") {%> active <%} %>"
+								href="/accounts/contra">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Contra</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+					<!--end:Menu item-->
+				</div>
+				<!--end:Menu sub-->
+		</div>
+		<div data-kt-menu-trigger="click" class="menu-item <% if( pageName === "reportsLedgers" || pageName === "profitAndLoss") {%> here show<%} %> menu-accordion">
+			<!--begin:Menu link-->
+			<span class="menu-link">
+				<span class="menu-icon">
+				<i class="ki-duotone ki-book-open fs-2">
+				 <span class="path1"></span>
+				 <span class="path2"></span>
+				 <span class="path3"></span>
+				 <span class="path4"></span>
+				</i>
+				</span>
+				<span class="menu-title">Reports</span>
+				<span class="menu-arrow"></span>
+			</span>
+			<!--end:Menu link-->
+			<!--begin:Menu sub-->
+			<div class="menu-sub menu-sub-accordion">
+				<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "bookingRegister") {%> here hover show<%} %>">
+
+					<!--begin:Menu link-->
+					<span class="menu-link">
+						<span class="menu-bullet">
+							<span class="bullet bullet-dot"></span>
+						</span>
+						<span class="menu-title">Booking</span>
+						<span class="menu-arrow"></span>
+					</span>
+					<!--end:Menu link--><!--begin:Menu sub-->
+					<div class="menu-sub menu-sub-accordion <% if(pageName === "bookingRegister") {%> show <%} %>" kt-hidden-height="83">
+						<div class="menu-item">
+							<!--begin:Menu link-->
+							<a class="menu-link <% if(pageName === "bookingRegister") {%> active <%}%>" href="/reports/booking/booking-register">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Booking Register</span>
+							</a>
+							<!--end:Menu link-->
+						</div>
+				
+						<!--end:Menu item-->
+					</div><!--end:Menu sub-->
+
+					
+				</div>
+
+				<div data-kt-menu-trigger="click" class="menu-item  menu-accordion <% if(pageName === "reportsLedgers" || pageName === "profitAndLoss" || pageName === "balanceSheet" ) {%> here hover show<%} %>">
+
+					<!--begin:Menu link-->
+					<span class="menu-link">
+						<span class="menu-bullet">
+							<span class="bullet bullet-dot"></span>
+						</span>
+						<span class="menu-title">Accounts</span>
+						<span class="menu-arrow"></span>
+					</span>
+					<!--end:Menu link--><!--begin:Menu sub-->
+					<div class="menu-sub menu-sub-accordion <% if(pageName === "reportsLedgers") {%> show <%} %>" kt-hidden-height="83">
+						<div class="menu-item">
+							<!--begin:Menu link-->
+							<a class="menu-link <% if(pageName === "reportsLedgers") {%> active <%}%>" href="/reports/accounts/ledgers">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Ledger</span>
+							</a>
+							<!--end:Menu link-->
+						</div>
+				
+						<!--end:Menu item-->
+					</div><!--end:Menu sub-->
+
+					<div class="menu-sub menu-sub-accordion <% if(pageName === "profitAndLoss") {%> show <%} %>" kt-hidden-height="83">
+						<div class="menu-item">
+							<!--begin:Menu link-->
+							<a class="menu-link <% if(pageName === "profitAndLoss") {%> active <%}%>" href="/reports/accounts/profit-and-loss">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Profit & Loss A/c</span>
+							</a>
+							<!--end:Menu link-->
+						</div>
+				
+						<!--end:Menu item-->
+					</div><!--end:Menu sub-->
+					<div class="menu-sub menu-sub-accordion <% if(pageName === "balanceSheet") {%> show <%} %>" kt-hidden-height="83">
+						<div class="menu-item">
+							<!--begin:Menu link-->
+							<a class="menu-link <% if(pageName === "balanceSheet") {%> active <%}%>" href="/reports/accounts/balance-sheet">
+								<span class="menu-bullet">
+									<span class="bullet bullet-dot"></span>
+								</span>
+								<span class="menu-title">Balance Sheet</span>
+							</a>
+							<!--end:Menu link-->
+						</div>
+				
+						<!--end:Menu item-->
+					</div><!--end:Menu sub-->
+				</div>
+			
+				
+
+			</div>
+			<!--end:Menu sub-->
+	</div>
+
+				<div data-kt-menu-trigger="click" class="menu-item <% if(pageName === " overview" || pageName==="smtp" || pageName==="communications" || pageName==="whitelisting" ) {%> here show<%} %> menu-accordion">
+						<!--begin:Menu link-->
+						<span class="menu-link">
+							<span class="menu-icon">
+								<i class="ki-duotone ki-setting-4 fs-2	">
+									<span class="path1"></span>
+									<span class="path2"></span>
+								</i>
+							</span>
+							<span class="menu-title">Settings</span>
+							<span class="menu-arrow"></span>
+						</span>
+						<!--end:Menu link-->
+						<!--begin:Menu sub-->
+						<div class="menu-sub menu-sub-accordion">
+							<!--begin:Menu item-->
+
+							<!--end:Menu item-->
+							<!--begin:Menu item-->
+							<div class="menu-item">
+								<!--begin:Menu link-->
+								<a class="menu-link <% if(pageName === " overview") {%> active <%} %>"
+										href="/settings/overview">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Overview</span>
+								</a>
+								<!--end:Menu link-->
+							</div>
+							<div class="menu-item">
+								<!--begin:Menu link-->
+								<a class="menu-link <% if(pageName === "lrSeriesAssign") {%> active <%} %>"
+										href="/settings/series-assign">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Series Assign</span>
+								</a>
+								<!--end:Menu link-->
+							</div>
+							<!--end:Menu item-->
+							<!--begin:Menu item-->
+							<div class="menu-item">
+								<!--begin:Menu link-->
+								<a class="menu-link <% if(pageName === " smtp") {%> active <%} %>"
+										href="/settings/smtp">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">SMTP</span>
+								</a>
+								<!--end:Menu link-->
+							</div>
+
+							<div class="menu-item">
+								<!--begin:Menu link-->
+								<a class="menu-link <% if(pageName === " communications") {%> active <%} %>"
+										href="/settings/communication">
+										<span class="menu-bullet">
+											<span class="bullet bullet-dot"></span>
+										</span>
+										<span class="menu-title">Communications</span>
+								</a>
+								<!--end:Menu link-->
+							</div>
+							<!--end:Menu item-->
+						</div>
+						<!--end:Menu sub-->
+				</div>
+			</div>
+
+			<!--end::Menu-->
+		</div>
+		<!--end::Menu wrapper-->
+	</div>
+	<!--end::sidebar menu-->
+	<!--begin::Footer-->
+	<div class="app-sidebar-footer flex-column-auto pt-2 pb-6 px-6" id="kt_app_sidebar_footer">
+		<a href="#"
+			class="btn btn-flex flex-center btn-custom btn-primary overflow-hidden text-nowrap px-0 h-40px w-100"
+			data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-dismiss-="click"
+			title="200+ in-house components and 3rd-party plugins">
+			<span class="btn-label">Docs & Components</span>
+			<i class="ki-duotone ki-document btn-icon fs-2 m-0">
+				<span class="path1"></span>
+				<span class="path2"></span>
+			</i>
+		</a>
+	</div>
+	<!--end::Footer-->
+</div>
+<!--end::Sidebar-->
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+	<!--begin::Content wrapper-->
+	<div class="d-flex flex-column flex-column-fluid">
+
+		<!--begin::Main-->
+		<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+			<!--begin::Content wrapper-->
+			<div class="d-flex flex-column flex-column-fluid">

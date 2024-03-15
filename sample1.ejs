@@ -1,0 +1,4 @@
+=IF(AND(BWD!P3="", BWD!V3="", BWD!Y3=""), "Pending for Dispatch", 
+  IF(AND(BWD!P3<>"", BWD!V3="", BWD!Y3=""), "In Transit", 
+    IF(AND(BWD!P3<>"", BWD!V3<>"", BWD!Y3=""), "At Delivery Godown", 
+      IF(AND(BWD!P3<>"", BWD!V3<>"", BWD!Y3<>""), "Delivered (POD Pending)",, ""))))

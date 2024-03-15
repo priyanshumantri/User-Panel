@@ -1,0 +1,1562 @@
+<% if(pageName==="journal" ) {%>
+    <script>
+        // Get the select element
+        const selectElement = $('#ledgerCR');
+
+        // Get the options of the select element
+        const options = selectElement.find('option');
+
+        // Convert the options to an array of objects containing the option's value and text
+        const optionsArray = options.map(function () {
+            return {
+                value: $(this).val(),
+                text: $(this).text()
+            };
+        }).get();
+
+        // Store the array of objects in the localStorage
+        localStorage.setItem('selectOptionsCR', JSON.stringify(optionsArray));
+
+
+    </script>
+
+    <script>
+        // Get the select element
+        const selectElement1 = $('#ledgerDR');
+
+        // Get the options of the select element
+        const options1 = selectElement1.find('option');
+
+        // Convert the options to an array of objects containing the option's value and text
+        const optionsArray1 = options1.map(function () {
+            return {
+                value: $(this).val(),
+                text: $(this).text(),
+                type: $(this).attr("data-type")
+            };
+        }).get();
+
+        // Store the array of objects in the localStorage
+        localStorage.setItem('selectOptionsDR', JSON.stringify(optionsArray1));
+    </script>
+    <script>
+        $("#recieptDate").flatpickr({
+            dateFormat: "d-m-Y",
+            minDate: new Date(new Date().getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+            maxDate: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000), // 1 day in the future
+        });
+    </script>
+    <script>
+        // Function to initialize DataTable
+        function initializeDataTable() {
+            // Set date data order
+            const tableRows = table.querySelectorAll('tbody tr');
+
+            tableRows.forEach(row => {
+                const dateRow = row.querySelectorAll('td');
+                const realDate = moment(dateRow[3].innerHTML, "DD MMM YYYY, LT").format(); // select date from 4th column in table
+                dateRow[3].setAttribute('data-order', realDate);
+            });
+
+            // Init datatable --- more info on datatables: https://datatables.net/manual/
+            datatable = $(table).DataTable({
+                "info": false,
+                'order': [],
+                'pageLength': 10,
+                'scrollX': true, // Set the height of the scrollable area (adjust as needed)
+                'fixedColumns': {
+                    leftColumns: 2, // Number of columns to freeze on the left
+                },
+            });
+
+            // Hook export buttons
+            const documentTitle = 'Challan Report';
+            var buttons = new $.fn.dataTable.Buttons(table, {
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        title: documentTitle
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        title: documentTitle
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        title: documentTitle
+                    }
+                ]
+            }).container().appendTo($('#kt_datatable_example_buttons'));
+
+            // Hook dropdown menu click event to datatable export buttons
+            const exportButtons = document.querySelectorAll('#kt_datatable_example_export_menu [data-kt-export]');
+            exportButtons.forEach(exportButton => {
+                exportButton.addEventListener('click', e => {
+                    e.preventDefault();
+
+                    // Get clicked export value
+                    const exportValue = e.target.getAttribute('data-kt-export');
+                    const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                    // Trigger click event on hidden datatable export buttons
+                    target.click();
+                });
+            });
+
+            // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
+            const filterSearch = document.querySelector('[data-kt-filter="search"]');
+            filterSearch.addEventListener('keyup', function (e) {
+                datatable.search(e.target.value).draw();
+            });
+        }
+
+        // Initialize DataTable on document ready
+        KTUtil.onDOMContentLoaded(function () {
+            table = document.querySelector('#kt_datatable_example');
+            if (table) {
+                initializeDataTable();
+            }
+        });
+    </script>
+
+    <script>
+        //disabling all inputs and select inside dr div
+        $("#dr input").prop("disabled", true)
+        $("#dr select").prop("disabled", true)
+    </script>
+
+    <script>
+        function addNewReciept() {
+            $("#recieptForm").trigger("reset")
+            $("#crPartyTable").empty()
+            $("#drPartyTable").empty()
+            $("#crPartyTotal").css("display", "none")
+            $("#drPartyTotal").css("display", "none")
+            $("#crIndividual").css("display", "none")
+            $("#drIndividual").css("display", "none")
+            $("#crTable").empty()
+            $("#drTable").empty()
+            $("#title").text("Add New Journal Voucher")
+            $("#recieptSubmit").css("display", "block")
+            $("#recieptUpdate").css("display", "none")
+
+            localStorage.removeItem("crReference")
+            localStorage.removeItem("drReference")
+            const today = new Date();
+            const day = today.getDate().toString().padStart(2, '0');
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const year = today.getFullYear();
+
+            const formattedDate = `${day}-${month}-${year}`;
+            $("#recieptDate").val(formattedDate);
+            $("#recieptSubmit").css("display", "block")
+            $("#recieptUpdate").css("display", "none")
+            $("#ledgerCR").prop("disabled", false).select2()
+
+            //adding back all dr ledgers to the select2
+            // Retrieve the array of objects from the localStorage when required
+            const storedOptions = JSON.parse(localStorage.getItem('selectOptionsCR'));
+
+            $("#ledgerCR option:not(:first)").remove()
+
+            // Use the stored options to populate the select element
+            storedOptions.forEach(option => {
+                const newOption = $('<option></option>').val(option.value).text(option.text);
+                $("#ledgerCR").append(newOption);
+            });
+
+            $("#ledgerCR").select2()
+
+
+            // Retrieve the array of objects from the localStorage when required
+            const storedOptions1 = JSON.parse(localStorage.getItem('selectOptionsDR'));
+
+            $("#ledgerDR option:not(:first)").remove()
+
+            // Use the stored options to populate the select element
+            storedOptions1.forEach(option => {
+                const newOption = $('<option></option>').val(option.value).text(option.text).attr("data-type", option.type);
+                $("#ledgerDR").append(newOption);
+            });
+
+            $("#ledgerDR").select2().prop("disabled", false)
+
+
+            setTimeout(function () {
+                $("#voucherNumber").prop("disabled", false).focus()
+            }, 200)
+        }
+    </script>
+    <script>
+        $("#ledgerCR").on("change", function () {
+            if ($("#ledgerCR").val() == "" && $("#crPartyTable tr").length < 1) {
+                showError("Please select a ledger")
+
+                return
+            }  else {
+                $("#ledgerDR").prop("disabled", true).select2()
+                fetch(`/accounts/reciepts/get-details?id=${$(this).val()}&type=cr`, {
+                    method: "GET"
+                }).then((res) => {
+                    return res.json().then((data) => {
+                        //empty except first option
+
+                        let display = "Cr"
+                        if (data.netBalance < 0) {
+                            display = "Dr"
+                        } else if (data.netBalance == 0) {
+                            display = ""
+                        }
+                        $("#crBalance").val(Math.abs(data.netBalance) + " " + display)
+                        $("#selectReferenceCr option:not(:first)").remove()
+                        data.constructedReferences.forEach((reference) => {
+                            $("#selectReferenceCr").append(`<option value="${reference.rel}" data-netbalance="${Math.abs(reference.netBalance)}">${reference.display}</option>`)
+                        })
+
+                        if (localStorage.getItem("crReference").length > 0) {
+                            const crReferenceArray = JSON.parse(localStorage.getItem("crReference"));
+                            crReferenceArray.forEach((reference) => {
+                                $("#selectReferenceCr option[value='" + reference.ref + "']").attr("data-netbalance", reference.netBalance).select2()
+                            });
+                        }
+
+                        $('#crTable tr').each(function () {
+                            var ledgerValue = $(this).attr('data-ledger');
+                            var optionVal = $('#crTable tr[data-ledger="' + ledgerValue + '"] td select[name="referenceNumberCR"] option:selected').val()
+
+                            $("#selectReferenceCr option[value='" + optionVal + "']").remove();
+                        });
+                        $("#selectReferenceCr").select2();
+
+
+                    })
+                })
+
+            }
+        })
+    </script>
+    <script>
+        $("#amountCr").on("keydown", function (event) {
+            if (event.keyCode === 9 && !event.shiftKey) {
+                if ($(this).val() == 0) {
+                    showError("Please enter a valid amount")
+                } else {
+                    $("#ledgerCR").prop("disabled", true)
+                    $("#selectReferenceTypeCr").prop("disabled", false)
+                }
+
+
+            }
+        })
+
+        $("#selectReferenceTypeCr").on("change", function () {
+            if ($(this).val() === "against") {
+                $("#billDIVCr").css("display", "block")
+                $("#newDIVCr").css("display", "none")
+                $("#billCr").prop("disabled", false)
+                $("#newCr").prop("disabled", true)
+                $("#newCrAmt").prop("disabled", true)
+                $("#selectReferenceCr").prop("disabled", false)
+            } else if ($(this).val() === "new") {
+                $("#billDIVCr").css("display", "none")
+                $("#newDIVCr").css("display", "block")
+                $("#newCr").prop("disabled", false)
+                $("#billCr").prop("disabled", true)
+                $("#recievedAmtCr").prop("disabled", false).val(0)
+                $("#newCrAmt").prop("disabled", true).focus().val(0)
+            } else if ($(this).val() === "onAccount") {
+                $("#billDIVCr").css("display", "block")
+                $("#newDIVCr").css("display", "none")
+                $("#selectReferenceCr").val(null).select2().prop("disabled", true)
+                $("#newCr").prop("disabled", true)
+                $("#recievedAmtCr").prop("disabled", false)
+                $("#newCrAmt").prop("disabled", true)
+                setTimeout(function () {
+                    $("#recievedAmtCr").focus()
+                }, 100)
+            }
+        })
+    </script>
+    <script>
+        $("#amountcr").on("keydown", function (event) {
+            if (event.keyCode === 9 && !event.shiftKey) {
+                $("#ledgerCR").prop("disabled", true)
+                $("#amountcr").prop("disabled", false)
+                $("#againstcr").prop("disabled", false)
+                setTimeout(function () {
+                    $("#againstcr").focus()
+                }, 200)
+
+            }
+        })
+    </script>
+
+    <script>
+        $("#selectReferenceCr").on("change", function () {
+            $("#recievedAmtCr").val($(this).find(":selected").data("netbalance"))
+            $("#newCrAmt").val($(this).find(":selected").data("netbalance"))
+            $("#recievedAmtCr").prop("disabled", false).focus()
+        })  
+    </script>
+
+    <script>
+        $("#recievedAmtCr").on("keydown", async function (event) {
+            //checking if only tab is pressed
+            if (event.keyCode === 9 && !event.shiftKey) {
+                if ($(this).val() == 0 || $(this).val() > parseFloat($("#amountCr").val())) {
+                    showError("Please enter a valid amount")
+                } else {
+                    const data = await checkValidAmount()
+                    if (data) {
+                        const tbody = $("#crTable")
+                        let refAmt = 0
+                        let balance = 0
+                        let amtRecieved = parseFloat($("#recievedAmtCr").val())
+                        if (amtRecieved > $("#selectReferenceCr option:selected").data("netbalance")) {
+                            showError("Please enter a valid amount")
+                            return
+                        }
+                        let defaultOption = ``
+                        if ($("#selectReferenceTypeCr").val() === "new") {
+                            refAmt = parseFloat($("#recievedAmtCr").val())
+                            balance = Math.abs(parseFloat($("#newCrAmt").val()) - parseFloat($("#recievedAmtCr").val()))
+                            defaultOption = ` <option selected value="${$("#newCr").val()}">${$("#newCr").val()}</option>`
+                        } else if ($("#selectReferenceTypeCr").val() === "against") {
+                            refAmt = parseFloat($("#selectReferenceCr option:selected").data("netbalance"))
+                            balance = parseFloat($("#amountCr").val()) - parseFloat($("#recievedAmtCr").val())
+                            defaultOption = ` <option selected value="${$("#selectReferenceCr").val()}">${$("#selectReferenceCr option:selected").text()}</option>`
+                        } else {
+
+                            defaultOption = ` <option value="onAccount" selected>On Account</option>`
+                        }
+                        $("#crIndividual").css("display", "block")
+                        const trLength = $("#crTable tr").length
+                        const newTR =
+
+                            `<tr data-ledger=${$("#ledgerCR").val()} data-rowID="${trLength + 1}">
+                        
+                             <td>
+                                <input type="hidden" name="statusCR" value="new">
+                                <input type="hidden" disabled class="ind-total-amt" value="${$("#amountCr").val()}">
+                              <input type="hidden" disabled name="ledgerCR" value="${$("#ledgerCR").val()}">
+                              <select class="form-select form-select-solid reference-type-cr" disabled name="referenceTypeCr">
+                                      <option value="against" ${$("#selectReferenceTypeCr").val() === 'against' ? 'selected' : ''}>Against Ref</option>
+                                      <option value="new" ${$("#selectReferenceTypeCr").val() === 'new' ? 'selected' : ''}>New</option>
+                                      <option value="onAccount" ${$("#selectReferenceTypeCr").val() === 'onAccount' ? 'selected' : ''}>On Account</option>
+                                  </select>
+                              </td>
+
+                                  <td>
+                                      <select class="form-select form-select-solid" disabled name="referenceNumberCR">
+                                         ${defaultOption}
+                                      </select>
+                                  </td>
+
+                                  <td>
+                                      <input type="text" class="form-control form-control-solid" disabled name="amountCr" value="${refAmt}">
+                                  </td>
+
+                                  <td>
+                                      <input type="text" class="form-control form-control-solid recieved-amount-cr" disabled name="recievedAmtCr" value="${$("#recievedAmtCr").val()}">
+                                  </td>
+
+                                  <td>
+                                     <input type="text" class="form-control form-control-solid" disabled name="balanceCr" value="${balance}">
+                                  </td>
+
+                                  <td>
+
+                                      <button type="button" onclick="deleteCRInd('${trLength + 1}','${$("#selectReferenceCr option:selected").val()}','${$("#selectReferenceCr option:selected").text()}' ,'${$("#selectReferenceCr option:selected").data("netbalance")}')" class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                                                              <i class="ki-duotone ki-trash-square fs-2">
+                                                               <span class="path1"></span>
+                                                               <span class="path2"></span>
+                                                               <span class="path3"></span>
+                                                               <span class="path4"></span>
+                                                              </i>
+                                      </button>
+                                  </td>
+                                </tr>
+                                  `
+
+                        tbody.append(newTR)
+
+
+                        //removing selected reference from select2
+                        $("#selectReferenceCr option:selected").remove().val(null).trigger("change")
+                        $("#selectReferenceTypeCr").val(null).trigger("change")
+                        $("#newCr").val()
+                        setTimeout(function () {
+                            $("#selectReferenceTypeCr").focus()
+                        }, 200)
+                        checkEntryCompletion()
+                    } else {
+                        showError("Please enter a valid amount")
+                    }
+                }
+            }
+        })
+    </script>
+    <script>
+        function deleteCRInd(rowID, value, text, balance, type) {
+            const trToDelete = $(`#crTable tr[data-rowID="${rowID}"]`)
+            trToDelete.remove()
+            const newOption = `<option value="${value}" data-netbalance="${balance}">${text}</option>`
+
+            if ($(`#crTable tr[data-ledger=${$("#ledgerCR").val()}]`).length < 1) {
+                $("#crIndividual").css("display", "none")
+                $("#ledgerCR").val(null).prop("disabled", false).select2()
+                $("#amountCr").val(0)
+                $("#crBalance").val(0)
+                $("#recievedAmtCr").val(0)
+                $("#newCrAmt").val(0)
+                $("#selectReferenceTypeCr").val(null).trigger("change")
+
+            }
+
+            $("#selectReferenceCr").append(newOption).val(null).trigger("change")
+
+            if (type == "edit") {
+                // Retrieve the array from localStorage
+                let crReferenceArray = JSON.parse(localStorage.getItem("crReference")) || [];
+
+                // Push new object to the array
+                const newObject = {
+                    ref: value,
+                    netBalance: balance
+                };
+                crReferenceArray.push(newObject);
+
+                // Save the modified array back to localStorage
+                localStorage.setItem("crReference", JSON.stringify(crReferenceArray));
+            }
+
+
+
+        }
+    </script>
+
+    <script>
+        function checkValidAmount() {
+            const table = $(`#crTable tr[data-ledger=${$("#ledgerCR").val()}] .recieved-amount-cr`)
+            let total = parseFloat($("#recievedAmtCr").val())
+            for (let i = 0; i < table.length; i++) {
+                total += parseFloat(table[i].value)
+            }
+
+            if (total > parseFloat($("#amountCr").val())) {
+                return false
+            } else {
+                return true
+            }
+        }
+    </script>
+
+    <script>
+        function checkEntryCompletion() {
+            const table = $(`#crTable tr[data-ledger=${$("#ledgerCR").val()}] .recieved-amount-cr`)
+            let total = 0
+            for (let i = 0; i < table.length; i++) {
+                total += parseFloat(table[i].value)
+            }
+
+            if (total == parseFloat($("#amountCr").val())) {
+
+                const ledgerValue = $("#ledgerCR").val();
+                const dataToHide = $(`#crTable tr[data-ledger='${ledgerValue}']`);
+                // Hide all data with the same ledger
+                dataToHide.css("display", "none");
+
+
+                //adding party table to the main table
+                const tbody = $("#crPartyTable")
+                const trLength = $("#crPartyTable tr").length
+                const refLength = $(`#crTable tr[data-ledger="${$("#ledgerCR").val()}"]`).length
+                $("#crIndividual").css("display", "none")
+                const newTR = `
+                <tr data-ledger="${$("#ledgerCR").val()}">
+
+                    <td>
+                        
+                        <input disabled type="text" disaled class="form-control form-control-solid" value="${trLength + 1}"></input>
+                    </td>
+
+                    <td> 
+                        <input disabled type="text" disabled class="form-control form-control-solid" value="${$("#ledgerCR option:selected").text()}"></input>
+                    </td>
+
+                    <td>
+                        <input disabled type="text" class="form-control form-control-solid" value="${refLength}">
+                    </td>
+
+                    <td>
+                        <input disabled type="text" class="form-control form-control-solid" value="${total}">    
+                    </td>
+                    <td>
+                        
+
+                        <button onclick="editCRTotal('${$("#ledgerCR option:selected").val()}', '${$("#ledgerCR option:selected").text()}')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-pencil fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                        </button>
+
+                        <button type="button" onclick="deleteCRTotal('${$("#ledgerCR option:selected").val()}', '${$("#ledgerCR option:selected").text()}')" class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                            <i class="ki-duotone ki-trash-square fs-2">
+                             <span class="path1"></span>
+                             <span class="path2"></span>
+                             <span class="path3"></span>
+                             <span class="path4"></span>
+                            </i>
+                        </button>
+                    </td>
+                    
+                </tr>
+                `
+                tbody.append(newTR)
+
+
+                //removing selected ledger from select2
+                $("#ledgerCR option:selected").remove().val(null).trigger("change")
+
+                //resetting all values
+                $("#ledgerCR").val(null).prop("disabled", false).select2()
+                $("#amountCr").val(0)
+                $("#crBalance").val(0)
+                $("#recievedAmtCr").val(0)
+                $("#newCrAmt").val(0)
+                $("#selectReferenceTypeCr").val(null).select2()
+                $("#selectReferenceCr").val(null).select2()
+                $("#newCr").val(null)
+                $("#billCr").val(null)
+
+                $("#crPartyTotal").css("display", "block")
+                
+                setTimeout(function () {
+                    $("#selectReferenceTypeCr").select2('close').blur()
+                    $("#ledgerCR").focus()
+                    $("#ledgerDR").prop("disabled", false).select2()
+                }, 200)
+
+                return true
+
+            } else {
+                $("#selectReferenceTypeCr").prop("disabled", false).val(null).select2()
+                $("#newCr").prop("disabled", true).val("")
+                $("#newDIVCr").css("display", "none")
+                $("#billDIVCr").css("display", "block")
+                $("#newCrAmt").prop("disabled", true).val(0)
+                $("#recievedAmtCr").prop("disabled", true).val(0)
+                return false
+            }
+        }
+
+    </script>
+    <script>
+        function editCRTotal(id, text) {
+            const trToDelete = $(`#crPartyTable tr[data-ledger="${id}"]`)
+            trToDelete.remove()
+
+            //adding the ledger back to the select2
+            const newOption = `<option value="${id}">${text}</option>`
+
+            $("#ledgerCR").append(newOption).val(id).select2().trigger("change").prop("disabled", true)
+            //finding an option with value and selecting it
+            const option = $(`#ledgerCR option[value="${id}"]`)
+            option.prop("selected", true).trigger("change")
+
+            const val = $(`#crTable tr[data-ledger='${id}'] .ind-total-amt:last`).val()
+            $("#amountCr").val(val)
+
+            //displaying table  
+            $("#crIndividual").css("display", "block")
+
+            //hiding all tr
+            $("#crTable tr").css("display", "none")
+
+            //displaying only the selected ledger tr
+            $(`#crTable tr[data-ledger="${id}"]`).css("display", "table-row")
+            if ($(`#crPartyTable tr`).length < 1) {
+                $("#crPartyTotal").css("display", "none")
+            }
+            $("#editSAVEBTNCR").remove()
+            const newSaveBTN = `<button id="editSAVEBTNCR" type="button" onclick="saveEditCR('${id}')" class="btn btn-sm btn-primary">SAVE</button>`
+            $("#crIndividual").append(newSaveBTN)
+
+        }
+    </script>
+    <script>
+        function saveEditCR(id) {
+            if (checkEntryCompletion()) {
+                $("#editSAVEBTNCR").remove()
+                reCalculateCRSerial()
+            } else {
+                showError("Please enter a valid amount")
+            }
+        }
+    </script>
+    <script>
+        function deleteCRTotal(id, text) {
+            const tr1ToDelete = $(`#crPartyTable tr[data-ledger="${id}"]`)
+            tr1ToDelete.remove()
+            const tr2ToDelete = $(`#crTable tr[data-ledger="${id}"]`)
+            tr2ToDelete.remove()
+
+            const newOption = `<option value="${id}">${text}</option>`
+
+            if ($(`#crPartyTable tr`).length < 1) {
+                $("#crPartyTotal").css("display", "none")
+            }
+
+            $("#ledgerCR").append(newOption).val(null).select2()
+            reCalculateCRSerial()
+        }
+    </script>
+    <script>
+        function reCalculateCRSerial() {
+            const table = $("#crPartyTable tr")
+            for (let i = 0; i < table.length; i++) {
+                table[i].querySelector("td:first-child input").value = i + 1
+            }
+        }
+    </script>
+
+    <script>
+        $("#ledgerDR").on("change", function () {
+
+            
+                $("#ledgerCR").prop("disabled", true).select2()
+                fetch(`/accounts/reciepts/get-details?id=${$(this).val()}&type=dr`, {
+                    method: "GET"
+                }).then((res) => {
+                    return res.json().then((data) => {
+
+                        $("#drBalanceDiv").css("display", "block")
+                        //empty except first option
+                        $("#selectReferenceDr option:not(:first)").remove();
+                        let display = "Cr"
+                        if (data.netBalance < 0) {
+                            display = "Dr"
+                        } else if (data.netBalance == 0) {
+                            display = ""
+                        }
+                        $("#drBalance").val(Math.abs(data.netBalance) + " " + display)
+                        data.constructedReferences.forEach((reference) => {
+                            $("#selectReferenceDr").append(`<option value="${reference.rel}" data-netbalance="${Math.abs(reference.netBalance)}">${reference.display}</option>`)
+                        })
+                        $('#drTable tr').each(function () {
+                            var ledgerValue = $(this).attr('data-ledger');
+                            var optionVal = $('#drTable tr[data-ledger="' + ledgerValue + '"] td select[name="referenceNumberDR"] option:selected').val()
+
+                            $("#selectReferenceDr option[value='" + optionVal + "']").remove();
+                        });
+
+                        if (localStorage.getItem("drReference") && localStorage.getItem("drReference").length > 0) {
+                            const drReferenceArray = JSON.parse(localStorage.getItem("drReference"));
+                            drReferenceArray.forEach((reference) => {
+                                $("#selectReferenceDr option[value='" + reference.ref + "']").attr("data-netbalance", reference.netBalance).select2()
+                            });
+                        }
+                        $("#selectReferenceDr").select2()
+                        $("#amountDr").prop("disabled", false)
+                        setTimeout(function () {
+                            $("#amountDr").focus()
+                        }, 200)
+                    })
+                })
+            
+
+
+
+        })
+
+
+        $("#amountDr").on("keydown", function (event) {
+            if (event.keyCode === 9 && !event.shiftKey) {
+                if ($(this).val() == 0) {
+                    showError("Please enter a valid amount")
+                } else {
+                    $("#selectReferenceTypeDr").prop("disabled", false)
+                    $("#ledgerDR").prop("disabled", true)
+                  
+                }
+
+
+            }
+        })
+
+        $("#selectReferenceTypeDr").on("change", function () {
+            if ($(this).val() === "against") {
+                $("#billDIVDr").css("display", "block")
+                $("#newDIVDr").css("display", "none")
+                $("#billDr").prop("disabled", false)
+                $("#newDr").prop("disabled", true)
+                $("#selectReferenceDr").prop("disabled", false).val(null).select2()
+                $("#newDrAmt").prop("disabled", true)
+
+            } else if ($(this).val() === "new") {
+                $("#billDIVDr").css("display", "none")
+                $("#newDIVDr").css("display", "block")
+                $("#newDr").prop("disabled", false)
+                $("#billDr").prop("disabled", true)
+                $("#newDrAmt").prop("disabled", true).val(0)
+                $("#recievedAmtDr").prop("disabled", false).focus()
+
+            } else if ($(this).val() === "onAccount") {
+                $("#billDIVDr").css("display", "block")
+                $("#newDIVDr").css("display", "none")
+                $("#selectReferencDr").val(null).select2().prop("disabled", true)
+                $("#newDr").prop("disabled", true)
+                $("#newDrAmt").prop("disabled", true)
+                $("#recievedAmtDr").prop("disabled", false)
+                setTimeout(function () {
+                    $("#recievedAmtDr").focus()
+                }, 100)
+
+
+            }
+        })
+
+        $("#selectReferenceDr").on("change", function () {
+            $("#newDrAmt").val($(this).find(":selected").data("netbalance"))
+            $("#recievedAmtDr").val($(this).find(":selected").data("netbalance"))
+            $("#recievedAmtDr").prop("disabled", false).focus()
+        })
+
+    </script>
+
+
+
+    <script>
+        function addNewRowDr() {
+            const tbody = $("#drTable")
+            let balance = 0
+            let refAmt = 0
+            let amtRecieved = parseFloat($("#recievedAmtDr").val())
+            let defaultAMT = 0
+            let defaultOption = ``
+          if ($("#selectReferenceTypeDr").val() === "new") {
+                refAmt = parseFloat($("#recievedAmtDr").val())
+                balance = parseFloat($("#recievedAmtDr").val())
+                defaultOption = ` <option selected value="${$("#newDr").val()}">${$("#newDr").val()}</option>`
+                defaultAMT = $("#recievedAmtDr").val()
+            } else if ($("#selectReferenceTypeDr").val() === "against") {
+                refAmt = parseFloat($("#selectReferenceDr option:selected").data("netbalance"))
+                balance = parseFloat($("#selectReferenceDr option:selected").data("netbalance")) - parseFloat($("#recievedAmtDr").val())
+                defaultOption = ` <option selected value="${$("#selectReferenceDr").val()}">${$("#selectReferenceDr option:selected").text()}</option>`
+                defaultAMT = $("#recievedAmtDr").val()
+            } else {
+                defaultOption = ` <option value="onAccount" selected>On Account</option>`
+                defaultAMT = $("#recievedAmtDr").val()
+            }
+            $("#drIndividual").css("display", "block")
+            const trLength = $("#drTable tr").length
+
+            const newTR =
+
+                `<tr data-rowid="${trLength + 1}" data-ledger="${$("#ledgerDR").val()}">
+                        
+                             <td>
+                                <input type="hidden" name="statusDR" value="new">
+                                <input type="hidden" disabled class="ind-total-amt" value="${$("#amountDr").val()}">
+                              <input type="hidden" disabled name="ledgerDR" value="${$("#ledgerDR").val()}">
+                              <select class="form-select form-select-solid reference-type-dr" disabled name="referenceTypeDr">
+                                      <option value="reciept" ${$("#selectReferenceTypeDr").prop('disabled') ? 'selected' : ''}>N/A</option>
+                                      <option value="against" ${$("#selectReferenceTypeDr").val() === 'against' ? 'selected' : ''}>Against Ref</option>
+                                      <option value="new" ${$("#selectReferenceTypeDr").val() === 'new' ? 'selected' : ''}>New</option>
+                                      <option value="onAccount" ${$("#selectReferenceTypeDr").val() === 'onAccount' ? 'selected' : ''}>On Account</option>
+                                  </select>
+                              </td>
+
+                                  <td>
+                                      <select class="form-select form-select-solid" disabled name="referenceNumberDR">
+                                         ${defaultOption}
+                                      </select>
+                                  </td>
+
+                                  <td>
+                                      <input type="text" class="form-control form-control-solid" disabled name="amountDr" value="${refAmt}">
+                                  </td>
+
+                                  <td>
+                                    <input type="text" class="form-control form-control-solid recieved-amount-dr" disabled name="recievedAmtDr" value="${defaultAMT}">
+                                  </td>
+
+                                  <td>
+                                     <input type="text" class="form-control form-control-solid" disabled name="balanceDr" value="${balance}">
+                                  </td>
+
+                                  <td>
+                                    <button type="button" onclick="deleteDRInd('${trLength + 1}','${$("#selectReferenceDr option:selected").val()}','${$("#selectReferenceDr option:selected").text()}' ,'${$("#selectReferenceDr option:selected").data("netbalance")}', '' )" class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                                                              <i class="ki-duotone ki-trash-square fs-2">
+                                                               <span class="path1"></span>
+                                                               <span class="path2"></span>
+                                                               <span class="path3"></span>
+                                                               <span class="path4"></span>
+                                                              </i>
+                                      </button>
+                                  </td>
+                                </tr>
+                                  `
+
+            tbody.append(newTR)
+
+
+            //removing selected reference from select2
+            $("#selectReferenceDr option:selected").remove().val(null).trigger("change")
+            $("#selectReferenceTypeDr").val(null).trigger("change")
+            $("#newDr").val()
+            setTimeout(function () {
+                $("#selectReferenceTypeDr").focus()
+            }, 200)
+
+            checkFinalEntryCompletion()
+
+        }
+    </script>
+
+    <script>
+        function saveEditDR(id) {
+            if (checkFinalEntryCompletion()) {
+                $("#editSAVEBTNDR").remove()
+                reCalculateDRSerial()
+            } else {
+                showError("Please enter a valid amount")
+            }
+
+
+        }
+    </script>
+    <script>
+        function deleteDRTotal(id, text, data) {
+            const tr1ToDelete = $(`#drPartyTable tr[data-ledger="${id}"]`)
+            tr1ToDelete.remove()
+            const tr2ToDelete = $(`#drTable tr[data-ledger="${id}"]`)
+            tr2ToDelete.remove()
+
+            const found = $("#ledgerDR option[value='" + id + "']").length
+            if (found < 1) {
+                const newOption = `<option value="${id}" data-type="${data}">${text}</option>`
+                $("#ledgerDR").append(newOption).val(null).select2().prop("disabled", false)
+            }
+            if ($(`#drPartyTable tr`).length < 1) {
+                $("#drPartyTotal").css("display", "none")
+            }
+            $("#selectReferenceTypeDr").prop("disabled", true)
+            $("#selectReferenceDr").prop("disabled", true)
+            $("#newDr").prop("disabled", true)
+            $("#newDrAmt").prop("disabled", true)
+            $("#recievedAmtDr").prop("disabled", true)
+
+
+            reCalculateDRSerial()
+        }
+    </script>
+    <script>
+        function deleteDRInd(rowID, value, text, balance, type) {
+
+            $(`#drTable tr[data-rowID="${rowID}"]`).remove()
+            const ledger = $(`#drTable tr[data-rowID="${rowID}"]`).attr("data-ledger")
+            const trToDelete = $(`#drTable tr[data-ledger="${ledger}"]`)
+            if (trToDelete.length = 0) {
+                deleteDRTotal($("#ledgerDR option:selected").val(), $("#ledgerDR option:selected").text(), $("#ledgerDR option:selected").attr("data-type"))
+                $("#editSAVEBTNDR").remove()
+                $("#ledgerDR").val(null).prop("disabled", false).select2()
+                $("#amountDr").val(0)
+                $("#drBalance").val(0)
+                $("#recievedAmtDr").val(0)
+                $("#newDrAmt").val(0)
+                $("#selectReferenceTypeDr").val(null).select2()
+                $("#selectReferenceDr").val(null).select2()
+            }
+            const newOption = `<option value="${value}" data-netbalance="${balance}">${text}</option>`
+
+            if ($(`#drTable tr[data-ledger=${$("#ledgerDR").val()}]`).length < 1) {
+                $("#drIndividual").css("display", "none")
+
+            }
+            if (type == "edit") {
+                // Retrieve the array from localStorage
+                let drReferenceArray = JSON.parse(localStorage.getItem("drReference")) || [];
+
+                // Push new object to the array
+                const newObject = {
+                    ref: value,
+                    netBalance: balance
+                };
+                drReferenceArray.push(newObject);
+
+                // Save the modified array back to localStorage
+                localStorage.setItem("drReference", JSON.stringify(drReferenceArray));
+                
+            }
+
+                if (!$("#selectReferenceDr option[value='" + value + "']").length > 0) {
+                    $("#selectReferenceDr").append(newOption).val(null).select2()
+                }
+
+                setTimeout(function () {
+                    $("#selectReferenceTypeDr").prop("disabled", false).focus()
+                }, 200)
+            
+
+        }
+    </script>
+    <script>
+        function reCalculateDRSerial() {
+            const table = $("#drPartyTable tr")
+            for (let i = 0; i < table.length; i++) {
+                table[i].querySelector("td:first-child input").value = i + 1
+            }
+        }
+    </script>
+    <script>
+        function editDRTotal(id, text, data) {
+            const trToDelete = $(`#drPartyTable tr[data-ledger="${id}"]`)
+            trToDelete.remove()
+
+            //adding the ledger back to the select2
+            const newOption = `<option value="${id}" data-type="${data}">${text}</option>`
+
+            $("#ledgerDR").append(newOption).val(id).select2().prop("disabled", true)
+            //finding an option with value and selecting it
+            const option = $(`#ledgerDR option[value="${id}"]`)
+            option.prop("selected", true).trigger("change")
+
+            const val = $(`#drTable tr[data-ledger='${id}'] .ind-total-amt:last`).val()
+            $("#amountDr").val(val)
+            //displaying table  
+            $("#drIndividual").css("display", "block")
+
+            //hiding all tr
+            $("#drTable tr").css("display", "none")
+
+            //displaying only the selected ledger tr
+            $(`#drTable tr[data-ledger="${id}"]`).css("display", "table-row")
+            if ($(`#drPartyTable tr`).length < 1) {
+                $("#drPartyTotal").css("display", "none")
+            }
+            $("#editSAVEBTNDR").remove()
+            const newSaveBTN = `<button id="editSAVEBTNDR" type="button" onclick="saveEditDR('${id}')" class="btn btn-sm btn-primary">SAVE</button>`
+            $("#drIndividual").append(newSaveBTN)
+
+        }
+    </script>
+
+    <script>
+        function checkFinalEntryCompletion() {
+            const table = $(`#drTable tr[data-ledger=${$("#ledgerDR").val()}] .recieved-amount-dr`)
+            let total = 0
+            for (let i = 0; i < table.length; i++) {
+                total += parseFloat(table[i].value)
+            }
+
+            if (total == parseFloat($("#amountDr").val())) {
+                const ledgerValue = $("#ledgerDR").val();
+                const dataToHide = $(`#drTable tr[data-ledger='${ledgerValue}']`);
+                // Hide all data with the same ledger
+                dataToHide.css("display", "none");
+
+
+                //adding party table to the main table
+                const tbody = $("#drPartyTable")
+                const trLength = $("#drPartyTable tr").length
+                const refLength = $(`#drTable tr[data-ledger="${$("#ledgerDR").val()}"]`).length
+                $("#drIndividual").css("display", "none")
+                const newTR = `
+                <tr data-ledger="${$("#ledgerDR").val()}">
+
+                <td>
+                    <input disabled type="text" disaled class="form-control form-control-solid" value="${trLength + 1}">
+                </td>
+
+                <td> 
+                    <input disabled type="text" disabled class="form-control form-control-solid" value="${$("#ledgerDR option:selected").text()}">
+                </td>
+
+                <td>
+                    <input disabled type="text" class="form-control form-control-solid" value="${refLength}">
+                </td>
+
+                <td>
+                    <input disabled type="text" class="form-control form-control-solid" value="${total}">    
+                </td>
+                <td>
+                    <button onclick="editDRTotal('${$("#ledgerDR option:selected").val()}', '${$("#ledgerDR option:selected").text()}', '${$("#ledgerDR option:selected").attr("data-type")}')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-pencil fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                        </button>
+
+                        <button type="button" onclick="deleteDRTotal('${$("#ledgerDR option:selected").val()}', '${$("#ledgerDR option:selected").text()}', '${$("#ledgerDR option:selected").attr("data-type")}')" class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                            <i class="ki-duotone ki-trash-square fs-2">
+                             <span class="path1"></span>
+                             <span class="path2"></span>
+                             <span class="path3"></span>
+                             <span class="path4"></span>
+                            </i>
+                        </button>
+                </td>
+                
+             </tr>
+                `
+                tbody.append(newTR)
+
+
+                //removing selected ledger from select2
+                $("#ledgerDR option:selected").remove().val(null).trigger("change")
+
+                //resetting all values
+                $("#ledgerDR").val(null).prop("disabled", false).select2()
+                $("#amountDr").val(0)
+                $("#drBalance").val(0)
+                $("#recievedAmtDr").val(0)
+                $("#selectReferenceTypeDr").val(null).trigger("change")
+                $("#selectReferenceDr").val(null).trigger("change")
+                $("#newDr").val(null)
+                $("#billDr").val(null)
+
+                $("#drPartyTotal").css("display", "block")
+
+
+                setTimeout(function () {
+                    $("#ledgerDR").focus()
+                    $("#ledgerCR").prop("disabled", false)
+                }, 200)
+
+
+                return true
+
+
+            } else {
+                $("#selectReferenceTypeDr").prop("disabled", false).val(null).select2()
+                $("#newDr").prop("disabled", true).val("")
+                $("#newDIVDr").css("display", "none")
+                $("#billDIVDr").css("display", "block")
+                $("#newDrAmt").prop("disabled", true).val(0)
+                $("#recievedAmtDr").prop("disabled", true).val(0)
+                return false
+            }
+        }
+
+    </script>
+
+    <script>
+        function checkValidAmountDr() {
+            const table = $(`#drTable tr[data-ledger=${$("#ledgerDR").val()}] .recieved-amount-dr`)
+            let total = parseFloat($("#recievedAmtDr").val())
+            for (let i = 0; i < table.length; i++) {
+                total += parseFloat(table[i].value)
+            }
+
+            if (total > parseFloat($("#amountDr").val())) {
+                return false
+            } else {
+                return true
+            }
+        }
+    </script>
+
+    <script>
+        $("#recievedAmtDr").on("keydown", function () {
+            if (event.keyCode === 9 && !event.shiftKey) {
+                if ($(this).val() == 0 || $(this).val() > parseFloat($("#amountDr").val())) {
+                    showError("Please enter a valid amount")
+                } else {
+                    addNewRowDr()
+                    $('#kt_modal_2 .modal-body').scrollTop($('#kt_modal_2 .modal-body')[0].scrollHeight);
+                    finalEntryCompletion()
+                }
+            }
+        })
+    </script>
+    <script>
+        function createReciept() {
+            const drTable = $("#drTable tr")
+            const crTable = $("#crTable tr")
+            const drPartyTable = $("#drPartyTable tr")
+            const crPartyTable = $("#crPartyTable tr")
+
+            if (drTable.length < 1 || crTable.length < 1 || drPartyTable.length < 1 || crPartyTable.length < 1) {
+                showError("Please do a valid entry")
+                return
+            }
+
+            const totalDRAmount = $("#drPartyTable tr td:nth-child(4) input")
+            const totalCRAmount = $("#crPartyTable tr td:nth-child(4) input")
+
+            let totalDR = 0
+            let totalCR = 0
+            for (let i = 0; i < totalDRAmount.length; i++) {
+                totalDR += parseFloat(totalDRAmount[i].value)
+            }
+            for (let i = 0; i < totalCRAmount.length; i++) {
+                totalCR += parseFloat(totalCRAmount[i].value)
+            }
+
+            if (totalDR !== totalCR) {
+                showError("Total Debit and Credit amount should be equal")
+                return
+            }
+
+            $("#recieptSubmit").attr("data-kt-indicator", "on").prop("disabled", true);
+            $("#modalCloseBTN").prop("disabled", true);
+            const form = document.getElementById("recieptForm");
+
+            // Enable disabled inputs and selects
+            const disabledInputs = form.querySelectorAll("input[disabled], select[disabled]");
+            for (const input of disabledInputs) {
+                input.removeAttribute("disabled");
+            }
+
+            // Serialize the form data
+            const formData = new FormData(form);
+
+            // Re-disable previously disabled inputs and selects
+            for (const input of disabledInputs) {
+                input.setAttribute("disabled", "disabled");
+            }
+
+            // Create a URLSearchParams object and add form data to it
+            const data = new URLSearchParams();
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]);
+            }
+
+            fetch("/accounts/journal/new", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: data
+            }).then((data) => {
+                if (data.status === 400) {
+
+                    return data.json().then((message) => {
+                        Swal.fire({
+                            text: message.message,
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((response) => {
+                            if (response.isConfirmed) {
+                                $("#newLedgerBTN").attr("data-kt-indicator", "off")
+                                $("#newLedgerBTN").attr("disabled", false)
+                            }
+                        })
+                    })
+
+                } else if (data.status === 200) {
+                    Swal.fire({
+                        text: "Journal Voucher Created",
+                        icon: "success",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((response) => {
+                        if (response.isConfirmed) {
+                            location.reload()
+                        }
+                    })
+                } else if (data.status === 401) {
+                    Swal.fire({
+                        text: "You are not authorized to perform this action",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((data) => {
+                        if (data.isConfirmed) {
+                            $("#newLedgerBTN").attr("data-kt-indicator", "off")
+                            $("#newLedgerBTN").attr("disabled", false)
+
+                        }
+                    })
+                }
+            })
+
+
+
+        }
+    </script>
+
+
+    <script>
+        function editReciept(id) {
+            $("#recieptForm").trigger("reset")
+            $("#crPartyTable").empty()
+            $("#drPartyTable").empty()
+            $("#crPartyTotal").css("display", "none")
+            $("#drPartyTotal").css("display", "none")
+            $("#crIndividual").css("display", "none")
+            $("#drIndividual").css("display", "none")
+            $("#crTable").empty()
+            $("#drTable").empty()
+            $("#title").text("Edit Journal Voucher")
+
+            fetch(`/accounts/journal/edit?id=${id}`, {
+                method: "GET"
+            }).then((res) => {
+                return res.json().then((data) => {
+
+                    let totalCR = 0
+
+                    data.crEntry.forEach((info) => {
+                        totalCR = 0
+                        for (i = 0; i < data.crEntry.length; i++) {
+                            if (info.ledger == data.crEntry[i].ledger) {
+                                totalCR += parseFloat(data.crEntry[i].amount)
+                            }
+                        }
+
+                        //checking if ledger already exists or adding it in option
+                        if ($(`#ledgerCR option[value="${info.ledger}"]`).length < 1) {
+                            const newOption = `<option value="${info.ledger}">${info.ledgerDisplay}</option>`
+                            $("#ledgerCR").append(newOption)
+                        }
+                        addEditRowCR(info.ledger, info.ledgerDisplay, info.referenceType, info.referenceNumber, info.referenceNumberDisplay, info.amount, info.balance, totalCR)
+
+                    })
+
+                    let totalDR = 0
+
+                    data.drEntry.forEach((info) => {
+                        totalDR = 0
+                        for (i = 0; i < data.drEntry.length; i++) {
+                            if (info.ledger == data.drEntry[i].ledger) {
+                                totalDR += parseFloat(data.drEntry[i].amount)
+                            }
+                        }
+
+                        //checking if ledger already exists or adding it in option
+                        if ($(`#ledgerDR option[value="${info.ledger}"]`).length < 1) {
+                            const newOption = `<option value="${info.ledger}">${info.ledgerDisplay}</option>`
+                            $("#ledgerDR").append(newOption)
+                        }
+                        addEditRowDR(info.ledger, info.ledgerDisplay, info.referenceType, info.referenceNumber, info.referenceNumberDisplay, info.amount, info.balance, totalDR)
+                    })
+                    $("#recievedAmtDr").prop("disabled", true)
+                    $("#recievedAmtCr").prop("disabled", true)
+                    $("#selectReferenceTypeDr").prop("disabled", true)
+                    $("#selectReferenceTypeCr").prop("disabled", true)
+                    $("#title").text(`Update Reciept No. ${data.data1.voucherNumber}`)
+                    $("#recieptDate").val(data.data1.date)
+                    $("#voucherNumber").val(data.data1.voucherNumber).prop("disabled", true)
+                    $("#recieptSubmit").css("display", "none")
+                    $("#recieptUpdate").css("display", "block")
+                    $("#editID").val(data.data1._id)
+                    setTimeout(function () {
+                        $("#ledgerDR").select2("close").blur()
+                        $("#ledgerCR").select2("close").blur()
+
+                    }, 200)
+
+                    $("#kt_modal_2").modal("show") 
+                })
+            })
+        }
+
+    </script>
+    <script>
+        function addEditRowDR(ledger, ledgerDisplay, referenceType, referenceNumber, referenceNumberDisplay, amount, balance, totalAMT) {
+            const tbody = $("#drTable")
+            const trLength = $("#drTable tr").length
+            const newTR = `
+            <tr data-ledger="${ledger}" data-rowID="${trLength + 1}">
+                <td>
+                    <input type="hidden" name="statusDR" value="old">
+                    <input type="hidden" disabled class="ind-total-amt" value="${totalAMT}">
+                              <input type="hidden" disabled name="ledgerDR" value="${ledger}">
+                    <select class="form-select form-select-solid" name="referenceTypeDr" disabled>
+                        <option value="against" ${referenceType === 'against' ? 'selected' : ''}>Against Ref</option>
+                        <option value="new" ${referenceType === 'new' ? 'selected' : ''}>New</option>
+                        <option value="onAccount" ${referenceType === 'onAccount' ? 'selected' : ''}>On Account</option>
+                        <option value="onAccount" ${referenceType === 'N/A' ? 'selected' : ''}>N/A</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select form-select-solid" name="referenceNumberDR" disabled>
+                        <option value="${referenceNumber}" selected>${referenceNumberDisplay}</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-solid" name="amountDr" value="${amount + balance}" disabled>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-solid recieved-amount-dr" name="recievedAmtDr" value="${amount}" disabled>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-solid" name="balanceDr" value="${balance}" disabled>
+                </td>
+                <td>
+                    <button type="button"  onclick="deleteDRInd('${trLength + 1}', '${referenceNumber}', '${referenceNumberDisplay}', '${amount + balance}', 'edit')" class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                        <i class="ki-duotone
+                        ki-trash-square fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                        </i>
+                    </button>
+                </td>
+                </tr>
+            `
+            tbody.append(newTR)
+            $("#ledgerDR").val(ledger).prop("disabled", true).select2()
+            $("#amountDr").val(totalAMT)
+            checkFinalEntryCompletion()
+
+        }
+    </script>
+
+    <script>
+        function addEditRowCR(ledger, ledgerDisplay, referenceType, referenceNumber, referenceNumberDisplay, amount, balance, totalAMT) {
+            const tbody = $("#crTable")
+            const trLength = $("#crTable tr").length
+            const newTR = `
+            <tr data-ledger="${ledger}" data-rowID="${trLength + 1}">
+                <td>
+                    <input type="hidden" name="statusCR" value="old">
+                    <input type="hidden" disabled class="ind-total-amt" value="${totalAMT}">
+                              <input type="hidden" disabled name="ledgerCR" value="${ledger}">
+                    <select class="form-select form-select-solid" name="referenceTypeCr" disabled>
+                        <option value="against" ${referenceType === 'against' ? 'selected' : ''}>Against Ref</option>
+                        <option value="new" ${referenceType === 'new' ? 'selected' : ''}>New</option>
+                        <option value="onAccount" ${referenceType === 'onAccount' ? 'selected' : ''}>On Account</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select form-select-solid" name="referenceNumberCR" disabled>
+                        <option value="${referenceNumber}" selected>${referenceNumberDisplay}</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-solid" name="amountCr" value="${amount + balance}" disabled>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-solid recieved-amount-cr" name="recievedAmtCr" value="${amount}" disabled>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-solid" name="balanceCr" value="${balance}" disabled>
+                </td>
+                <td>
+                    <button type="button" onclick="deleteCRInd('${trLength + 1}', '${referenceNumber}', '${referenceNumberDisplay}', '${amount + balance}', 'edit')" class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                        <i class="ki-duotone
+                        ki-trash-square fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                        </i>
+                    </button>
+                </td>
+
+            </tr>
+            `
+            tbody.append(newTR)
+            $("#ledgerCR").val(ledger).prop("disabled", true).select2()
+            $("#amountCr").val(totalAMT)
+            checkEntryCompletion()
+        }
+    </script>
+
+    <script>
+        function updateReciept() {
+            const drTable = $("#drTable tr")
+            const crTable = $("#crTable tr")
+            const drPartyTable = $("#drPartyTable tr")
+            const crPartyTable = $("#crPartyTable tr")
+
+            if (drTable.length < 1 || crTable.length < 1 || drPartyTable.length < 1 || crPartyTable.length < 1) {
+                showError("Please do a valid entry")
+                return
+            }
+
+            const totalDRAmount = $("#drPartyTable tr td:nth-child(4) input")
+            const totalCRAmount = $("#crPartyTable tr td:nth-child(4) input")
+
+            let totalDR = 0
+            let totalCR = 0
+            for (let i = 0; i < totalDRAmount.length; i++) {
+                totalDR += parseFloat(totalDRAmount[i].value)
+            }
+            for (let i = 0; i < totalCRAmount.length; i++) {
+                totalCR += parseFloat(totalCRAmount[i].value)
+            }
+
+            if (totalDR !== totalCR) {
+                showError("Total Debit and Credit amount should be equal")
+                return
+            }
+            // $("#recieptUpdate").attr("data-kt-indicator", "on").prop("disabled", true);
+            // $("#modalCloseBTN").prop("disabled", true);
+            const form = document.getElementById("recieptForm");
+
+            // Enable disabled inputs and selects
+            const disabledInputs = form.querySelectorAll("input[disabled], select[disabled]");
+            for (const input of disabledInputs) {
+                input.removeAttribute("disabled");
+            }
+
+            // Serialize the form data
+            const formData = new FormData(form);
+
+            // Re-disable previously disabled inputs and selects
+            for (const input of disabledInputs) {
+                input.setAttribute("disabled", "disabled");
+            }
+
+            // Create a URLSearchParams object and add form data to it
+            const data = new URLSearchParams();
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]);
+            }
+
+            fetch("/accounts/journal/edit", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: data
+            }).then((data) => {
+                if (data.status === 400) {
+
+                    return data.json().then((message) => {
+                        Swal.fire({
+                            text: message.message,
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((response) => {
+                            if (response.isConfirmed) {
+                                $("#newLedgerBTN").attr("data-kt-indicator", "off")
+                                $("#newLedgerBTN").attr("disabled", false)
+                            }
+                        })
+                    })
+
+                } else if (data.status === 200) {
+                    Swal.fire({
+                        text: "Voucher Updated Successfully",
+                        icon: "success",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((response) => {
+                        if (response.isConfirmed) {
+                            location.reload()
+                        }
+                    })
+                } else if (data.status === 401) {
+                    Swal.fire({
+                        text: "You are not authorized to perform this action",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((data) => {
+                        if (data.isConfirmed) {
+                            $("#newLedgerBTN").attr("data-kt-indicator", "off")
+                            $("#newLedgerBTN").attr("disabled", false)
+
+                        }
+                    })
+                } else {
+                    showError("Something went wrong")
+                }
+            })
+
+
+
+        }
+    </script>
+
+    <script>
+        function deleteReciept(id) {
+            Swal.fire({
+                text: "Are you sure you want to delete this Journal2?",
+                icon: "warning",
+                showCancelButton: !0,
+                buttonsStyling: !1,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                }
+            }).then(response => {
+                if (response.isConfirmed) {
+                    // Send the form data to the server
+
+                    fetch(`/accounts/journal/delete?id=${id}`, {
+                        method: "GET"
+                    }).then((data) => {
+                        if (data.status === 400) {
+
+                            return data.json().then((message) => {
+                                Swal.fire({
+                                    text: message.message,
+                                    icon: "error",
+                                    buttonsStyling: !1,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                })
+                            })
+
+                        } else if (data.status === 200) {
+                            Swal.fire({
+                                text: "Journal Voucher Deleted",
+                                icon: "success",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((response) => {
+                                if (response.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                        } else if (data.status === 401) {
+                            Swal.fire({
+                                text: "You are not authorized to perform this action",
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    i.setAttribute("data-kt-indicator", "off")
+                                    i.disabled = 0
+                                    n.hide()
+                                    e.reset()
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+
+        }
+    </script>
+
+    <%} %>

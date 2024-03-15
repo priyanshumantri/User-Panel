@@ -1,0 +1,254 @@
+<% if(pageName==="actions" ) {%>
+
+    <script>
+        "use strict";
+        var KTAppEcommerceCategories = function () {
+            var t, e, n = () => {
+                t.querySelectorAll('[data-kt-ecommerce-category-filter="delete_row"]').forEach((t => {
+                    t.addEventListener("click", (function (t) {
+                        t.preventDefault();
+                        const n = t.target.closest("tr"),
+                            o = n.querySelector('[data-kt-ecommerce-category-filter="category_name"]').innerText;
+                        Swal.fire({
+                            text: "Are you sure you want to delete " + o + "?",
+                            icon: "warning",
+                            showCancelButton: !0,
+                            buttonsStyling: !1,
+                            confirmButtonText: "Yes, delete!",
+                            cancelButtonText: "No, cancel",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-danger",
+                                cancelButton: "btn fw-bold btn-active-light-primary"
+                            }
+                        }).then((function (t) {
+                            t.value ? Swal.fire({
+                                text: "You have deleted " + o + "!.",
+                                icon: "success",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary"
+                                }
+                            }).then((function () {
+                                e.row($(n)).remove().draw()
+                            })) : "cancel" === t.dismiss && Swal.fire({
+                                text: o + " was not deleted.",
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary"
+                                }
+                            })
+                        }))
+                    }))
+                }))
+            };
+            return {
+                init: function () {
+                    (t = document.querySelector("#kt_ecommerce_category_table")) && ((e = $(t).DataTable({
+                        info: !1,
+                        order: [],
+                        pageLength: 10,
+                        columnDefs: [{
+                            orderable: !1,
+                            targets: 0
+                        }, {
+                            orderable: !1,
+                            targets: 3
+                        }]
+                    })).on("draw", (function () {
+                        n()
+                    })), document.querySelector('[data-kt-ecommerce-category-filter="search"]').addEventListener("keyup", (function (t) {
+                        e.search(t.target.value).draw()
+                    })), n())
+                }
+            }
+        }();
+        KTUtil.onDOMContentLoaded((function () {
+            KTAppEcommerceCategories.init()
+        }));
+    </script>
+
+    <script>
+        function allowOnlyWholeNumbers(event) {
+            const input = event.target;
+
+            // Regular expression to match only numeric characters (0-9)
+            const regex = /^[0-9]+$/;
+
+            // Check if the input value contains any non-numeric characters
+            if (!regex.test(input.value)) {
+                // Prevent the input of non-numeric characters
+                event.preventDefault();
+
+                // Remove any non-numeric characters immediately
+                input.value = input.value.replace(/[^0-9]/g, '');
+            }
+        }
+
+
+
+    </script>
+
+
+    <script>
+        function packageAction(status, NOPLost, lrID, challanID, lrNumber, challanNumber, actualWeight, chargedWeight) {
+            const editModal = document.getElementById('kt_modal_update_permission');
+            const editPackageLRElement = $("#editPackageLR")
+            const editPackageChallanElement = $("#editPackageChallan")
+
+            editPackageLRElement.select2()
+            editPackageChallanElement.select2()
+
+            const challanOptionValue = challanID
+            const challaOnoptionText = challanNumber
+            const newOption = new Option(challaOnoptionText, challanOptionValue, true, true)
+            editPackageChallanElement.append(newOption).trigger("change")
+
+            const lrOptionValue = lrID
+            const lrOptionText = lrNumber
+            const newOption1 = new Option(lrOptionText, lrOptionValue, true, true)
+            editPackageLRElement.append(newOption1).trigger("change")
+
+            const NOPFoundElement = $("#NOPFound")
+            const NOPLostElement = $("#NOPLost")
+            NOPLostElement.val(NOPLost)
+            NOPFoundElement.val(NOPLost)
+            const action = $("#action")
+            action.val(status)
+
+            const actualWeightElement = $("#actualWeight")
+            const chargedWeightElement = $("#chargedWeight")
+            const originalActualWeight = $("#originalActualWeight")
+            const originalChargedWeight = $("#originalChargedWeight")
+            actualWeightElement.val(actualWeight)
+            chargedWeightElement.val(chargedWeight)
+            originalActualWeight.val("#originalActualWeight")
+            originalChargedWeight.val("#originalChargedWeight")
+
+
+            $(editModal).modal('show');
+            NOPFoundElement.on("input", function () {
+
+                if (parseInt(NOPFoundElement.val()) > parseInt(NOPLostElement.val())) {
+                    NOPFoundElement.val(NOPLostElement.val())
+                }
+
+            })
+        }
+    </script>
+
+    <script>
+        function showError(message) {
+            Swal.fire({
+                text: message,
+                icon: "error",
+                buttonsStyling: !1,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            })
+        }
+    </script>
+    <script>
+        "use strict";
+        var KTUsersUpdatePermission = function () {
+            const t = document.getElementById("kt_modal_update_permission"),
+                e = t.querySelector("#editCity"),
+                n = new bootstrap.Modal(t);
+
+            return {
+                init: function () {
+                    const i = t.querySelector('[data-kt-permissions-modal-action="submit"]');
+                    i.addEventListener("click", (function (event) {
+                        event.preventDefault();
+
+                        const form = document.getElementById("packageActionForm");
+                            // Enable disabled inputs and selects
+                            const disabledInputs = form.querySelectorAll("select[disabled]");
+                            for (const input of disabledInputs) {
+                                input.removeAttribute("disabled");
+                            }
+
+                            // Serialize the form data
+                            const formData = new FormData(form);
+
+                            // Re-disable previously disabled inputs and selects
+                            for (const input of disabledInputs) {
+                                input.setAttribute("disabled", "disabled");
+                            }
+
+                            // Create a URLSearchParams object and add form data to it
+                            const data = new URLSearchParams();
+                            for (const pair of formData) {
+                                data.append(pair[0], pair[1]);
+                            }
+
+                            // Send the form data to the server
+                            fetch("/actions", {
+                                method: "POST",
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: data
+                            }).then((data) => {
+                                if (data.status === 400) {
+alert("OK")
+                                    return data.json().then((message) => {
+                                        Swal.fire({
+                                            text: message.message,
+                                            icon: "error",
+                                            buttonsStyling: !1,
+                                            confirmButtonText: "Ok, got it!",
+                                            customClass: {
+                                                confirmButton: "btn btn-primary"
+                                            }
+                                        })
+                                    })
+
+                                } else if (data.status === 200) {
+                                    Swal.fire({
+                                        text: "New Challan Create Successfully",
+                                        icon: "success",
+                                        buttonsStyling: !1,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn btn-primary"
+                                        }
+                                    }).then((response) => {
+                                        if (response.isConfirmed) {
+                                            location.reload()
+                                        }
+                                    })
+                                } else if (data.status === 401) {
+                                    Swal.fire({
+                                        text: "You are not authorized to perform this action",
+                                        icon: "error",
+                                        buttonsStyling: !1,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn btn-primary"
+                                        }
+                                    }).then((data) => {
+                                        if (data.isConfirmed) {
+                                            i.setAttribute("data-kt-indicator", "off")
+                                            i.disabled = 0
+                                            n.hide()
+                                            e.reset()
+                                        }
+                                    })
+                                }
+                            })
+
+                    }));
+                }
+            }
+        }();
+        KTUtil.onDOMContentLoaded((function () {
+            KTUsersUpdatePermission.init();
+        }));
+
+    </script>
+    <%} %>

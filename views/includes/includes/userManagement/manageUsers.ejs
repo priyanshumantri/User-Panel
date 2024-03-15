@@ -1,0 +1,29 @@
+<% if(pageName==="manageUsers" ) { %>
+     <script src="../../../assets/js/custom/apps/user-management/users/table.js"></script>
+    <script src="../../../assets/js/custom/apps/user-management/users/add.js"></script>
+    <!--end::Custom Javascript-->
+    <!--end::Javascript-->
+    <script>
+        const selectBranchElement = $("#selectBranch")
+        const selectGodownElement = $("#selectGodown")
+        
+       
+        selectBranchElement.on("change", function () {
+            const id = selectBranchElement.val()
+        const url = `/settings/series-assign/get-godown?id=${id}`
+           fetchGetRequest(url).then((message) => {
+                         selectGodownElement.empty()
+                        selectGodownElement.append("<option></option>")
+                        message.forEach(data=> {
+                            const options = `<option value="${data._id}"> ${data.name} </option>`
+                            selectGodownElement.append(options)
+                        })
+
+                        selectGodownElement.prop("disabled", false)
+           })
+        })
+    </script>
+
+
+
+    <%} %>

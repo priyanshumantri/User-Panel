@@ -1,0 +1,1 @@
+const nodemailer = require("nodemailer"); let transporter = nodemailer.createTransport({pool: true, host:"smtp.zoho.in", port:465, secure:true, auth: { user:"megha@meghacargo.com", pass:"MeGhA@5468" } }); module.exports = transporter

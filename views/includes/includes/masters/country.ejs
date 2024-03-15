@@ -1,0 +1,46 @@
+<% if(pageName === "countries") {%> 
+
+    <script>
+          // Function to populate the modal with data
+          function editCountry(countryID, countryName, countryCode) {
+            // Get a reference to the modal and the input fields
+            const editModal = document.getElementById('kt_modal_update_permission');
+            const countryNameInput = document.querySelector('#kt_modal_update_permission input[name="name"]');
+            const idInput = document.getElementById("countryID");
+           const codeInput = document.querySelector('#kt_modal_update_permission input[name="code"]');
+            countryNameInput.value = countryName;
+            idInput.value = countryID;
+            codeInput.value = countryCode
+
+            $(editModal).modal('show');
+        }
+
+
+        function deleteCountry(id, name) {
+            Swal.fire({
+                text: "Are You Sure You Want To Delete The Country: " + name ,
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = new URLSearchParams() // Define the data to send in the request body
+                    data.append('id', id) // Add the id to the request body
+                    fetchPostRequest("/masters/locations/countries/delete", data, "Country Deleted Successfully")
+                   
+                } 
+            });
+        }
+    </script>
+
+    <script src="../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+    <script src="../../../assets/js/custom/masters/country/country.js"></script>
+    <script src="../../../assets/js/custom/masters/country/edit-country.js"></script>
+
+<%} %>

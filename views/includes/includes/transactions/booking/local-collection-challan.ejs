@@ -1,0 +1,1509 @@
+<% if(pageName==="LC" ) {%>
+
+    <script>
+        $("#deliveryChallanDate").flatpickr({
+            dateFormat: "d-m-Y",
+            minDate: new Date(new Date().getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+            maxDate: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000), // 1 day in the future
+            defaultDate: new Date() // Set the default date to the current date
+        });
+    </script>
+    <script>
+        var start = moment().subtract(29, "days");
+        var end = moment();
+
+        function cb(start, end) {
+            $("#searchRange").html(start.format("D, M, Y") + " - " + end.format("D, M, Y"));
+        }
+
+        $("#searchRange").daterangepicker({
+            startDate: start,
+            endDate: end,
+            ranges: {
+                "Today": [moment(), moment()],
+                "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
+                "Last 7 Days": [moment().subtract(6, "days"), moment()],
+                "Last 30 Days": [moment().subtract(29, "days"), moment()],
+                "This Month": [moment().startOf("month"), moment().endOf("month")],
+                "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+            },
+            locale: {
+                format: "D-M-Y"
+            }
+        }, cb);
+
+        cb(start, end);
+
+        if (storedDateRange) {
+            // If a stored date range is found, parse it and set it as the default value
+            const parsedDateRange = JSON.parse(storedDateRange);
+            $("#searchRange").val(parsedDateRange.join(' to '))
+        }
+    </script>
+    <script>
+        function calculateTotalActualWeight() {
+            const actualWeightInputs = document.querySelectorAll(".actual-weight-input");
+            let total = 0;
+
+            actualWeightInputs.forEach(function (input) {
+                const value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    total += value;
+                }
+            });
+
+            // Update the value of the "totalActualWeight" input.
+            const totalActualWeightElement = document.getElementById("totalActualWeight");
+            if (totalActualWeightElement) {
+                totalActualWeightElement.value = total.toFixed(2); // Round to two decimal places.
+            }
+        }
+
+        function calculateTotalChargedWeight() {
+            const chargedWeightInputs = document.querySelectorAll(".charged-weight-input");
+            let totalChargedWeight = 0;
+
+            chargedWeightInputs.forEach(function (input) {
+                const value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    totalChargedWeight += value;
+                }
+            });
+
+            const totalChargedWeightElement = document.getElementById("totalChargedWeight");
+            if (totalChargedWeightElement) {
+                totalChargedWeightElement.value = totalChargedWeight.toFixed(2);
+            }
+        }
+
+        function calculateTotalNOP() {
+            const NOPInputs = document.querySelectorAll(".NOP-input");
+            let totalNOP = 0;
+
+            NOPInputs.forEach(function (input) {
+                const value = parseInt(input.value);
+                if (!isNaN(value)) {
+                    totalNOP += value;
+                }
+            });
+
+            const totalNOPEelement = document.getElementById("totalNOP");
+            if (totalNOPEelement) {
+                totalNOPEelement.value = totalNOP;
+            }
+        }
+    </script>
+    <script>
+        // Function to initialize DataTable
+        function initializeDataTable() {
+            // Set date data order
+            const tableRows = table.querySelectorAll('tbody tr');
+
+            tableRows.forEach(row => {
+                const dateRow = row.querySelectorAll('td');
+                const realDate = moment(dateRow[3].innerHTML, "DD MMM YYYY, LT").format(); // select date from 4th column in table
+                dateRow[3].setAttribute('data-order', realDate);
+            });
+
+            // Init datatable --- more info on datatables: https://datatables.net/manual/
+            datatable = $(table).DataTable({
+                "info": false,
+                'order': [],
+                'pageLength': 10,
+                'scrollX': true, // Set the height of the scrollable area (adjust as needed)
+                'fixedColumns': {
+                    leftColumns: 2, // Number of columns to freeze on the left
+                },
+            });
+
+            // Hook export buttons
+            const documentTitle = 'Delivery Challan Report';
+            var buttons = new $.fn.dataTable.Buttons(table, {
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        title: documentTitle
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        title: documentTitle
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        title: documentTitle
+                    }
+                ]
+            }).container().appendTo($('#kt_datatable_example_buttons'));
+
+            // Hook dropdown menu click event to datatable export buttons
+            const exportButtons = document.querySelectorAll('#kt_datatable_example_export_menu [data-kt-export]');
+            exportButtons.forEach(exportButton => {
+                exportButton.addEventListener('click', e => {
+                    e.preventDefault();
+
+                    // Get clicked export value
+                    const exportValue = e.target.getAttribute('data-kt-export');
+                    const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
+
+                    // Trigger click event on hidden datatable export buttons
+                    target.click();
+                });
+            });
+
+            // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
+            const filterSearch = document.querySelector('[data-kt-filter="search"]');
+            filterSearch.addEventListener('keyup', function (e) {
+                datatable.search(e.target.value).draw();
+            });
+        }
+
+        // Initialize DataTable on document ready
+        KTUtil.onDOMContentLoaded(function () {
+            table = document.querySelector('#kt_datatable_example');
+            if (table) {
+                initializeDataTable();
+            }
+        });
+    </script>
+    <script>
+        const totalLRElement = $("#totalLR")
+        const toElement = $("#to")
+        const actualWeightElement = $("#actualWeight")
+        const originalActualWeightElement = $("#originalActualWeight")
+        const chargedWeightElement = $("#chargedWeight")
+        const originalChargedWeight = $("#originalChargedWeight")
+        const NOPElement = $("#NOP")
+        const originalNOP = $("#originalNOP")
+        const vehicleNumberElement = $("#vehicleNumber")
+        const selectLRElement = $("#selectLR")
+        vehicleNumberElement.select2()
+
+        vehicleNumberElement.on("change", function () {
+            const vehicleID = vehicleNumberElement.val()
+            const ownerNameElement = $("#ownerName")
+            const brokerNameElement = $("#brokerName")
+            const toElement = $("#to")
+            toElement.prop("disabled", false)
+            selectLRElement.prop("disabled", false)
+            if($("#vehicleNumber option:selected").attr("data-owner") !== "") {
+                ownerNameElement.val($("#vehicleNumber option:selected").attr("data-owner"))
+            }
+            if($("#vehicleNumber option:selected").attr("data-broker") !== "") {
+                brokerNameElement.val($("#vehicleNumber option:selected").attr("data-broker"))
+            }
+            if(!$("#vehicleNumber option:selected").attr("data-broker") && $("#vehicleNumber option:selected").attr("data-owner") !== "") {
+                $("#accountTO").val("owner").prop("disabled", true)
+            } else {
+                $("#accountTO").prop("disabled", false)
+            }
+            $("#accountTO").select2()
+        })
+    </script>
+
+    <script>
+        selectLRElement.on("change", function () {
+            const actualWeight = selectLRElement.find("option:selected").attr("data-actualweight")
+            const chargedWeight = selectLRElement.find("option:selected").attr("data-chargedweight")
+            const NOP = selectLRElement.find("option:selected").attr("data-NOP")
+
+            originalActualWeightElement.val(Math.round(parseFloat(actualWeight) * 100) / 100);
+            chargedWeightElement.val(Math.round(parseFloat(chargedWeight) * 100) / 100);
+            originalChargedWeight.val(Math.round(parseFloat(chargedWeight) * 100) / 100);
+            actualWeightElement.val(Math.round(parseFloat(actualWeight) * 100) / 100);
+
+            NOPElement.val(NOP)
+            originalNOP.val(NOP)
+            NOPElement.prop("disabled", false)
+            chargedWeightElement.prop("disabled", false)
+            setTimeout(function () {
+                $("#NOP").focus()
+            }, 100)
+        })
+    </script>
+
+    <script>
+        NOPElement.on("input", function () {
+            if (parseInt(NOPElement.val()) > parseInt(originalNOP.val())) {
+                NOPElement.val(originalNOP.val())
+                chargedWeightElement.val(Math.round(parseFloat(originalChargedWeight.val()) * 100) / 100);
+
+                actualWeightElement.val(Math.round(parseFloat(originalChargedWeight.val()) * 100) / 100);
+
+            } else {
+                const calculatedActualWeight = (parseFloat(originalActualWeightElement.val()) / parseFloat(originalNOP.val())) * parseInt(NOPElement.val())
+                const calculatedChargedWeight = (parseFloat(originalChargedWeight.val()) / parseFloat(originalNOP.val())) * parseInt(NOPElement.val())
+                actualWeightElement.val(Math.round(calculatedActualWeight * 100) / 100);
+
+                chargedWeightElement.val(Math.round(calculatedChargedWeight * 100) / 100);
+
+            }
+        })
+
+        actualWeightElement.on("input", function () {
+            if (parseFloat(actualWeightElement.val()) > parseFloat(originalActualWeightElement.val())) {
+                actualWeightElement.val(Math.round(parseFloat(originalActualWeightElement.val()) * 100) / 100);
+
+            }
+        })
+
+        chargedWeightElement.on("input", function () {
+            if (parseFloat(chargedWeightElement.val()) > parseFloat(originalChargedWeight.val())) {
+                chargedWeightElement.val(Math.round(parseFloat(originalChargedWeight.val()) * 100) / 100);
+
+            }
+        })
+    </script>
+    <script>
+        let rowCounter = 0
+        function addPackage() {
+
+            if (selectLRElement.val() === "") {
+                showError("Please Select a Valid LR Number")
+            } else if (parseInt(NOPElement.val()) > parseInt(NOPElement.val()) || parseFloat(NOPElement.val()) === 0) {
+                showError("Please Enter Valid Number of Packages")
+            } else if (parseFloat(actualWeightElement.val()) > parseFloat(originalActualWeightElement.val()) || parseFloat(actualWeightElement.val()) === 0) {
+                showError("Please Enter Valid Actual Weight")
+            } else if (parseFloat(chargedWeightElement.val()) > parseFloat(originalChargedWeight.val()) || parseFloat(chargedWeightElement.val()) === 0) {
+                showError("Please Enter Valid Charged Weight")
+            } else {
+   
+                const itemTableBody = $("#itemTableBody")
+                const rowCounter = $("#itemTableBody tr").length + 1
+                const selectedLR = $("#selectLR option:selected").text();
+                const newRow = ` 
+                                                        <tr class="border-bottom border-bottom-dashed"
+                                                            data-kt-element="item" data-rowid="${rowCounter}">
+                                                            <td class="pe-7">
+                                                                <input type="hidden" name="type" value="NEW">
+                                                                ${rowCounter}
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <select disabled class="form-select form-select-solid" data-placeholder="Select LR" name="lrNumber" id="lrNumber">
+                                                                <option data-actualweight="${selectLRElement.find("option:selected").attr("data-actualweight")}" data-chargedweight="${selectLRElement.find("option:selected").attr("data-chargedweight")}" data-nop="${selectLRElement.find("option:selected").attr("data-nop")}" value="${selectLRElement.val()}">${selectedLR}</option>
+                                                        
+                                                                </select>
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <input value="${NOPElement.val()}" disabled type="text" class="NOP-input form-control form-control-solid" name="NOP">
+                                                            </td>
+
+                                                          
+
+                                                            <td class="pe-7">
+                                                                <input value="${actualWeightElement.val()}" disabled type="text" class="actual-weight-input form-control form-control-solid" name="actualWeight">
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <input value="${chargedWeightElement.val()}" disabled type="text" class="charged-weight-input form-control form-control-solid" name="chargedWeight">
+                                                            </td>
+                                                            <td class="pe-7">
+                                                                <button onclick="deletePackage(${rowCounter})" type="button" class="btn btn-sm btn-icon btn-danger btn-active-color-grey remove-item" data-kt-element="remove-item">
+                                                                    <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                                                  </button>
+                                                            </td>
+                                                        </tr>
+                                                      `
+                totalLRElement.val(parseInt(totalLRElement.val()) + 1)
+
+                //Deleting LR From options after been added once
+                const selectedOption = $("#selectLR").val(); // Get the selected option value.
+                const selectedOptionText = $("#selectLR option:selected").text(); // Get the selected option text.
+
+                if (selectedOption) {
+                    // Remove the selected option from the Select2 dropdown.
+                    $("#selectLR option:selected").remove();
+
+
+                    // Destroy the current Select2 instance.
+                    $("#selectLR").select2('destroy');
+
+                    // Reinitialize the Select2 dropdown.
+                    $("#selectLR").select2();
+
+                }
+
+                actualWeightElement.val(0)
+                originalActualWeightElement.val(0)
+                chargedWeightElement.val(0)
+                originalChargedWeight.val(0)
+                NOPElement.val(0)
+                originalNOP.val(0)
+                itemTableBody.append(newRow);
+                setTimeout(function () {
+                    $("#selectLR").focus()
+                }, 100)
+            }
+
+        }
+    </script>
+
+
+
+    <script>
+        function deletePackage(id) {
+            // Find the specific row with the given data-rowid.
+            var rowToDelete = document.querySelector(`tr[data-rowid="${id}"]`);
+
+            if (rowToDelete) {
+                // Find the "lrNumber" select element within the row.
+                var selectedOption = $(rowToDelete).find("#lrNumber option:selected");
+                var selectedValue = selectedOption.val();
+                var selectedText = selectedOption.text();
+                var actualWeight = selectedOption.attr("data-actualweight")
+                var chargedWeight = selectedOption.attr("data-chargedweight")
+                var nop = selectedOption.attr("data-nop")
+                // Append the selected option to the "selectLR" Select2 element.
+                const newOption = `<option value="${selectedValue}" data-chargedweight="${chargedWeight}" data-actualweight="${actualWeight}" data-nop="${nop}">${selectedText}</option>`
+                $("#selectLR").append(newOption)
+
+                // Destroy and reinitialize the Select2 instance for "selectLR".
+                $("#selectLR").select2('destroy').select2();
+
+                // Remove the row.
+                rowToDelete.remove();
+                totalLRElement.val(parseInt(totalLRElement.val()) - 1)
+                // Calculate totals.
+
+
+            } else {
+
+            }
+        }
+
+
+    </script>
+
+    <script>
+        function showError(message) {
+            Swal.fire({
+                text: message,
+                icon: "error",
+                buttonsStyling: !1,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            })
+        }
+    </script>
+
+
+    <script>
+        const deliveryChallanNumber = $("#deliveryChallanNumber")
+        const vehicleNumber = $("#vehicleNumber")
+        const brokerName = $("#ownerName")
+        const freight = $("#freight")
+        const balance = $("#balance")
+        const advance = $("#advance")
+        function createDeliveryChallan() {
+
+            var tbody = document.getElementById("itemTableBody");
+            var rowCount = tbody.getElementsByTagName("tr").length;
+            if (rowCount < 1) {
+                showError("Please Add Atleast 1 LR")
+            } else if (vehicleNumber.val() === "") {
+                showError("Please Select Vehicle Number")
+            } else if (brokerName.val() === "") {
+                showError("Please Add Broker Name")
+            } else if (toElement.val() === "") {
+                showError("Please Select Destination")
+            } else if(parseFloat(freight) <= 0) {
+                showError("Please Enter Valid Freight Amount")
+            } else if(parseFloat(balance) === 0 && parseFloat(advance) === 0) {
+                showError("Please Enter Valid Freight Amount")
+            } else {
+                
+            editAdvanceDetails()
+            editOthersAddBTN()
+            editOthersSubBTN()
+              
+                const form = document.getElementById("deliveryChallanForm");
+
+                // Enable disabled inputs and selects
+                const disabledInputs = form.querySelectorAll("input[disabled], select[disabled]");
+                for (const input of disabledInputs) {
+                    input.removeAttribute("disabled");
+                }
+
+                // Serialize the form data
+                const formData = new FormData(form);
+
+                // Re-disable previously disabled inputs and selects
+                for (const input of disabledInputs) {
+                    input.setAttribute("disabled", "disabled");
+                }
+
+                // Create a URLSearchParams object and add form data to it
+                const data = new URLSearchParams();
+                for (const pair of formData) {
+                    data.append(pair[0], pair[1]);
+                }
+                $("#deliveryChallanSubmit").attr("data-kt-indicator", "on").prop("disabled", true)
+                $("#DCCloseBTN").prop("disabled", true)
+
+                fetchPostRequest("/transactions/booking/local-collection-challan/new", data, "Local Collection Challan Created Successfully", $("#deliveryChallanSubmit"), $("#DCCloseBTN"))
+            }
+        }
+    </script>
+
+    <script>
+        function allowOnlyNumbers(event) {
+            const keyCode = event.which || event.keyCode;
+
+            // Allow numbers (0-9), the decimal point (.), and the backspace key (8)
+            if ((keyCode >= 48 && keyCode <= 57) || keyCode === 46 || keyCode === 8) {
+                return true;
+            } else {
+                event.preventDefault(); // Prevent input of other characters
+                return false;
+            }
+        }
+    </script>
+    <script>
+        function getLRData() {
+            fetchGetRequest("/transactions/booking/local-collection-challan/get-lr-data").then((data)=> {
+                const selectLR = $("#selectLR")
+                        selectLR.find("option:not(:first)").remove()
+                        selectLR.append(`<option></option>`)
+                        data.forEach(lr => {
+                            selectLR.append(`<option data-actualweight="${lr.actualWeight}" data-chargedweight="${lr.chargedWeight}" data-NOP="${lr.NOP}" value="${lr.lrID}">${lr.lrNumber}</option>`)
+                        })
+
+                        selectLR.select2()
+            })
+            
+        }
+    </script>
+    <script>
+        function addDeliveryChallan() {
+            localStorage.setItem("othersAdd", JSON.stringify([]))
+            localStorage.setItem("othersSub", JSON.stringify([]))
+            localStorage.setItem("advanceDetails", null)
+            const table = $("#itemTableBody")
+            table.empty()
+            $("#title").html("Add New Local Collection Challan")
+            $("#deliveryChallanSubmit").css("display", "block")
+            $("#deliveryChallanUpdateBTN").css("display", "none")
+            $("#deliveryChallanForm").trigger("reset")
+            const today = new Date()
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            const date = `${day}-${month}-${year}`
+            $("#deliveryChallanDate").val(date)
+            $("#to").prop("disabled", true).val(null).select2()
+            $("#vehicleNumber").val(null).select2()
+            setTimeout(function () {
+                $("#deliveryChallanNumber").focus()
+            }, 200)
+            getLRData()
+
+
+        }
+    </script>
+    <script>
+        $("#chargedWeight").on("keydown", function () {
+            if (event.key === "Tab" && !event.shiftKey) {
+                addPackage()
+            }
+        })
+    </script>
+    <script>
+        function editDeliveryChallan(id) {
+           
+            getLRData()
+            const table = $("#itemTableBody")
+            table.empty()
+            fetchGetRequest(`/transactions/booking/local-collection-challan/edit?id=${id}`).then((newData)=> {
+                        const data = newData.lcData
+                        $("#title").html("Edit Delivery Challan")
+                        $("#deliveryChallanSubmit").css("display", "none")
+                        $("#deliveryChallanUpdateBTN").css("display", "block")
+                        $("#deliveryChallanID").val(data._id)
+                        $("#deliveryChallanNumber").val(data.number)
+                        $("#deliveryChallanDate").val(data.date)
+                        $("#vehicleNumber option").each(function () {
+                            if ($(this).val() == data.vehicle._id) {
+                                $(this).prop("selected", true)
+                            }
+                        })
+                        $("#vehicleNumber").select2()
+                        $("#ownerName").val(data.vehicle.owner.name)
+                        $("#brokerName").val(data.vehicle.broker.name)
+                        $("#to").val(data.to)
+
+                        $("#to option").each(function () {
+                            if ($(this).val() == data.vehicle.to) {
+                                $(this).prop("selected", true)
+                            }
+                        })
+                        $("#to").select2()
+                        addEditRow(data.material, newData.maxData)
+                        calculateTotalActualWeight();
+                        calculateTotalChargedWeight()
+                        calculateTotalNOP()
+                        $("#freight").val(data.freight.amount)
+                        $("#advance").val(data.advance)
+                        $("#balance").val(data.balance.amount)
+                        $("#cashAmount").val(data.cashAdvance.cashAmount)
+                        $("#cashLedger").val(data.cashAdvance.cashLedger).select2()
+                        $("#cashStatus").val(data.cashAdvance.cashStatus).select2()
+                        $("#cashDate").val(data.cashAdvance.cashDate)
+                        $("#bankAmount").val(data.bankAdvance.bankAmount)
+                        $("#bankLedger").val(data.bankAdvance.bankLedger).select2()
+                        $("#bankStatus").val(data.bankAdvance.bankStatus).select2()
+                        $("#bankDate").val(data.bankAdvance.bankDate)
+                        $("#dieselAmount").val(data.dieselAdvance.dieselAmount)
+                        $("#dieselLedger").val(data.dieselAdvance.dieselLedger).select2()
+                        $("#dieselStatus").val(data.dieselAdvance.dieselStatus).select2()
+                        $("#dieselDate").val(data.dieselAdvance.dieselDate)
+                        saveAdvanceDetails()
+                           //adding add other row
+                           for (i = 0; i < data.othersAdd.length; i++) {
+                            addRepeaterListEdit("add", data.othersAdd[i].ledger, data.othersAdd[i].amount)
+                        }
+
+                        //adding sub other row
+                        for (i = 0; i < data.othersSub.length; i++) {
+                            addRepeaterListEdit("sub", data.othersSub[i].ledger, data.othersSub[i].amount)
+                        }
+
+                        saveOthersAdd()
+                        saveOthersSub()
+                        let totalAddAmt = 0
+                        data.othersAdd.forEach((item) => {
+                            totalAddAmt += parseFloat(item.amount)
+                        })
+                        let totalSubAmt = 0
+                        data.othersSub.forEach((item) => {
+                            totalSubAmt += parseFloat(item.amount)
+                        })
+
+                        $("#othersAddAmtTotal").val(totalAddAmt).trigger("input")
+                        $("#othersSubAmtTotal").val(totalSubAmt).trigger("input")
+                        $("#selectLR").prop("disabled", false)
+                        $("#accountTO").prop("disabled", false).val(data.accountTO).select2()
+                        $("#kt_modal_2").modal("show")
+            })
+        }
+    </script>
+    <script>
+          function addRepeaterListEdit(forV, ledger, amount) {
+            let div = $("#repeaterAdd")
+            let length = $("#repeaterAdd .newRow").length
+            let id = 3
+            let text = "Add"
+            if (forV === "sub") {
+                div = $("#repeaterSub")
+                length = $("#repeaterSub .newRow").length
+                id = 4
+                text = "Sub"
+            }
+            const newRow = `
+            <div class="form-group newRow" data-rowid="${length}">
+                                    <div class="form-group row mb-5">
+                                        <div class="col-lg-5">
+                                            <label class="form-label">Select Expense Type</label>
+                                            <select name="othersSubLedger"
+                                                class="form-select form-select-solid select-expense" data-control="select2"
+                                                data-dropdown-parent="#kt_modal_stacked_${id}"
+                                                data-placeholder="Select Expense Type">
+                                                <option></option>
+                                                <%directExpenses.forEach((data)=> {%> 
+                                                    <option value="<%=data._id%>"><%=data.name%></option>
+                                                    <%}) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <label class="form-label">Amount</label>
+                                            <input oninput="validateNumberWithDecimals(this)" value="${amount}" name="othersSubAmt"
+                                                class="form-control form-control-solid expense-amount" disabled type="text"
+                                                placeholder="Amount" />
+                                        </div>
+    
+                                        <div class="col-lg-2">
+                                            <button onclick="deleteRepeaterList('${forV}', '${length}')"
+                                                class="btn btn-flex btn-sm btn-light-danger mt-3 mt-md-9">
+                                                <i class="ki-duotone ki-trash fs-3">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                    <span class="path5"></span></i>
+    
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+            `
+            div.append(newRow)
+            if (forV == "sub") {
+                //finding ledger and making it selected
+                $(`#repeaterSub .newRow[data-rowid="${length}"] select option[value="${ledger}"]`).prop("selected", true)
+                setTimeout(function () {
+                    $(`#repeaterSub .newRow[data-rowid="${length}"] select`).select2()
+                }, 100)
+            } else {
+                //finding ledger and making it selected
+                $(`#repeaterAdd .newRow[data-rowid="${length}"] select option[value="${ledger}"]`).prop("selected", true)
+                setTimeout(function () {
+                    $(`#repeaterAdd .newRow[data-rowid="${length}"] select`).select2()
+                }, 100)
+            }
+        }
+    </script>
+    <script>
+         function deleteRepeaterList(forV, id) {
+            let div = $("#repeaterAdd")
+            if (forV == "add") {
+                $(`#repeaterAdd .newRow[data-rowid="${id}"]`).remove()
+            } else {
+                $(`#repeaterSub .newRow[data-rowid="${id}"]`).remove()
+            }
+        }
+    </script>
+    <script>
+        function addEditRow(rowData, maxData) {
+            rowData.forEach((data, index) => {
+                const table = $("#itemTableBody")
+                const newRow = `
+                <tr class="border-bottom border-bottom-dashed" data-kt-element="item" data-rowid="${index + 1}">
+                                                            <td class="pe-7">
+                                                                <input type="hidden" name="type" value="OLD">
+                                                                ${index + 1}
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <select disabled class="form-select form-select-solid" data-placeholder="Select LR" name="lrNumber" id="lrNumber">
+                                                                    <option data-actualweight="${maxData[index].actualWeight}" data-chargedweight="${maxData[index].chargedWeight}" data-nop="${maxData[index].NOP}" value="${data.lrNumber._id}">${data.lrNumber.lrNumber}</option>
+                                                            
+                                                        
+                                                                </select>
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <input type="hidden" id="originalNOP${index + 1}" name="originalNOP" class="original-NOP" value="${maxData[index].NOP}">
+                                                                <input value="${data.numberOfPackages}" type="text" class="NOP-input form-control form-control-solid" name="NOP">
+                                                            </td>
+
+                                                          
+
+                                                            <td class="pe-7">
+                                                                <input type="hidden" id="originalActualWeight${index + 1}" name="originalActualWeight" class="original-actual-weight" value="${maxData[index].actualWeight}">
+                                                                <input value="${data.actualWeight}" disabled type="text" class="actual-weight-input form-control form-control-solid" name="actualWeight">
+                                                            </td>
+
+                                                            <td class="pe-7">
+                                                                <input type="hidden" id="originalChargedWeight${index + 1}" name="originalChargedWeight" class="original-charged-weight" value="${maxData[index].chargedWeight}">
+                                                                <input value="${data.chargedWeight}" type="text" class="charged-weight-input form-control form-control-solid" name="chargedWeight">
+                                                            </td>
+                                                            <td class="pe-7">
+                                                                <button onclick="deletePackage(${index + 1})" type="button" class="btn btn-sm btn-icon btn-danger btn-active-color-grey remove-item" data-kt-element="remove-item">
+                                                                    <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                                                  </button>
+                                                            </td>
+                                                        </tr>
+                `
+
+                table.append(newRow)
+
+                $("#selectLR option").each(function () {
+                    if ($(this).val() == data.lrNumber._id) {
+                        $(this).remove()
+                    }
+
+                })
+                totalLRElement.val(parseInt(totalLRElement.val()) + 1)
+
+            })
+
+            $("#selectLR").prop("disabled", false)
+            $("#selectLR").select2()
+
+            $(document).ready(function () {
+                $(".charged-weight-input, .actual-weight-input, .NOP-input").on("input", function () {
+
+                    const rowId = $(this).closest("tr").attr("data-rowid")
+                    const originalNOP = $(`#originalNOP${rowId}`).val()
+                    const originalActualWeight = $(`#originalActualWeight${rowId}`).val()
+                    const originalChargedWeight = $(`#originalChargedWeight${rowId}`).val()
+                    const NOP = $(`#itemTableBody tr[data-rowid="${rowId}"] .NOP-input`).val()
+                    const actualWeight = $(`#itemTableBody tr[data-rowid="${rowId}"] .actual-weight-input`).val()
+                    const chargedWeight = $(`#itemTableBody tr[data-rowid="${rowId}"] .charged-weight-input`).val()
+
+                    if (parseInt(NOP) > parseInt(originalNOP)) {
+
+                        $(`#itemTableBody tr[data-rowid="${rowId}"] .NOP-input`).val(originalNOP)
+                        $(`#itemTableBody tr[data-rowid="${rowId}"] .charged-weight-input`).val(originalChargedWeight)
+                        $(`#itemTableBody tr[data-rowid="${rowId}"] .actual-weight-input`).val(originalActualWeight)
+                    } else if (parseInt(actualWeight) > parseInt(originalActualWeight)) {
+                        $(`#itemTableBody tr[data-rowid="${rowId}"] .actual-weight-input`).val(originalActualWeight)
+                        $("#itemTableBody tr[data-rowid='${rowId}'] .charged-weight-input").val(originalChargedWeight)
+                        $("#itemTableBody tr[data-rowid='${rowId}'] .NOP-input").val(originalNOP)
+                    } else if (parseInt(chargedWeight) > parseInt(originalChargedWeight)) {
+                        $("#itemTableBody tr[data-rowid='${rowId}'] .charged-weight-input").val(originalChargedWeight)
+                        $(`#itemTableBody tr[data-rowid="${rowId}"] .charged-weight-input`).val(originalChargedWeight)
+                        $("#itemTableBody tr[data-rowid='${rowId}'] .NOP-input").val(originalNOP)
+                    } else {
+                        const calculatedActualWeight = (parseFloat(originalActualWeight) / parseFloat(originalNOP)) * parseInt(NOP)
+                        $(`#itemTableBody tr[data-rowid="${rowId}"] .actual-weight-input`).val(customRound(calculatedActualWeight))
+
+                    }
+
+                })
+            })
+
+        }
+    </script>
+    <script>
+        function updateDeliveryChallan() {
+
+            var tbody = document.getElementById("itemTableBody");
+            var rowCount = tbody.getElementsByTagName("tr").length;
+            if (rowCount < 1) {
+                showError("Please Add Atleast 1 LR")
+            } else if (vehicleNumber.val() === "") {
+                showError("Please Select Vehicle Number")
+            } else if (brokerName.val() === "") {
+                showError("Please Add Broker Name")
+            } else if (toElement.val() === "") {
+                showError("Please Select Destination")
+            } else {
+               
+                const form = document.getElementById("deliveryChallanForm");
+
+                // Enable disabled inputs and selects
+                const disabledInputs = form.querySelectorAll("input[disabled], select[disabled]");
+                for (const input of disabledInputs) {
+                    input.removeAttribute("disabled");
+                }
+
+                // Serialize the form data
+                const formData = new FormData(form);
+
+                // Re-disable previously disabled inputs and selects
+                for (const input of disabledInputs) {
+                    input.setAttribute("disabled", "disabled");
+                }
+
+                // Create a URLSearchParams object and add form data to it
+                const data = new URLSearchParams();
+                for (const pair of formData) {
+                    data.append(pair[0], pair[1]);
+                }
+                $("#deliveryChallanUpdateBTN").attr("data-kt-indicator", "on").prop("disabled", true)
+                $("#DCCloseBTN").prop("disabled", true)
+                fetchPostRequest("/transactions/booking/local-collection-challan/edit", data, "Local Collection Challan Edited Successfully", $("#deliveryChallanUpdateBTN"), $("#DCCloseBTN"))
+             
+            }
+
+        }  
+    </script>
+    <script>
+        function deleteDeliveryChallan(id) {
+            Swal.fire({
+                text: "Are you sure you want to delete this Local Collection Challan?",
+                icon: "warning",
+                showCancelButton: !0,
+                buttonsStyling: !1,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                }
+            }).then(response => {
+                if (response.isConfirmed) {
+                    // Send the form data to the server
+
+                    const data = new URLSearchParams();
+                    data.append("id", id);
+                    fetchPostRequest("/transactions/booking/local-collection-challan/delete", data, "Local Collection Challan Deleted")
+                    
+                }
+            })
+        }
+    </script>
+     <script>
+        const today = new Date();
+        const day = today.getDate().toString().padStart(2, '0');
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const year = today.getFullYear();
+
+        const formattedDate = `${day}-${month}-${year}`;
+    </script>
+    <script>
+        // Function to format timestamp
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            // Convert the new timestamp to a Date object
+            const currentDate = new Date();
+
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            const formattedDate = `${day}-${month}-${year}, ${hours}:${minutes}`;
+
+            // Check if the timestamp has passed
+            const hasPassed = date < currentDate;
+
+            return { formattedDate, hasPassed };
+        }
+    </script>
+    <script>
+        function closeDeliveryChallan() {
+            $("#dcCloseTable").dataTable().fnDestroy()
+            $("#dcCloseTitle").html("Close Delivery Challans")
+            $("#dcData").empty()
+            fetch("/transactions/delivery/delivery-challan/close", {
+                method: "GET"
+            }).then(response => {
+                if (response.status === 200) {
+                    return response.json().then(newData => {
+
+
+                        newData.forEach(data => {
+                            const dcData = $("#dcData")
+                            const newTableRow = ` <tr class="odd">
+                                                <td>
+                                                 <input type="checkbox" class="form-check-input" name="dcID" value="${data._id}">
+                                                </td>
+                                                <td>${formatTimestamp(data.expiry).hasPassed ? `<span class="badge badge-danger">${formatTimestamp(data.expiry).formattedDate}</span>` : `<span class="badge badge-success">${formatTimestamp(data.expiry).formattedDate}</span>`}</td>
+                                            <td>${data.number}</td>
+                                            <td>${data.date}</td>
+                                            <td>${data.vehicle.number}</td>
+                                            <td>${data.material.length}</td>
+                                            <td>${data.material.reduce((total, item) => total + item.actualWeight, 0)}</td>
+                                            <td>${data.material.reduce((total, item) => total + item.chargedWeight, 0)}</td>
+                                            <td>${data.material.reduce((total, item) => total + item.numberOfPackages, 0)}</td>
+                                        
+                                           
+                                            </tr>
+                                         `
+
+                            dcData.append(newTableRow)
+                        })
+
+
+                        setTimeout(function () {
+                            const table = $("#dcCloseTable").DataTable({
+                                "info": true,
+                                'order': false,
+                                'pageLength': 10,
+                                'scrollX': true,
+                                scrollY: '50vh',
+                                fixedColumns: {
+                                    leftColumns: 2, // Number of columns to freeze on the left
+                                }
+                            });
+
+                            $(document).ready(function () {
+
+                                const headerCheckbox = $('#selectAll');
+
+                                headerCheckbox.on('click', function () {
+                                    const isChecked = this.checked;
+                                    const rowsOnPage = table.rows({ page: 'current' }).nodes();
+
+                                    $(rowsOnPage).find('input[type="checkbox"]').prop('checked', isChecked);
+                                });
+
+                                // Listen to DataTable page change event
+                                table.on('page.dt', function () {
+                                    // Reset the header checkbox when changing the page
+                                    headerCheckbox.prop('checked', false);
+                                });
+                            });
+
+                            const filterSearch = document.querySelector('[data-kt-filter="search-dcClose"]');
+                            filterSearch.addEventListener('keyup', function (e) {
+                                table.search(e.target.value).draw();
+                            });
+
+
+                        }, 350)
+
+
+                        $("#kt_modal_3").modal("show")
+
+
+
+                    })
+                } else if (response.status === 400) {
+                    return response.json().then(data => {
+                        showError(data.message)
+                    })
+                } else if (response.status === 401) {
+                    showError("You are not authorized to perform this action")
+                } else if (response.status === 500) {
+                    showError("Something went wrong")
+                }
+            })
+
+        }
+    </script>
+
+    <script>
+        function submitCloseDC() {
+
+            $("#closeDCBTN").attr("data-kt-indicator", "on").prop("disabled", true)
+            $("#extendDCBTN").prop("disabled", true)
+            const form = document.getElementById("dcCloseForm");
+
+            // Serialize the form data
+            const formData = new FormData(form);
+
+
+
+            // Create a URLSearchParams object and add form data to it
+            const data = new URLSearchParams();
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]);
+            }
+
+            fetch("/transactions/delivery/delivery-challan/close", {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: data,
+                method: "POST"
+            }).then((data) => {
+                if (data.status === 400) {
+
+                    return data.json().then((message) => {
+                        Swal.fire({
+                            text: message.message,
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then(response=> {
+                            if(response.isConfirmed) {
+                                $("#closeDCBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                                $("#extendDCBTN").prop("disabled", false)
+                            }
+                        })
+                    })
+
+                } else if (data.status === 200) {
+                    Swal.fire({
+                        text: "Delivery Challans Closed Successfully",
+                        icon: "success",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((response) => {
+                        if (response.isConfirmed) {
+                            $("#closeDCBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                            $("#extendDCBTN").prop("disabled", false)
+                            location.reload()
+                        }
+                    })
+                } else if (data.status === 401) {
+                    Swal.fire({
+                        text: "You are not authorized to perform this action",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then(response=> {
+                            if(response.isConfirmed) {
+                                $("#closeDCBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                                $("#extendDCBTN").prop("disabled", false)
+                            }
+                        })
+                } else if (response.status === 500) {
+                    Swal.fire({
+                        text: "Something Went Wrong",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then(response => {
+                        if (response.isConfirmed) {
+                            location.reload()
+                        }
+                    })
+                }
+            })
+        }
+    </script>
+    <script>
+        function submitExtendDC() {
+            $("#closeDCBTN").prop("disabled", true)
+            $("#extendDCBTN").attr("data-kt-indicator", "on").prop("disabled", true)
+
+            const form = document.getElementById("dcCloseForm");
+
+            // Serialize the form data
+            const formData = new FormData(form);
+
+
+
+            // Create a URLSearchParams object and add form data to it
+            const data = new URLSearchParams();
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]);
+            }
+
+            fetch("/transactions/delivery/delivery-challan/extend", {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: data,
+                method: "POST"
+            }).then((data) => {
+                if (data.status === 400) {
+
+                    return data.json().then((message) => {
+                        Swal.fire({
+                            text: message.message,
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then(response=> {
+                            if(response.isConfirmed) {
+                                $("#closeDCBTN").prop("disabled", false)
+                                $("#extendDCBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                            }
+                        })
+                    })
+
+                } else if (data.status === 200) {
+                    Swal.fire({
+                        text: "Delivery Challans Extended Successfully",
+                        icon: "success",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((response) => {
+                        if (response.isConfirmed) {
+                            $("#closeDCBTN").prop("disabled", false)
+                            $("#extendDCBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                            location.reload()
+                        }
+                    })
+                } else if (data.status === 401) {
+                    Swal.fire({
+                        text: "You are not authorized to perform this action",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then((data) => {
+                        if (data.isConfirmed) {
+                            $("#closeDCBTN").prop("disabled", false)
+                            $("#extendDCBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                        }
+                    })
+                } else if (response.status === 500) {
+                    Swal.fire({
+                        text: "Something Went Wrong",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    }).then(response => {
+                        if (response.isConfirmed) {
+                            location.reload()
+                        }
+                    })
+                }
+            })
+        }
+    </script>
+
+ 
+<script>
+     function editOthersAddBTN() {
+            // we will save current state of othersAddAmtTotal
+            const currentOthersSavedObject = localStorage.getItem("othersAdd");
+            let currentOthersSaved = []
+            if (currentOthersSavedObject) {
+                currentOthersSaved = JSON.parse(currentOthersSavedObject);
+            }
+            $("#repeaterAdd").empty()
+            if (currentOthersSaved.length > 0) {
+                for (i = 0; i < currentOthersSaved.length; i++) {
+                    const newRow = `
+                     <div class="form-group newRow" data-rowid="${i}">
+                                    <div class="form-group row mb-5">
+                                        <div class="col-lg-5">
+                                            <label class="form-label">Select Expense Type</label>
+                                            <select name="othersAddLedger"
+                                                class="form-select form-select-solid select-expense" data-control="select2"
+                                                data-dropdown-parent="#kt_modal_stacked_3"
+                                                data-placeholder="Select Expense Type">
+                                                <option></option>
+                                                <%directExpenses.forEach((data)=> {%> 
+                                                    <option value="<%=data._id%>"><%=data.name%></option>
+                                                    <%}) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <label class="form-label">Amount</label>
+                                            <input oninput="validateNumberWithDecimals(this)" value="${currentOthersSaved[i].amount}" name="othersAddAmt"
+                                                class="form-control form-control-solid expense-amount" disabled type="text"
+                                                placeholder="Amount" />
+                                        </div>
+    
+                                        <div class="col-lg-2">
+                                            <button onclick="deleteRepeaterList('add', '${i}')"
+                                                class="btn btn-flex btn-sm btn-light-danger mt-3 mt-md-9">
+                                                <i class="ki-duotone ki-trash fs-3">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                    <span class="path5"></span></i>
+    
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                         `
+
+                    $("#repeaterAdd").append(newRow)
+                    $(`#repeaterAdd .newRow[data-rowid="${i}"] select option[value="${currentOthersSaved[i].select}"]`).prop("selected", true)
+                    $(`#repeaterAdd .newRow[data-rowid="${i}"] select`).select2()
+                    $(`#repeaterAdd .newRow[data-rowid="${i}"] input`).prop("disabled", false)
+                }
+            }
+
+        }
+</script>
+<script>
+     function addRepeaterList(forV) {
+            let div = $("#repeaterAdd")
+            let length = $("#repeaterAdd .newRow").length
+            let id = 3
+            let text = "Add"
+            if (forV === "sub") {
+                div = $("#repeaterSub")
+                length = $("#repeaterSub .newRow").length
+                id = 4
+                text = "Sub"
+            }
+            const newRow = `
+            <div class="form-group newRow" data-rowid="${length}">
+                                    <div class="form-group row mb-5">
+                                        <div class="col-lg-5">
+                                            <label class="form-label">Select Expense Type</label>
+                                            <select name="others${text}Ledger"
+                                                class="form-select form-select-solid select-expense" data-control="select2"
+                                                data-dropdown-parent="#kt_modal_stacked_${id}"
+                                                data-placeholder="Select Expense Type">
+                                                <option></option>
+                                                <%directExpenses.forEach((data)=> {%> 
+                                                    <option value="<%=data._id%>"><%=data.name%></option>
+                                                    <%}) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <label class="form-label">Amount</label>
+                                            <input oninput="validateNumberWithDecimals(this)" value="0" name="others${text}Amt"
+                                                class="form-control form-control-solid expense-amount" disabled type="text"
+                                                placeholder="Amount" />
+                                        </div>
+    
+                                        <div class="col-lg-2">
+                                            <button onclick="deleteRepeaterList('${forV}', '${length}')"
+                                                class="btn btn-flex btn-sm btn-light-danger mt-3 mt-md-9">
+                                                <i class="ki-duotone ki-trash fs-3">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                    <span class="path5"></span></i>
+    
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+            `
+            div.append(newRow)
+            if (forV == "sub") {
+                setTimeout(function () {
+                    $(`#repeaterSub .newRow[data-rowid="${length}"] select`).select2()
+                }, 100)
+            } else {
+                setTimeout(function () {
+                    $(`#repeaterAdd .newRow[data-rowid="${length}"] select`).select2()
+                }, 100)
+            }
+
+        }
+</script>
+<script>
+    $(document).ready(function () {
+        $(document).on('change', '.select-expense', function () {
+            var parent = $(this).closest('.row');
+            var input = parent.find('.expense-amount');
+            if ($(this).val() !== '') {
+                input.prop('disabled', false).val(0)
+            } else {
+                input.prop('disabled', true).val(0)
+            }
+        });
+    });
+
+</script>
+<script>
+     function saveOthersAdd() {
+            let total = 0
+            $("#kt_modal_stacked_3 .expense-amount").each(function () {
+                if ($(this).val() !== "") {
+                    total += parseFloat($(this).val())
+                }
+            })
+            $("#othersAddAmtTotal").val(total).trigger("input")
+            let currentArray = []
+            $("#repeaterAdd .newRow").each(function () {
+                const select = $(this).find("select option:selected").val()
+                const amount = $(this).find("input").val()
+                currentArray.push({
+                    select,
+                    amount
+                })
+            }
+            )
+            localStorage.setItem("othersAdd", JSON.stringify(currentArray))
+            $("#kt_modal_stacked_3").modal("hide")
+        }
+</script>
+<script>
+     function saveOthersSub() {
+            let total = 0
+            $("#kt_modal_stacked_4 .expense-amount").each(function () {
+                if ($(this).val() !== "") {
+                    total += parseFloat($(this).val())
+                }
+            })
+            $("#othersSubAmtTotal").val(total).trigger("input")
+            let currentArray = []
+            $("#repeaterSub .newRow").each(function () {
+                const select = $(this).find("select option:selected").val()
+                const amount = $(this).find("input").val()
+                currentArray.push({
+                    select,
+                    amount
+                })
+            }
+            )
+            localStorage.setItem("othersSub", JSON.stringify(currentArray))
+            $("#kt_modal_stacked_4").modal("hide")
+        }
+</script>
+<script>
+      function editOthersSubBTN() {
+            // we will save current state of othersAddAmtTotal
+            const currentOthersSavedObject = localStorage.getItem("othersSub");
+            let currentOthersSaved = []
+            if (currentOthersSavedObject) {
+                currentOthersSaved = JSON.parse(currentOthersSavedObject);
+            }
+            $("#repeaterSub").empty()
+            if (currentOthersSaved.length > 0) {
+                for (i = 0; i < currentOthersSaved.length; i++) {
+                    const newRow = `
+                     <div class="form-group newRow" data-rowid="${i}">
+                                    <div class="form-group row mb-5">
+                                        <div class="col-lg-5">
+                                            <label class="form-label">Select Expense Type</label>
+                                            <select name="othersSubLedger"
+                                                class="form-select form-select-solid select-expense" data-control="select2"
+                                                data-dropdown-parent="#kt_modal_stacked_4"
+                                                data-placeholder="Select Expense Type">
+                                                <option></option>
+                                                <%directExpenses.forEach((data)=> {%> 
+                                                    <option value="<%=data._id%>"><%=data.name%></option>
+                                                    <%}) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <label class="form-label">Amount</label>
+                                            <input oninput="validateNumberWithDecimals(this)" value="${currentOthersSaved[i].amount}" name="othersSubAmt"
+                                                class="form-control form-control-solid expense-amount" disabled type="text"
+                                                placeholder="Amount" />
+                                        </div>
+    
+                                        <div class="col-lg-2">
+                                            <button onclick="deleteRepeaterList('sub', '${i}')"
+                                                class="btn btn-flex btn-sm btn-light-danger mt-3 mt-md-9">
+                                                <i class="ki-duotone ki-trash fs-3">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                    <span class="path5"></span></i>
+    
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+             `
+
+                    $("#repeaterSub").append(newRow)
+                    $(`#repeaterSub .newRow[data-rowid="${i}"] select option[value="${currentOthersSaved[i].select}"]`).prop("selected", true)
+                    $(`#repeaterSub .newRow[data-rowid="${i}"] select`).select2()
+                    $(`#repeaterSub .newRow[data-rowid="${i}"] input`).prop("disabled", false)
+                }
+
+            }
+        }
+</script>
+<script>
+     $("#cashDate").flatpickr()
+        $("#bankDate").flatpickr()
+        $("#dieselDate").flatpickr()
+
+        $("#cashDate").val(formattedDate)
+        $("#bankDate").val(formattedDate)
+        $("#dieselDate").val(formattedDate)
+</script>
+<script>
+    $("#cashStatus").on("change", function () {
+        if ($(this).val() === "paid") {
+            //enabling all inputs and select elements in div with id advanceDetails
+            $("#advanceCash").find("input, select:not(:last)").prop("disabled", false)
+
+        } else {
+            //disabling all inputs and select elements in div with id advanceDetails
+            $("#advanceCash").find("input, select").prop("disabled", true)
+            //resetting all inputs and select elements in div with id advanceDetails
+            $("#advanceCash").find("input:not(:last)").val(0).prop("disabled", false)
+            $("#advanceCash").find("select:not(:last)").val(null).select2()
+            $(this).prop("disabled", false)
+
+        }
+    })
+
+    $("#bankStatus").on("change", function () {
+        if ($(this).val() === "paid") {
+            //enabling all inputs and select elements in div with id advanceDetails
+            $("#advanceBank").find("input, select:not(:last)").prop("disabled", false)
+
+        } else {
+            //disabling all inputs and select elements in div with id advanceDetails
+            $("#advanceBank").find("input, select").prop("disabled", true)
+            //resetting all inputs and select elements in div with id advanceDetails
+            $("#advanceBank").find("input:not(:last)").val(0).prop("disabled", false)
+            $("#advanceBank").find("select:not(:last)").val(null).select2()
+            $(this).prop("disabled", false)
+
+        }
+    })
+
+    $("#dieselStatus").on("change", function () {
+        if ($(this).val() === "paid") {
+            //enabling all inputs and select elements in div with id advanceDetails
+            $("#advanceDiesel").find("input, select:not(:last)").prop("disabled", false)
+
+        } else {
+            //disabling all inputs and select elements in div with id advanceDetails
+            $("#advanceDiesel").find("input, select").prop("disabled", true)
+            //resetting all inputs and select elements in div with id advanceDetails
+            $("#advanceDiesel").find("input:not(:last)").val(0).prop("disabled", false)
+            $("#advanceDiesel").find("select:not(:last)").val(null).select2()
+            $(this).prop("disabled", false)
+
+        }
+    })
+</script>
+<script>
+    function saveAdvanceDetails() {
+        if (($("#cashStatus").val() == "paid" && ($("#cashAmount").val() == "" || $("#cashLedger").val() == "")) || ($("#bankStatus").val() == "paid" && ($("#bankAmount").val() == "" || $("#bankLedger").val() == "")) || ($("#dieselStatus").val() == "paid" && ($("#dieselAmount").val() == "" || $("#dieselLedger").val() == ""))) {
+            showError("All fields are required")
+
+        } else {
+            const totalAdvance = parseFloat($("#cashAmount").val()) + parseFloat($("#bankAmount").val()) + parseFloat($("#dieselAmount").val())
+            $("#advance").val(totalAdvance).trigger("input")
+            const cashAdvanceAmount = $("#cashAmount").val()
+            const cashAdvanceLedger = $("#cashLedger").val()
+            const cashAdvanceStatus = $("#cashStatus").val()
+            const cashAdvanceDate = $("#cashDate").val()
+
+            const chequeAdvanceAmount = $("#bankAmount").val()
+            const chequeAdvanceLedger = $("#bankLedger").val()
+            const chequeAdvanceStatus = $("#bankStatus").val()
+            const chequeAdvanceDate = $("#bankDate").val()
+
+            const dieselAdvanceAmount = $("#dieselAmount").val()
+            const dieselAdvanceLedger = $("#dieselLedger").val()
+            const dieselAdvanceStatus = $("#dieselStatus").val()
+            const dieselAdvanceDate = $("#dieselDate").val()
+            const newOBJ = {
+                cashAdvanceAmount,
+                cashAdvanceLedger,
+                cashAdvanceStatus,
+                cashAdvanceDate,
+                chequeAdvanceAmount,
+                chequeAdvanceLedger,
+                chequeAdvanceStatus,
+                chequeAdvanceDate,
+                dieselAdvanceAmount,
+                dieselAdvanceLedger,
+                dieselAdvanceStatus,
+                dieselAdvanceDate
+            }
+            localStorage.setItem("advanceDetails", JSON.stringify(newOBJ))
+
+            $("#kt_modal_stacked_2").modal("hide")
+        }
+
+    }
+</script>
+<script>
+    function editAdvanceDetails() {
+        const data = JSON.parse(localStorage.getItem("advanceDetails"))
+        $("#cashAmount").val(data ? data.cashAdvanceAmount : 0)
+        $("#cashLedger").val(data? data.cashAdvanceLedger : null).select2()
+        $("#cashStatus").val(data ? data.cashAdvanceStatus : "due").select2()
+        $("#cashDate").val(data ? data.cashAdvanceDate : formattedDate)
+
+
+        $("#bankAmount").val(data ? data.chequeAdvanceAmount : 0)
+        $("#bankLedger").val(data ? data.chequeAdvanceLedger : null).select2()
+        $("#bankStatus").val(data ? data.chequeAdvanceStatus : "due").select2()
+        $("#bankDate").val(data ? data.chequeAdvanceDate : formattedDate)
+
+        $("#dieselAmount").val(data ? data.dieselAdvanceAmount : 0)
+        $("#dieselLedger").val(data ? data.dieselAdvanceLedger : null).select2()
+        $("#dieselStatus").val(data ? data.dieselAdvanceStatus : "due").select2()
+        $("#dieselDate").val(data ? data.dieselAdvanceDate : formattedDate)
+
+    }
+</script>
+<script>
+    $("#freight, #advance, #othersAddAmtTotal, #othersSubAmtTotal").on("input", function() {
+        const freight = parseFloat($("#freight").val())
+        const advance = parseFloat($("#advance").val())
+        const othersAdd = parseFloat($("#othersAddAmtTotal").val())
+        const othersSub = parseFloat($("#othersSubAmtTotal").val())
+        const total = freight - advance + othersAdd - othersSub
+        $("#balance").val(total)
+    })
+</script>
+    <%} %>

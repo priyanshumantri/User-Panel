@@ -1,0 +1,50 @@
+<% if(pageName==="permissions" ) {%>
+
+    <script
+        src="../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+
+    <script
+        src="../../../assets/js/custom/apps/user-management/permissions/list.js"></script>
+    <script
+        src="../../../assets/js/custom/apps/user-management/permissions/add-permission.js"></script>
+    <script
+        src="../../../assets/js/custom/apps/user-management/permissions/update-permission.js"></script>
+
+    <script>
+        // Function to populate the modal with data
+        function editPermission(permissionName, permissionId, core) {
+            // Get a reference to the modal and the input fields
+            const editModal = document.getElementById('kt_modal_update_permission');
+            const permissionNameInput = document.querySelector('#kt_modal_update_permission input[name="permissionName"]');
+            const permissionIdInput = document.querySelector('#kt_modal_update_permission input[name="permissionId"]');
+
+            if (core === "true") {
+                document.getElementById("kt_permissions_core").checked = true
+                document.getElementById("kt_permissions_core").disabled = true
+                document.getElementById("permissionNameUpdate").disabled = true
+            }
+            // Set the values of the input fields
+            permissionNameInput.value = permissionName;
+            permissionIdInput.value = permissionId;
+
+            // Show the modal
+            $(editModal).modal('show');
+        }
+    </script>
+
+    <script>
+        function deletePermission(permissionId) {
+            // Set the input field value
+            const deletePermissionInput = document.querySelector('input[name="deletePermissionID"]');
+            if (deletePermissionInput) {
+                deletePermissionInput.value = permissionId;
+            }
+
+            // Implement your delete logic here, e.g., making an AJAX request to delete the permission
+            // You can use permissionId to identify which permission to delete
+            console.log("Delete permission with ID: " + permissionId);
+        }
+    </script>
+
+
+    <%}%>

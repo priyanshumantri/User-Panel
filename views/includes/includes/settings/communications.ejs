@@ -1,0 +1,51 @@
+<% if(pageName==="communications" ) {%>
+    <script>
+        function communications() {
+
+            if (document.getElementById("authProcess").value === "") {
+                Swal.fire({
+                    text: "Please fill all required fields",
+                    icon: "error",
+                    buttonsStyling: !1,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn btn-primary"
+                    }
+                })
+            } else {
+
+                const e = document.getElementById("communicationsForm")
+                const data = new URLSearchParams();
+                for (const pair of new FormData(e)) {
+                    data.append(pair[0], pair[1]);
+                }
+
+                fetch("/settings/communication", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: data
+                }).then((data) => {
+                    if (data.status === 200) {
+                        Swal.fire({
+                            text: "Communication Settings Updated Successfully",
+                            icon: "success",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((response) => {
+                            if (response.isConfirmed) {
+                                location.reload()
+                            }
+                        })
+                    }
+                })
+
+            }
+
+        } 
+    </script>
+    <%} %>

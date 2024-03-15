@@ -1,0 +1,461 @@
+<%- include("includes/header", {pageName : "actions" }) %>
+    <%- include("includes/sidebar", {pageName : "actions" }) %>
+        <%- include("includes/toolbar", {pageName : "Actions" , pageHead : "Masters" }) %>
+        <style>
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+    
+            th, td {
+                border: 1px solid #ffffff;
+                padding: 8px;
+                text-align: center;
+            }
+    
+            th {
+                color: #000;
+            }
+    
+            th.main-header {
+                text-align: center;
+            }
+    
+           
+    
+            th.colspan-3 {
+                background-color: #f2f2f2;
+                text-align: center;
+            }
+            /* Main Header Columns */
+.main-header {
+  background-color: #333; /* Background color for all main headers */
+  color: #fff; /* Text color for all main headers */
+  text-align: center; /* Center-align the text */
+  font-weight: bold; /* Make the text bold */
+}
+
+/* Specific styles for each main header */
+.main-header-booking {
+  background-color: #005a75; /* Background color for the Booking Godown header */
+}
+
+.main-header-dispatched {
+  background-color: #32CD32; /* Background color for the Dispatched header */
+}
+
+/* Add similar styles for other main headers */
+
+/* Sub Header Columns */
+.sub-header {
+  background-color: #666; /* Background color for all sub headers */
+  color: #fff; /* Text color for all sub headers */
+  text-align: center; /* Center-align the text */
+}
+
+/* Table Rows (You can add more styles as needed) */
+.custom-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2; /* Alternate row background color */
+}
+/* Main Header Columns */
+.main-header {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+  position: relative; /* Add position relative */
+}
+
+/* Right border for charged weight columns */
+.main-header:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px; /* Adjust the thickness of the border */
+  height: 100%;
+  background-color: white; /* Change the color of the border */
+}
+
+/* Specific styles for each main header */
+.main-header-booking {
+  background-color: #FFA500;
+}
+
+.main-header-dispatched {
+  background-color: #32CD32;
+}
+
+/* Add similar styles for other main headers */
+
+/* Sub Header Columns */
+.sub-header {
+  background-color: #666;
+  color: #fff;
+  text-align: center;
+}
+
+/* Table Rows (You can add more styles as needed) */
+.custom-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+td:nth-child(4), /* 4th column */
+td:nth-child(7), /* 7th column */
+td:nth-child(10), /* 10th column */
+td:nth-child(13), /* 13th column */
+td:nth-child(16), /* 16th column */
+td:nth-child(19) { /* 19th column */
+  border-right: 4px solid white; /* Adjust the thickness and color as needed */
+}
+/* Apply the thick right border to the entire column */
+th:nth-child(4), /* 4th column (Charged Weight for Booking Godown) */
+th:nth-child(7), /* 7th column (Charged Weight for Dispatched) */
+th:nth-child(10), /* 10th column (Charged Weight for Transfer) */
+th:nth-child(13), /* 13th column (Charged Weight for Delivery Godown) */
+th:nth-child(16), /* 16th column (Charged Weight for Out for Delivery) */
+th:nth-child(19), /* 19th column (Charged Weight for Delivered) */
+th:nth-child(22), /* 22nd column (Charged Weight for Pending) */
+td:nth-child(4), /* 4th column (Charged Weight for Booking Godown) */
+td:nth-child(7), /* 7th column (Charged Weight for Dispatched) */
+td:nth-child(10), /* 10th column (Charged Weight for Transfer) */
+td:nth-child(13), /* 13th column (Charged Weight for Delivery Godown) */
+td:nth-child(16), /* 16th column (Charged Weight for Out for Delivery) */
+td:nth-child(19), /* 19th column (Charged Weight for Delivered) */
+td:nth-child(22) { /* 22nd column (Charged Weight for Pending) */
+  border-right: 4px solid white; /* Adjust the thickness and color as needed */
+}
+
+        </style>
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+
+                    <!--begin::Category-->
+                    <div class="card card-flush">
+                        <!--begin::Card header-->
+                        <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                            <!--begin::Card title-->
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1">
+                                    <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4"><span
+                                            class="path1"></span><span class="path2"></span></i> <input type="text"
+                                        data-kt-ecommerce-category-filter="search"
+                                        class="form-control form-control-solid w-250px ps-12"
+                                        placeholder="Search By LR Number">
+                                </div>
+                                <!--end::Search-->
+                            </div>
+                            <!--end::Card title-->
+
+                            <!--begin::Card toolbar-->
+                            <!-- <div class="card-toolbar">
+                                begin::Add customer-->
+                                <!-- <a href="/metronic8/demo1/../demo1/apps/ecommerce/catalog/add-category.html"
+                                    class="btn btn-primary">
+                                    Add Category
+                                </a> -->
+                                <!--end::Add customer-->
+                            <!-- </div> --> 
+                            <!--end::Card toolbar-->
+                        </div>
+                        <!--end::Card header-->
+
+                        <!--begin::Card body-->
+                        <div class="card-body pt-0">
+
+                            <!--begin::Table-->
+                            <div id="kt_ecommerce_category_table_wrapper"
+                                class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                <div class="table-responsive">
+                                    <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+                                        id="kt_ecommerce_category_table">
+                                        <thead>
+                                            <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                                <th class="w-10px pe-2 sorting_disabled" rowspan="1" colspan="1"
+                                                    aria-label="" style="width: 29.8906px;">
+                                                    <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                                     Sr No.
+                                                    </div>
+                                                </th>
+                                                <th class="min-w-150px sorting" tabindex="0"
+                                                    aria-controls="kt_ecommerce_category_table" rowspan="1" colspan="1"
+                                                    aria-label="Category: activate to sort column ascending"
+                                                    style="width: 783.125px;">LR Number</th>
+
+                                                    <th class="min-w-150px sorting" tabindex="0"
+                                                    aria-controls="kt_ecommerce_category_table" rowspan="1" colspan="1"
+                                                    aria-label="Category: activate to sort column ascending"
+                                                    style="width: 783.125px;">Challan Number</th>
+
+                                                    <th class="min-w-150px sorting" tabindex="0"
+                                                    aria-controls="kt_ecommerce_category_table" rowspan="1" colspan="1"
+                                                    aria-label="Category: activate to sort column ascending"
+                                                    style="width: 783.125px;">Consignor</th>
+
+                                                    <th class="min-w-150px sorting" tabindex="0"
+                                                    aria-controls="kt_ecommerce_category_table" rowspan="1" colspan="1"
+                                                    aria-label="Category: activate to sort column ascending"
+                                                    style="width: 783.125px;">Consignee</th>
+
+                                                    <th class="min-w-100px sorting" tabindex="0"
+                                                    aria-controls="kt_ecommerce_category_table" rowspan="1" colspan="1"
+                                                    aria-label="Category: activate to sort column ascending"
+                                                    style="width: 783.125px;">Actual Weight</th>
+
+                                                    <th class="min-w-100px sorting" tabindex="0"
+                                                    aria-controls="kt_ecommerce_category_table" rowspan="1" colspan="1"
+                                                    aria-label="Category: activate to sort column ascending"
+                                                    style="width: 783.125px;">Charged Weight</th>
+
+                                                    <th class="min-w-100px sorting" tabindex="0"
+                                                    aria-controls="kt_ecommerce_category_table" rowspan="1" colspan="1"
+                                                    aria-label="Category: activate to sort column ascending"
+                                                    style="width: 783.125px;">No. of PKG</th>
+
+                                                <th class="text-end min-w-130px sorting_disabled" rowspan="1" colspan="1"
+                                                    aria-label="Actions" style="width: 142.578px;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="fw-semibold text-gray-600">
+
+
+                                            <% if(data && data.length > 0) {%> 
+
+                                                <% data.forEach((data, index)=> {%> 
+
+                                                    
+                                            <tr class="odd">
+                                                <td>
+                                                    <div
+                                                        class="form-check form-check-sm form-check-custom form-check-solid">
+                                                        <%=index+1%>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <%=data.lrNumber%>
+                                                </td>
+                                                <td>
+                                                   <%=data.challanNumber%>
+                                                </td>
+                                                <td><%=data.consignor%></td>
+                                                <td><%=data.consignee%></td>
+                                                <td><%=data.actualWeight%></td>
+                                                <td><%=data.chargedWeight%></td>
+                                                <td><%=data.NOPLost%></td>
+                                                <td>
+                                                    <a href="#" class="btn btn-icon-danger btn-text-danger">
+                                                        <i class="ki-duotone ki-minus-circle fs-1"><span class="path1"></span><span class="path2"></span></i>
+                                                       
+                                                       </a>
+                                                       <a onclick="packageAction('found','<%=data.NOPLost%>', '<%=data.lrID%>', '<%=data.challanID%>', '<%=data.lrNumber%>', '<%=data.challanNumber%>', '<%=data.actualWeight%>', '<%=data.chargedWeight%>')" class="btn btn-icon-success btn-text-success">
+                                                        <i class="ki-duotone ki-double-check-circle fs-1">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                            <span class="path3"></span>
+                                                           </i>
+                                                       
+                                                       </a>
+                                                  
+                                                  
+                                                </td>
+                                            </tr>
+                                                    
+                                                <%}) %>
+                                                
+                                            <%} %>
+                                           
+                                        </tbody>
+                                        <!--end::Table body-->
+                                    </table>
+                                </div>
+                             
+                            </div>
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>    <th class="main-header main-header-booking" colspan="1"></th>
+                                            <th class="main-header main-header-booking" colspan="3">Booking Godown</th>
+                                            <th class="main-header main-header-booking" colspan="3">Dispatched</th>
+                                            <th class="main-header main-header-booking" colspan="3">Transfer</th>
+                                            <th class="main-header main-header-booking" colspan="3">Delivery Godown</th>
+                                            <th class="main-header main-header-booking" colspan="3">Out for Delivery</th>
+                                            <th class="main-header main-header-booking" colspan="3">Delivered</th>
+                                            <th class="main-header main-header-booking" colspan="3">Pending</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="sub-header">LR Number</th>
+                                            <th class="sub-header">Qty</th>
+                                            <th class="sub-header">Actual Weight</th>
+                                            <th class="sub-header">Charged Weight</th>
+                                            <th class="sub-header">Qty</th>
+                                            <th class="sub-header">Actual Weight</th>
+                                            <th class="sub-header">Charged Weight</th>
+                                            <th class="sub-header">Qty</th>
+                                            <th class="sub-header">Actual Weight</th>
+                                            <th class="sub-header">Charged Weight</th>
+                                            <th class="sub-header">Qty</th>
+                                            <th class="sub-header">Actual Weight</th>
+                                            <th class="sub-header">Charged Weight</th>
+                                            <th class="sub-header">Qty</th>
+                                            <th class="sub-header">Actual Weight</th>
+                                            <th class="sub-header">Charged Weight</th>
+                                            <th class="sub-header">Qty</th>
+                                            <th class="sub-header">Actual Weight</th>
+                                            <th class="sub-header">Charged Weight</th>
+                                            <th class="sub-header">Qty</th>
+                                            <th class="sub-header">Actual Weight</th>
+                                            <th class="sub-header">Charged Weight</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% inventoryData.forEach((data)=> {%> 
+
+                                            <tr>    
+                                                <!--booking-->
+                                                <td><%=data.lrNumber%></td>
+                                                <td><%=data.qtyAtBooking%></td>
+                                                <td><%=data.actualWeightAtBooking%></td>
+                                                <td><%=data.chargedWeightAtBooking%></td>
+                                                <!--dispatched-->
+                                                <td><%=data.qtyDispatched%></td>
+                                                <td><%=data.actualWeightDispatched%></td>
+                                                <td><%=data.chargedWeightDispatched%></td>
+                                                <!--transfer-->
+                                                <td><%=data.qtyTransfer%></td>
+                                                <td><%=data.actualWeightTransfer%></td>
+                                                <td><%=data.chargedWeightTransfer%></td>
+                                                <!--delivery godown-->
+                                                <td><%=data.qtyDeliveryGodown%></td>
+                                                <td><%=data.actualWeightDeliveryGodown%></td>
+                                                <td><%=data.chargedWeightDeliveryGodown%></td>
+                                                <!--out for delivery-->
+                                                <td><%=data.qtyOutForDelivery%></td>
+                                                <td><%=data.actualWeightOutForDelivery%></td>
+                                                <td><%=data.chargedWeightOutForDelivery%></td>
+                                                <!--delivered-->
+                                                <td><%=data.qtyDelivered%></td>
+                                                <td><%=data.actualWeightDelivered%></td>
+                                                <td><%=data.chargedWeightDelivered%></td>
+                                                <!--pending-->
+                                                <td><%=data.qtyPending%></td>
+                                                <td><%=data.actualWeightPending%></td>
+                                                <td><%=data.chargedWeightPending%></td>
+                                               
+                                            </tr>
+
+                                        <%}) %>
+                                    </tbody>
+                                </table>    
+
+                               
+                            
+                            </div>
+                            <!--end::Table-->
+                           
+                        </div>
+                        
+                        <!--end::Card body-->
+                    </div>
+                    
+                    <!--end::Category-->
+                </div>
+                <!--end::Content container-->
+            </div>
+
+            <div class="modal fade" id="kt_modal_update_permission" tabindex="-1" aria-hidden="true">
+                <!--begin::Modal dialog-->
+                <div class="modal-dialog modal-dialog-centered mw-650px">
+                    <!--begin::Modal content-->
+                    <div class="modal-content">
+                        <!--begin::Modal header-->
+                        <div class="modal-header">
+                            <!--begin::Modal title-->
+                            <h2 class="fw-bold">Update City Details</h2>
+                            <!--end::Modal title-->
+                            <!--begin::Close-->
+                            <div class="btn btn-icon btn-sm btn-active-icon-primary"
+                                data-kt-permissions-modal-action="close">
+                                <i class="ki-duotone ki-cross fs-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </div>
+                            <!--end::Close-->
+                        </div>
+                        <!--end::Modal header-->
+                        <!--begin::Modal body-->
+                        <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                            <!--begin::Notice-->
+
+                            <!--end::Notice-->
+                            <!--begin::Form-->
+                            <form id="packageActionForm" class="form fv-plugins-bootstrap5 fv-plugins-framework">
+                                <input type="hidden" id="action" name="actionType" value="">
+                                <div class="fv-row mb-7">
+                                  <label for="lrNumber" class="requried form-label ">Lorry Reciept Number</label>
+                                    <select disabled name="lrNumber" class="form-select form-select-solid" data-control="select2" data-placeholder="LR Number" id="editPackageLR">
+                                        <option value=""></option>
+                                    </select>
+                                
+
+                                    <!--end::Input-->
+                                </div>
+
+                                <div class="fv-row mb-7">
+                                    <label for="challanNumber" class="fs-6 fw-semibold form-label mb-2 requried">Challan Number</label>
+                                    <select disabled name="challanNumber" class="form-select form-select-solid" data-control="select2" data-placeholder="LR Number" id="editPackageChallan">
+                                        <option value=""></option>
+                                    </select>
+
+                                    <!--end::Input-->
+                                </div>
+                                <div class="fv-row mb-7">
+                                    <input type="hidden" id="originalActualWeight">
+                                    <label for="actualWeight" class="fs-6 fw-semibold form-label mb-2 requried">Actual Weight</label>
+                                    <input oninput="return allowOnlyWholeNumbers(event)" type="text" id="actualWeight" name="actualWeight" class="form-control form-control-solid" placeholder="Actual Weight">
+
+                                    <!--end::Input-->
+                                </div>
+                                <div class="fv-row mb-7">
+                                    <input type="hidden" id="originalChargedWeight">
+                                    <label for="chargedWeight" class="fs-6 fw-semibold form-label mb-2 requried">Charged Weight</label>
+                                    <input oninput="return allowOnlyWholeNumbers(event)" type="text" id="chargedWeight" name="chargedWeight" class="form-control form-control-solid" placeholder="Charged Weight">
+
+                                    <!--end::Input-->
+                                </div>
+                                <div class="fv-row mb-7">
+                                    <input type="hidden" id="NOPLost">
+                                    <label for="challanNumber" class="fs-6 fw-semibold form-label mb-2 requried">No. of Packages Found</label>
+                                    <input oninput="return allowOnlyWholeNumbers(event)" type="text" id="NOPFound" name="NOPFound" class="form-control form-control-solid" placeholder="Packages Found">
+
+                                    <!--end::Input-->
+                                </div>
+
+                                <!--begin::Actions-->
+                                <div class="text-center pt-15">
+                                    <button type="reset" class="btn btn-light me-3"
+                                        data-kt-permissions-modal-action="cancel">Discard</button>
+                                    <button type="submit" class="btn btn-primary"
+                                        data-kt-permissions-modal-action="submit">
+                                        <span class="indicator-label">Submit</span>
+                                        <span class="indicator-progress">Please wait...
+                                            <span
+                                                class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                                    </button>
+                                </div>
+                                <!--end::Actions-->
+                            </form>
+                            <!--end::Form-->
+                        </div>
+                        <!--end::Modal body-->
+                    </div>
+                    <!--end::Modal content-->
+                </div>
+                <!--end::Modal dialog-->
+            </div>
+
+            
+            <%- include("includes/footer", {pageName : "actions" }) %>

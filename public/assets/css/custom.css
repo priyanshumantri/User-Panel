@@ -1,0 +1,238 @@
+.customAlert {
+    margin: 15px;
+}
+
+.swal2-styled.swal2-confirm {
+    background-color: #d9534f;
+    color: white; /* Text color, adjust as needed */
+    /* Add any other styles you want */
+}
+
+.custom-error-messages {
+    color : red
+}
+
+  /* Add a border to table cells */
+  #example td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+
+[data-bs-theme="light"] body {
+    background-color: #dddee0
+}
+
+[data-bs-theme="light"] .form-control.form-control-solid {
+  background-color: #dddee0;
+    border-color: #d2d2d2 !important;
+    color: black !important;
+}
+
+[data-bs-theme="light"]  .form-select.form-select-solid {
+       border-color: #d2d2d2!important; 
+    color: black !important;
+}
+
+ [data-bs-theme="light"] .select2-container .select2-selection__rendered,  
+ [data-bs-theme="light"] .select2-container .select2-results__option,  
+ [data-bs-theme="light"] tr>th,
+ [data-bs-theme="light"] .form-label {
+    color: black !important;
+    font-weight: 600;
+  } 
+
+
+
+
+  [data-bs-theme="dark"] .form-control.form-control-solid {
+   
+    color: white !important;
+}
+
+[data-bs-theme="dark"]  .form-select.form-select-solid {
+     
+    color: white !important;
+}
+
+ [data-bs-theme="dark"] .select2-container .select2-selection__rendered,  
+ [data-bs-theme="dark"] .select2-container .select2-results__option,  
+ [data-bs-theme="dark"] tr>th,
+ [data-bs-theme="dark"] .form-label {
+    color: white !important;
+  } 
+
+  /* Target disabled input elements */
+input[disabled],
+select[disabled] {
+  cursor: not-allowed; /* Change the cursor to "not-allowed" for disabled elements */
+}
+
+
+/* Change the cursor style for a disabled Select2 container */
+.select2-container-disabled {
+    cursor: not-allowed !important;
+  }
+  
+  /* Change the cursor style for the disabled Select2 selection area */
+  .select2-container-disabled .select2-selection {
+    cursor: not-allowed !important;
+  }
+
+  /* Change the placeholder color for a Select2 input */
+  [data-bs-theme="light"] .select2-container--bootstrap5 .select2-selection--single.form-select-solid {
+    color: #65666b !important; /* Set the desired color */
+  }
+
+  [data-bs-theme="light"] .form-control.form-control-solid::placeholder {
+    color: #65666b !important; 
+  }
+
+  [data-bs-theme="dark"] .form-control.form-control-solid::placeholder {
+    color : #bdbdc8 !important
+  }
+
+  [data-bs-theme="dark"] .form-control.form-control-solid {
+   border-color: #242323 !important;
+  }
+  
+  [data-bs-theme="dark"] .select2-container--bootstrap5 .select2-selection--single.form-select-solid .select2-selection__placeholder {
+    color:  #bdbdc8 !important; /* Set the desired color */
+  }
+  [data-bs-theme="dark"]  .form-select.form-select-solid {
+    border-color: #242323!important; 
+
+}
+
+[data-bs-theme="light"] .separator.separator-dashed {
+    border-bottom-color: #8f8f8f;
+}
+
+[data-bs-theme="light"] input:not(.exclude),[data-bs-theme="light"] .form-select.form-select-solid {
+    background-color: #dddee0 !important;
+    color: black !important;
+    font-weight: 600 !important;
+}
+
+
+[data-bs-theme="light"] .select2-selection__placeholder , .form-label{
+    color: black !important;
+  }
+
+  [data-bs-theme="dark"] .table-responsive::-webkit-scrollbar-thumb {
+    background: grey; /* Color of the scrollbar thumb */
+  }
+
+  /* Change scrollbar color on hover for WebKit (Chrome, Safari) */
+[data-bs-theme="dark"] .table-responsive::-webkit-scrollbar-thumb:hover {
+    background: white; 
+  }
+
+  [data-bs-theme="light"] .table-responsive::-webkit-scrollbar-thumb {
+    background: #c7c7c7; /* Color of the scrollbar thumb */
+  }
+
+  /* Change scrollbar color on hover for WebKit (Chrome, Safari) */
+[data-bs-theme="light"] .table-responsive::-webkit-scrollbar-thumb:hover {
+    background: grey; 
+  }
+
+
+  [data-bs-theme="light"] label {
+    color : black;
+    font-weight: 600;
+  }
+  /* Set the color for the scrollbar thumb (the draggable part) */
+  [data-bs-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #bdbdc8 !important;
+}
+::-webkit-scrollbar {
+  height: 8px !important;
+}
+
+[data-bs-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #929292 !important;
+}
+[data-bs-theme="light"] .custom-modal {
+  background-color: #dddee0 !important;
+}
+[data-bs-theme="dark"] .custom-modal {
+  background-color: #121212 !important;
+}
+
+
+input[type="checkbox"]:checked {
+ background-color: var(--bs-primary)!important;
+}
+[data-bs-theme="light"] input[type="checkbox"]:not(:checked) {
+  background-color: #bebebe !important;
+ }
+input[type="checkbox"]:not(:checked).switch{
+  background-color: var(--bs-danger)!important;
+ }
+
+
+
+ [data-bs-theme="dark"] label {
+  color : white;
+  font-weight: 500;
+}
+
+[data-bs-theme="light"] .select2-container--bootstrap5.select2-container--focus:not(.select2-container--disabled) .form-select-solid, .select2-container--bootstrap5.select2-container--open:not(.select2-container--disabled) .form-select-solid  {
+background-color: rgba(88, 88, 88, 0.3) !important;
+}
+
+
+[data-bs-theme="light"] .select2-container--bootstrap5 .select2-dropdown .select2-results__option.select2-results__option--highlighted {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+  }
+
+  [data-bs-theme="light"] .select2-container--bootstrap5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+    background-color: white !important;
+    font-weight: 700 !important;
+  }
+  [data-bs-theme="light"] .select2-container--bootstrap5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice .select2-selection__choice__display {
+
+    font-weight: 600 !important;
+  }
+  [data-bs-theme="light"] .form-control:focus {
+    background-color: white !important;
+    border-color: black !important;
+  }
+
+  [data-bs-theme="light"] .custom-datatable .even, [data-bs-theme="light"] .custom-datatable .even .dtfc-fixed-left, [data-bs-theme="light"] .custom-datatable .odd .dtfc-fixed-left, [data-bs-theme="light"] .custom-datatable .odd .dtfc-fixed-left {
+    color: black !important;
+    font-weight: 500 !important;
+    background-color: #dedede !important;
+  }
+
+  [data-bs-theme="light"] .custom-datatable tr {
+border-bottom-color: #b6b6b6 !important;
+  }
+  [data-bs-theme="light"] .custom-datatable th {
+    color: black !important;
+    font-weight: 800 !important;
+    background-color: #dedede !important;
+  }
+
+  [data-bs-theme="dark"] .custom-datatable .even, [data-bs-theme="dark"] .custom-datatable .even .dtfc-fixed-left {
+    color: white !important;
+    font-weight: 500 !important;
+  }
+  [data-bs-theme = "light"] .app-header {
+    background-color: white;
+  }
+
+  [data-bs-theme="dark"] table.dataTable tfoot tr>.dtfc-fixed-left {
+    background-color: #1c1c1c !important;
+  }
+
+  @media (min-width: 576px) {
+   .custom-crossing {
+      max-width: 900px !important;
+    }
+  }
+
+ [data-bs-theme="light"] .accordion-item {
+   border : 1px solid #e6e6e6 !important
+  }

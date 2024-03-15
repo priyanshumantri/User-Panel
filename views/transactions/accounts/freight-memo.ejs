@@ -1,0 +1,683 @@
+<%- include("../../includes/header", {pageName : "freightMemo" }) %>
+    <%- include("../../includes/sidebar", {pageName : "freightMemo" }) %>
+
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_content_container" class="app-container  container-xxl ">
+          
+   
+            <div style="padding: 30px;" class="card card-p-0 card-flush">
+              
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Branch</label>
+                            <% if (user.role.roleType === "ADMIN") { %>
+                            <select name="branch" id="branch" form="findLRForm" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Branch">
+                                <option></option>
+                       
+                            </select>
+                            <% } else { %>
+                            <input disabled type="text" id="branch" form="findLRForm" name="branch" class="form-control form-control-solid" value="<%=user.branch.name%>">
+                            <% } %>
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Date Range</label>
+                            <input class="form-control form-control-solid" name="dateRange" form="findLRForm" placeholder="Pick date range" id="searchRange" />
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <button style="margin-top: 20px;" type="button" onclick="findLR()" class="btn btn-sm btn-primary">Find</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+         
+       
+        </div>
+    </div>
+
+
+    <form id="findLRForm"></form>
+ 
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+             
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                 
+                    <div style="padding: 30px;" class="card card-p-0 card-flush">
+                        <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1">
+                                    <span class="svg-icon fs-1 position-absolute ms-4">
+                                        <i class="ki-duotone ki-magnifier fs-3">
+                                         <span class="path1"></span>
+                                         <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="Search Freight Memo" />
+                                </div>
+                                <!--end::Search-->
+                                <!--begin::Export buttons-->
+                                <div id="kt_datatable_example_1_export" class="d-none"></div>
+                                <!--end::Export buttons-->
+                            </div>
+                            <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                                <button onclick="addNewFM()" type="button" class="btn btn-primary btn-active-light-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_2">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Add New Freight Memo
+                                </button>
+                                <!--begin::Export dropdown-->
+                                <button type="button" class="btn btn-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Export Report
+                                </button>
+                                <!--begin::Menu-->
+                                <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                        Copy to clipboard
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                        Export as Excel
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                        Export as CSV
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                  
+                                    <!--end::Menu item-->
+                                </div>
+                                <!--end::Menu-->
+                                <!--end::Export dropdown-->
+                    
+                                <!--begin::Hide default export buttons-->
+                                <div id="kt_datatable_example_buttons" class="d-none"></div>
+                                <!--end::Hide default export buttons-->
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table align-middle  rounded table-row-dashed fs-6 g-5" id="kt_datatable_example">
+                                <thead>
+                                    <!--begin::Table row-->
+                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                        <th class="min-w-250px w-250px">Action</th>
+                                        
+                                        <th class="min-w-100px w-100px">Date</th>
+                                        
+                                        <th class="min-w-100px w-100px">FM Number</th>
+                                        <th class="min-w-100px w-100px">Challan Number</th>
+                                        <th class="min-w-100px w-100px">Total Weight</th>
+                                        <th class="min-w-100px w-100px">Rate ON</th>
+                                        <th class="min-w-100px w-100px">Rate</th>
+                                        <th class="min-w-100px w-100px">Net Freight</th>
+                                        <th class="min-w-100px w-100px">Balance</th>
+                                        <th class="min-w-100px w-100px">Balance Payable At</th>
+                                        <th class="min-w-100px w-100px">Advance</th>
+                                        <th class="min-w-100px w-100px">Account To</th>
+                                    </tr>
+                                    <!--end::Table row-->
+                                </thead>
+                                <tbody id="lrDATA" class="fw-semibold text-gray-600">
+                                    <% if(typeof fmData !== "undefined") {%> 
+
+                                        <% fmData.forEach(data=> {%> 
+
+                                            <tr class="odd">
+                                                <td>
+
+                                                    <button onclick="viewChallan('<%=data._id%>')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-eye fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                        </i>
+                                                    </button>
+                                                    
+                                                    <button onclick="editFM('<%=data._id%>')"  class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-pencil fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-arrow-down fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-printer fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                         <span class="path5"></span>
+                                                        </i>
+                                                    </button>
+                                                   
+                                                    <button onclick="deleteFM('<%=data._id%>')"  class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                                                        <i class="ki-duotone ki-trash-square fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                        </i>
+                                                    </button>
+
+                                                </td>
+                                                <td><%=data.date%></td>
+                                            <td><%=data.number%></td>
+                                            <td><%=data.challan.number%></td>
+                                            <td><%= data.challan.material.reduce((total, item) => total + item.actualWeight, 0) %></td>
+                                            <%
+                                                let rateON
+                                                if(data.rateON === "actualWeight") {
+                                                    rateON = "Actual Weight"
+                                                } else if(data.rateON === "chargedWeight") {
+                                                    rateON = "Charged Weight"
+                                                } else if(data.rateON === "pkg") {
+                                                    rateON = "Package"
+                                                } else if(data.rateON === "ftl") {
+                                                    rateON = "FTL (Fix)"
+                                                }
+                                            %>
+                                            <td><%=rateON%></td>
+                                            <td><%=data.rate%></td>
+                                            <td><%=data.netFreight%></td>
+                                            <td><%=data.balance.amount%></td>
+                                            <td><%= data.payableAt.name %></td>
+                                            <td><%= data.cashAdvance.cashAmount + data.bankAdvance.bankAmount + data.dieselAdvance.dieselAmount %></td>
+                                            <td><%=data.accountTo%></td>
+                                           
+                                            </tr>
+
+                                        <%}) %>
+
+                                    <%} %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                  
+                </div>
+           </div>
+           <%     function getCurrentFinancialYear() {
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+          
+            // Check if the current month is April (month index 3) or later
+            // If it's April or later, return the current year and the next year as the financial year
+            // Otherwise, return the previous year and the current year as the financial year
+            const startYear = currentDate.getMonth() >= 3 ? currentYear : currentYear - 1;
+            const endYear = startYear + 1;
+          
+            // Format the financial year as "2324", "2425", etc.
+            const formattedFinancialYear = `${String(startYear).slice(-2)}${String(endYear).slice(-2)}`;
+          
+            return formattedFinancialYear;
+          }
+          %>
+    <form id="fmForm">
+           <div class="modal bg-body  fade" tabindex="-1" id="kt_modal_2" data-bs-focus="false">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content custom-modal shadow-none">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="title"></h5>
+        
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+        
+                    <div class="modal-body">
+                          <!--begin::Layout-->
+                    <div class="d-flex flex-column flex-lg-row">
+                        <!--begin::Content-->
+                        <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+                            <!--begin::Card-->
+                            <div class="card">
+                                <!--begin::Card body-->
+                                <div class="card-body p-12">
+                                    <!--begin::Form-->
+                                    
+                                        <!--begin::Wrapper-->
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row">
+                                            <div class="col-lg-3" style="margin-right: 10px;" id="addChallanNumberDiv">
+                                                <input type="hidden" name="editID" id="editID">
+                                            <label for="newChallan" class="form-label required">FM No.</label>
+                                            <input value="0" tabindex="1" checkindex="1" type="number" value="<%=fmNumber%>" name="fmNumber" id="fmNumber" class="form-control form-control-solid">
+                                            </div>
+                               
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="fmDate" class="form-label required">FM Date</label>
+                                                        <input tabindex="2" checkindex="2"
+                                                        class="form-control form-control-solid fw-bold pe-5 flatpickr-input"
+                                                        placeholder="Select Bill Date" name="fmDate" type="text"
+                                                        id="fmDate">
+                                            </div>
+
+                                            <div id="selectChallan" class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="challan" class="form-label required">Select Challan</label>
+                                               <select tabindex="3" checkindex="3" name="challan" id="challan" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Challan Number" data-dropdown-parent="#kt_modal_2">
+
+                                                <option></option>
+                                                <% challanData.forEach((data)=> {%> 
+                                                    <option value="<%=data._id%>"><%=data.number%></option>    
+                                                <%}) %>
+                                               </select>
+                                            </div>
+
+                                            <div id="displayChallan" class="col-lg-3" style="margin-right: 10px; display: none;">
+                                                <label for="challan" class="form-label required">Challan Number</label>
+                                               <select tabindex="3" checkindex="3" name="displayChallan" id="displayChallanSelect" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Challan Number" data-dropdown-parent="#kt_modal_2">
+
+                                               </select>
+                                            </div>
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="from" class="form-label required">From</label>
+                                                <input tabindex="4" checkindex="4" disabled type="text" id="from" class="form-control form-control-solid" placeholder="From Godown">
+                                            </div>
+                                            <!--end::Input group-->
+                                        </div>
+                                        
+                                        
+                                       
+
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                            
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="to" class="form-label required">To</label>
+                                               <input tabindex="5" checkindex="5" disabled type="text" class="form-control form-control-solid" id="to" placeholder="To Branch">
+                                            </div>
+
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="vehicleNumber" class="form-label required">Vehicle No.</label>
+                                                <input tabindex="6" checkindex="6" disabled type="text" id="vehicleNumber" class="form-control form-control-solid">
+                                            </div>
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="owner" class="form-label required">Owner</label>
+                                                <input tabindex="7" checkindex="7" disabled type="text" id="owner" class="form-control form-control-solid" placeholder="Owner Name">
+                                            </div>
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="to" class="form-label required">Broker</label>
+                                               <input tabindex="8" checkindex="8" disabled type="text" class="form-control form-control-solid" id="broker" placeholder="Broker Name">
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                      
+
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="vehicleNumber" class="form-label required">Account To</label>
+                                                <select tabindex="9" checkindex="9" disabled data-dropdown-parent="#kt_modal_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select LR" name="accountTO" id="accountTO">
+                                                   <option></option>
+                                                    <option value="owner">Owner</option>
+                                                    <option value="broker">Broker</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="to" class="form-label required">No. of PKG's</label>
+                                                <input tabindex="10" checkindex="10" disabled type="text" class="form-control form-control-solid" id="pkg" placeholder="No. of PKG's">
+                                            </div>
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="to" class="form-label required">Actual Weight</label>
+                                                <input tabindex="11" checkindex="11" disabled type="text" class="form-control form-control-solid" id="actualWeight" placeholder="Actual Weight">
+                                            </div>
+                                            <div class="col-lg-3" style="margin-right: 10px;">
+                                                <label for="to" class="form-label required">Charged Weight</label>
+                                                <input tabindex="12" checkindex="12" disabled type="text" class="form-control form-control-solid" id="chargedWeight" placeholder="Charged Weight">
+                                            </div>
+                                        </div>
+                                        <!--end::Top-->
+
+                                        <!--begin::Separator-->
+                                        <div class="separator separator-dashed my-10"></div>
+                                        <!--end::Separator-->
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                        <div class="col-lg-3" style="margin-right: 10px;">
+                                            <label for="" class="form-label">Rate On</label>
+                                            <select tabindex="13" checkindex="13" name="rateON" id="rateON" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Challan Number" data-dropdown-parent="#kt_modal_2">
+                                                <option></option>
+                                                <option value="actualWeight">Actual Weight</option>
+                                                <option value="chargedWeight">Charged Weight</option>
+                                                <option value="pkg">Package</option>
+                                                <option value="ftl">FTL (Fix)</option>
+                                               </select>
+                                        </div>  
+                                        <div class="col-lg-3" style="margin-right: 10px;">
+                                            <label for="" class="form-label">Rate</label>
+                                            <input oninput="validateNumberWithDecimals(this)" tabindex="14" checkindex="14" type="number" name="rate" id="rate" class="form-control form-control-solid" placeholder="Rate">
+                                        </div>   
+                                        <div class="col-lg-3" style="margin-right: 10px;">
+                                            <label for="" class="form-label">Freight</label>
+                                            <input value="0" disabled tabindex="15" checkindex="15" type="number" name="freight" id="freight" class="form-control form-control-solid" placeholder="Freight">
+                                        </div>   
+                                        <div class="col-lg-3" style="margin-right: 10px;">
+                                            <label for="" class="form-label">Hamali (+)</label>
+                                            <input oninput="validateNumberWithDecimals(this)" value="0" tabindex="16" checkindex="16" type="number" name="hamali" id="hamali" class="form-control form-control-solid" placeholder="Hamali">
+                                        </div>    
+                                        </div>
+
+
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                            <div class="col-lg-6" style="margin-right: 10px;">
+                                                <label for="" class="form-label">Others (+)</label><br>
+                                                <div style="display: inline-block; width: 88%;">
+                                                    <input value="0" disabled type="number" id="othersAddAmtTotal" class="form-control form-control-solid" placeholder="Advance">
+                                                </div>
+                                                <button onclick="editOthersAddBTN()" data-bs-stacked-modal="#kt_modal_stacked_3" style="display: inline-block !important; vertical-align: top;" type="button" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                    <i class="ki-duotone ki-pencil fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </button>
+                                            </div>
+                                            <div class="col-lg-6" style="margin-right: 10px;">
+                                                <label for="" class="form-label">Others (-)</label><br>
+                                                <div style="display: inline-block; width: 88%;">
+                                                    <input value="0" disabled type="number" id="othersSubAmtTotal" class="form-control form-control-solid" placeholder="Advance">
+                                                </div>
+                                                <button onclick="editOthersSubBTN()" data-bs-stacked-modal="#kt_modal_stacked_4" style="display: inline-block !important; vertical-align: top;" type="button" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                    <i class="ki-duotone ki-pencil fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </button>
+                                            </div>
+                                            </div>
+
+                                            <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="" class="form-label">Mamul (-)</label>
+                                                    <input oninput="validateNumberWithDecimals(this)"  value="0"tabindex="21" checkindex="21" type="number" name="mamul" id="mamul" class="form-control form-control-solid" placeholder="Mamul">
+                                                </div>  
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="" class="form-label">Unloading (-)</label>
+                                                    <input oninput="validateNumberWithDecimals(this)"  value="0"tabindex="22" checkindex="22" type="number" name="unloading" id="unloading" class="form-control form-control-solid" placeholder="Unloading">
+                                                </div>   
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="" class="form-label">TDS %</label>
+                                                    <input oninput="validateNumberWithDecimals(this)" value="0" tabindex="23" checkindex="23" type="number" name="tdsP" id="tdsP" class="form-control form-control-solid" placeholder="TDS %">
+                                                </div>   
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="" class="form-label">TDS</label>
+                                                    <input value="0" oninput="validateNumberWithDecimals(this)" value="0" disabled tabindex="24" checkindex="24" type="number" name="tds" id="tds" class="form-control form-control-solid" placeholder="TDS">
+                                                </div>    
+                                            </div>
+
+                                            <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="" class="form-label">Net Freight</label>
+                                                    <input disabled value="0" tabindex="25" checkindex="25" type="number" name="netFreight" id="netFreight" class="form-control form-control-solid" placeholder="Net Freight">
+                                                </div>  
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="" class="form-label">Advance</label><br>
+                                                    <div style="display: inline-block; width: 88%;">
+                                                        <input value="0" disabled tabindex="26" checkindex="26" type="number" name="advance" id="advance" class="form-control form-control-solid" placeholder="Advance">
+                                                    </div>
+                                                    <button data-bs-stacked-modal="#kt_modal_stacked_2" style="display: inline-block !important; vertical-align: top;" type="button" onclick="editAdvanceDetails()" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-pencil fs-2">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                </div>
+                                                  
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="" class="form-label">Balance</label>
+                                                    <input value="0" disabled tabindex="27" checkindex="27" type="number" name="balance" id="balance" class="form-control form-control-solid" placeholder="Balance">
+                                                </div>   
+                                                <div class="col-lg-3" style="margin-right: 10px;">
+                                                    <label for="" class="form-label">Payable At</label>
+                                                    <select tabindex="28" checkindex="28" name="payableAt" id="payableAt" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Balance Payable At" data-dropdown-parent="#kt_modal_2">
+                                                        <option></option>
+                                                        <% godownData.forEach((data)=> {%> 
+                                                        <option <% if(user.branch._id == data._id) {%> selected <%} %> value="<%=data._id%>"><%=data.name%></option>    
+                                                        <%}) %>
+                                                       </select>
+                                                </div>    
+                                            </div>
+                                           
+                                    <!--end::Form-->
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::Card-->
+                        </div>
+                        <!--end::Content-->
+
+            
+                    </div>
+                    <!--end::Layout-->
+                    </div>
+        
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="modalCloseBTN">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="createFreightMemo()" id="fmSubmit">
+                            <span class="indicator-label">
+                                Create New Freight Memo
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="updateFreightMemo()" id="fmUpdate">
+                            <span class="indicator-label">
+                                Update Freight Memo
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+       
+        </div>
+
+        <div class="modal fade" tabindex="-1" id="kt_modal_stacked_2">
+            <div class="modal-dialog modal-dialog-centered modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="editFreightTitle">Edit Advance Details</h3>
+            
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+            
+                    <div class="modal-body">
+                 
+
+                       
+                            <div id="advanceCash">
+                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px;">
+                                    <div class="col-lg-3" style="margin-right: 10px; ">
+                                        <input oninput="validateNumberWithDecimals(this)" value="0"  class="form-control form-control-solid" type="number" name="cashAmount" id="cashAmount" placeholder="Amt Paid in Cash">
+                                    </div> 
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <select disabled data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Cash Payment Ledger" name="cashLedger" id="cashLedger">
+                                            <option></option>
+                                           <%cashLedger.forEach((data)=> {%> 
+                                            <option value="<%=data._id%>"><%=data.name%></option>
+                                            <%}) %>
+                                        </select>
+                                    </div> 
+                                    <div class="col-lg-2" style="margin-right: 10px;">
+                                        <select data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Cash Payment Status" name="cashStatus" id="cashStatus">
+                              
+                                            <option value="paid">Paid</option>
+                                            <option value="due" selected>Due</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <input placeholder="Select Date" type="date" name="cashDate" id="cashDate" class="form-control form-control-solid">
+                                     </div>
+                                </div>
+                            </div>
+                    
+
+                            <div id="advanceBank">
+                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px;">
+                                    <div class="col-lg-3" style="margin-right: 10px; ">
+                                        <input oninput="validateNumberWithDecimals(this)" value="0"  class="form-control form-control-solid" type="number" name="bankAmount" id="bankAmount" placeholder="Amt Paid via Cheque">
+                                    </div> 
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <select disabled data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Bank A/C" name="bankLedger" id="bankLedger">
+                                            <option></option>
+                                            <%bankLedger.forEach((data)=> {%> 
+                                                <option value="<%=data._id%>"><%=data.name%></option>
+                                                <%}) %>
+                                        </select>
+                                    </div> 
+                                    <div class="col-lg-2" style="margin-right: 10px;">
+                                        <select data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Cash Payment Status" name="bankStatus" id="bankStatus">
+                                      
+                                            <option value="paid">Paid</option>
+                                            <option value="due" selected>Due</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                       <input placeholder="Select Date" type="date" name="bankDate" id="bankDate" class="form-control form-control-solid">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="advanceDiesel">
+                                <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px;">
+                                    <div class="col-lg-3" style="margin-right: 10px; ">
+                                        <input oninput="validateNumberWithDecimals(this)" value="0"  class="form-control form-control-solid" type="number" name="dieselAmount" id="dieselAmount" placeholder="Diesel Amt">
+                                    </div> 
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <select disabled data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Diesel Ledger" name="dieselLedger" id="dieselLedger">
+                                            <option></option>
+                                            <%sundryCreditors.forEach((data)=> {%> 
+                                                <option value="<%=data._id%>"><%=data.name%></option>
+                                                <%}) %>
+                                        </select>
+                                    </div> 
+                                    <div class="col-lg-2" style="margin-right: 10px;">
+                                        <select data-dropdown-parent="#kt_modal_stacked_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Cash Payment Status" name="dieselStatus" id="dieselStatus">
+                                           
+                                            <option value="paid">Paid</option>
+                                            <option value="due" selected>Due</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3" style="margin-right: 10px;">
+                                        <input placeholder="Select Date" type="date" name="dieselDate" id="dieselDate" class="form-control form-control-solid">
+                                     </div>
+                                </div>
+                            </div>
+                        
+                          
+                    
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                        <button type="button" onclick="saveAdvanceDetails()" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="modal fade" tabindex="-1" id="kt_modal_stacked_3">
+                <div class="modal-dialog modal-dialog-centered modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Edit Others (+) Details</h3>
+            
+                            <!--begin::Close-->
+                            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                                aria-label="Close">
+                                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                            </div>
+                            <!--end::Close-->
+                        </div>
+            
+                        <div class="modal-body">
+
+                           <div id="repeaterAdd">
+
+                           </div> 
+            
+                                <!--begin::Form group-->
+                                <div class="form-group">
+                                    <button onclick="addRepeaterList('add')" type="button" class="btn btn-flex btn-light-primary">
+                                        <i class="ki-duotone ki-plus fs-3"></i>
+                                        Add
+                                    </button>
+                                </div>
+                                <!--end::Form group-->
+                        
+            
+            
+            
+                        </div>
+            
+                        <div class="modal-footer">
+                            <button type="button" onclick="saveOthersAdd()" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <div class="modal fade" tabindex="-1" id="kt_modal_stacked_4">
+                    <div class="modal-dialog modal-dialog-centered modal-md">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="modal-title">Edit Others (-) Details</h3>
+                
+                                <!--begin::Close-->
+                                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                                </div>
+                                <!--end::Close-->
+                            </div>
+                
+                            <div class="modal-body">
+                                <div id="repeaterSub">
+
+                                </div>
+                                    <div class="form-group">
+                                        <button type="button" onclick="addRepeaterList('sub')" class="btn btn-flex btn-light-primary">
+                                            <i class="ki-duotone ki-plus fs-3"></i>
+                                            Add
+                                        </button>
+                                    </div>
+                                    <!--end::Form group-->
+                            
+                
+                
+                
+                           </div>
+                
+                            <div class="modal-footer">
+                                <button type="button" onclick="saveOthersSub()" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+            </form>
+    <%- include("../../includes/footer", {pageName : "freightMemo" }) %>

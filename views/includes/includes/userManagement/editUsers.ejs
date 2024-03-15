@@ -1,0 +1,94 @@
+<% if(pageName==="editUser" ) { %>
+    <!--begin::Vendors Javascript(used for this page only)-->
+    <script src="../../../assets/plugins/custom/datatables/datatables.bundle.js"></script>
+    <!--end::Vendors Javascript-->
+
+    <!--begin::Custom Javascript(used for this page only)-->
+    <script src="../../../assets/js/custom/account/settings/signin-methods.js"></script>
+    <script src="../../../assets/js/custom/account/settings/profile-details.js"></script>
+    <script src="../../../assets/js/custom/account/settings/deactivate-account.js"></script>
+    <script src="../../../assets/js/custom/pages/user-profile/general.js"></script>
+    <script src="../../../assets/js/widgets.bundle.js"></script>
+    <script src="../../../assets/js/custom/widgets.js"></script>
+    <script src="../../../assets/js/custom/apps/chat/chat.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/upgrade-plan.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/create-app.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/offer-a-deal/type.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/offer-a-deal/details.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/offer-a-deal/finance.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/offer-a-deal/complete.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/offer-a-deal/main.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/two-factor-authentication.js"></script>
+    <script src="../../../assets/js/custom/utilities/modals/users-search.js"></script>
+
+
+    <script>
+        function containsLetters(inputString) {
+            const regex = /[a-zA-Z]/; // Regular expression to match any letter (uppercase or lowercase)
+            return regex.test(inputString);
+        }
+
+        function displayErrorMessage(message) {
+            Swal.fire({
+                text: message,
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            });
+        }
+
+        function editUser() {
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const email = document.getElementById("email").value;
+            const mobile = document.getElementById("mobile").value;
+
+            if (firstName === "") {
+                displayErrorMessage("First Name is required");
+            } else if (lastName === "") {
+                displayErrorMessage("Last Name is required");
+            } else if (email === "") {
+                displayErrorMessage("Email is required");
+            } else if (mobile.length >= 1 && mobile.length !== 10 || containsLetters(mobile)) {
+                displayErrorMessage("Please enter a valid 10-digit mobile number");
+            } else {
+
+                const e = document.getElementById("updateUserForm")
+                const data = new URLSearchParams();
+                for (const pair of new FormData(e)) {
+                    data.append(pair[0], pair[1]);
+                }
+                const url = `/user-management/manage-users/edit`
+                fetchPostRequest(url, data, "User Updated Successfully")
+
+            }
+        }
+    </script>
+    
+
+    <script>
+        const selectBranchElement = $("#selectBranch")
+        const selectGodownElement = $("#selectGodown")
+        selectBranchElement.on("change", async function () {
+            const id = selectBranchElement.val()
+            const url = `/settings/series-assign/get-godown?id=${id}`
+            fetchGetRequest(url).then((message) => {
+                selectGodownElement.empty()
+                selectGodownElement.append("<option></option>")
+                message.forEach(data => {
+                    const options = `<option value="${data._id}"> ${data.name} </option>`
+                    selectGodownElement.append(options)
+                })
+
+                selectGodownElement.prop("disabled", false)
+            });
+
+
+        })
+    </script>
+
+    <!--end::Custom Javascript-->
+    <% } %>

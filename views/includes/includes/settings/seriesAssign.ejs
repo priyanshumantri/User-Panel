@@ -1,0 +1,510 @@
+<% if(pageName==="lrSeriesAssign" ) {%>
+
+    <script src="../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+    <script src="../../../assets/js/custom/settings/lrSeriesAssign/new.js"></script>
+
+
+    <script>
+        function editGoodsDescription(id, name) {
+            const editModal = document.getElementById('kt_modal_update_permission');
+            const goodsDescriptionInput = document.querySelector('#kt_modal_update_permission input[name="editGoodsDescription"]');
+            const goodsDescriptionID = document.querySelector('#kt_modal_update_permission input[name="id"]');
+
+            goodsDescriptionID.value = id
+            goodsDescriptionInput.value = name
+
+            $(editModal).modal('show');
+        }
+
+
+        function deleteSeriesAssigned(id) {
+            Swal.fire({
+                text: "Are You Sure You Want To Delete This Series Assigned ",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = { id: id }; // Define the data to send in the request body
+
+                    fetch("/settings/series-assign/delete", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json' // Set the content type to JSON
+                        },
+                        body: JSON.stringify(data) // Convert data to JSON format
+                    }).then((response) => {
+                        if (response.status === 400) {
+                            return response.json().then((data) => {
+                                Swal.fire({
+                                    text: data.message,
+                                    icon: "error",
+                                    buttonsStyling: !1,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                })
+                            })
+                        } else if (response.status === 200) {
+                            Swal.fire({
+                                text: "Successfully Deleted Assigned Series",
+                                icon: "success",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                        } else if (response.status === 500) {
+                            Swal.fire({
+                                text: "INTERNAL SERVER ERROR",
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                        }
+                    }).catch((error) => {
+                        console.error(error);
+                    });
+                } else {
+                    // Handle the cancel action here
+                }
+            });
+        }
+    </script>
+
+
+    <script>
+        function stopSeriesAssigned(id) {
+            Swal.fire({
+                text: "Are You Sure You Want To Stop Usage Of This Series Assigned?",
+                icon: "info",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, Stop Usage of This Series",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-info",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = { id: id }; // Define the data to send in the request body
+
+                    fetch("/settings/series-assign/stop", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json' // Set the content type to JSON
+                        },
+                        body: JSON.stringify(data) // Convert data to JSON format
+                    }).then((response) => {
+                        if (response.status === 400) {
+                            return response.json().then((data) => {
+                                Swal.fire({
+                                    text: data.message,
+                                    icon: "error",
+                                    buttonsStyling: !1,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                })
+                            })
+                        } else if (response.status === 200) {
+                            Swal.fire({
+                                text: "Successfully Blocked Usage of This Series",
+                                icon: "success",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                        } else if (response.status === 500) {
+                            Swal.fire({
+                                text: "INTERNAL SERVER ERROR",
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                        }
+                    }).catch((error) => {
+                        console.error(error);
+                    });
+                } else {
+                    // Handle the cancel action here
+                }
+            });
+        }
+    </script>
+    <script>
+        function startSeriesAssigned(id) {
+            Swal.fire({
+                text: "Are You Sure You Want To Start Usage Of This Series Assigned?",
+                icon: "info",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, Start Usage of This Series",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-info",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = { id: id }; // Define the data to send in the request body
+
+                    fetch("/settings/series-assign/start", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json' // Set the content type to JSON
+                        },
+                        body: JSON.stringify(data) // Convert data to JSON format
+                    }).then((response) => {
+                        if (response.status === 400) {
+                            return response.json().then((data) => {
+                                Swal.fire({
+                                    text: data.message,
+                                    icon: "error",
+                                    buttonsStyling: !1,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                })
+                            })
+                        } else if (response.status === 200) {
+                            Swal.fire({
+                                text: "Successfully Started Usage of This Series",
+                                icon: "success",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                        } else if (response.status === 500) {
+                            Swal.fire({
+                                text: "INTERNAL SERVER ERROR",
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                        }
+                    }).catch((error) => {
+                        console.error(error);
+                    });
+                } else {
+                    // Handle the cancel action here
+                }
+            });
+        }
+    </script>
+    <script>
+        function allowOnlyNumbers(event) {
+            const inputElement = event.target;
+            const inputValue = inputElement.value;
+
+            // Remove any non-numeric characters
+            const numericValue = inputValue.replace(/[^0-9]/g, '');
+
+            // Update the input field with the cleaned value
+            inputElement.value = numericValue;
+        }
+    </script>
+    <script>
+        $("#assignFor").on("change", function () {
+            $("#assignFor").prop("disabled", true)
+            $("#selectBranch").prop("disabled", false)
+        })
+    </script>
+    <script>
+        const selectBranchElement = $("#selectBranch")
+        const selectGodownElement = $("#selectGodown")
+        selectBranchElement.on("change", function () {
+            if ($("#assignFor").val() !== "branch") {
+                const id = selectBranchElement.val()
+                fetch(`/settings/series-assign/get-godown?id=${id}`, {
+                    method: "GET"
+                }).then(data => {
+                    if (data.status === 400) {
+
+                        return data.json().then((message) => {
+                            Swal.fire({
+                                text: message.message,
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then(response => {
+                                if (response.isConfirmed) {
+                                    selectGodownElement.empty()
+                                    selectGodownElement.prop("disabled", true)
+                                }
+                            })
+                        })
+
+                    } else if (data.status === 200) {
+                        selectGodownElement.empty()
+                        return data.json().then((message) => {
+                            selectGodownElement.append("<option></option>")
+                            message.forEach(data => {
+                                const options = `<option value="${data._id}"> ${data.name} </option>`
+                                selectGodownElement.append(options)
+                            })
+
+                            selectGodownElement.prop("disabled", false)
+                            setTimeout(function () {
+                                selectGodownElement.focus()
+                            }, 100)
+
+                        })
+
+                    }
+                })
+            } else {
+                $("#for").prop("disabled", false).focus()
+                $("#from").prop("disabled", false)
+                $("#to").prop("disabled", false)
+            }
+        })
+    </script>
+    <script>
+        selectGodownElement.on("change", function () {
+            $("#for").prop("disabled", false)
+            $("#from").prop("disabled", false)
+            $("#to").prop("disabled", false)
+        })
+    </script>
+    <script>
+        function addNewRow(to, from, forValue, forText) {
+            const table = $("#itemTableBody")
+            const tr = table.find("tr")
+            const newRow = `
+              <tr data-rowid="${tr.length}">
+                <td>
+                <select class="form-control form-control-solid" name="forValue" disabled>
+                   
+                   <option selected value="${forValue}">${forText}</option>
+                    </select>
+                </td>
+                <td>
+                <input type="text" class="form-control form-control-solid" name="from" value="${from}" disabled>
+                </td>
+                <td>
+                <input type="text" class="form-control form-control-solid" name="to" value="${to}" disabled>
+                </td>
+                <td>
+                    <button onclick="deleteRow(${tr.length})" type="button" class="btn btn-sm btn-icon btn-danger btn-active-color-grey remove-item" data-kt-element="remove-item">
+                       <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                     </button>
+               
+                </td>
+                </tr>
+            
+            `
+
+            table.append(newRow)
+        }
+    </script>
+    <script>
+        $("#to").on("keydown", function () {
+            if (event.key === "Tab" && !event.shiftKey) {
+                const selectedForElement = $("#for");
+                const selectedOptionText = selectedForElement.find(":selected").text()
+                if ($("#to").val() == 0) {
+                    Swal.fire({
+                        text: "Please Enter To Value",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    })
+                } else if (parseInt($("#to").val()) < parseInt($("#from").val())) {
+                    Swal.fire({
+                        text: "To Value Should Be Greater Than From Value",
+                        icon: "error",
+                        buttonsStyling: !1,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    })
+                } else {
+                    addNewRow($("#to").val(), $("#from").val(), $("#for").val(), selectedOptionText)
+                    $("#to").val(0)
+                    $("#from").val(0)
+                    $("#for").val(null).select2()
+                    $("#selectBranch").prop("disabled", true)
+                    $("#selectGodown").prop("disabled", true)
+                }
+
+
+            }
+        })
+    </script>
+    <script>
+        function addSeries() {
+            $("#modalTitle").text("Assign New Series")
+            $("#seriesAssign").trigger("reset")
+            $("#for").val(null).prop("disabled", true).select2()
+            $("#from").val(0).prop("disabled", true)
+            $("#to").val(0).prop("disabled", true)
+            $("#selectBranch").val(null).prop("disabled", true).select2()
+            $("#selectGodown").val(null).prop("disabled", true).select2()
+            $("#assignFor").val(null).prop("disabled", false).select2()
+            $("#itemTableBody").empty()
+        }
+    </script>
+    <script>
+        function deleteRow(id) {
+            $(`tr[data-rowid="${id}"]`).remove()
+        }
+    </script>
+    <script>
+        function submitAssigned () {
+            if($("#itemTableBody").find("tr").length === 0){
+                showError("Please Assign Atleast One Series")
+        } else if($("#assignFor").val() === "") {
+                showError("Please Select Assign For")
+        } else if($("#selectBranch").val() === "") {
+            showError("Please Select Branch")
+        } else if($("#assignFor").val() === "godown" && $("#selectGodown").val() === "") {
+            showError("Please Select Godown")
+        } else {
+                $("#assignBTN").attr("data-kt-indicator", "on").prop("disabled", true)
+                $("#closeBTN").prop("disabled", true)
+                const form = document.getElementById("seriesAssign");
+             
+                // Enable disabled inputs and selects
+                const disabledInputs = form.querySelectorAll("input[disabled], select[disabled]");
+                for (const input of disabledInputs) {
+                    input.removeAttribute("disabled");
+                }
+         
+                // Serialize the form data
+                const formData = new FormData(form);
+
+                // Re-disable previously disabled inputs and selects
+                for (const input of disabledInputs) {
+                    input.setAttribute("disabled", "disabled");
+                }
+           
+                // Create a URLSearchParams object and add form data to it
+                const data = new URLSearchParams();
+                for (const pair of formData) {
+                    data.append(pair[0], pair[1]);
+                }
+           
+                // Send the form data to the server
+                fetch("/settings/series-assign/new", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: data
+                }).then((data) => {
+                    if (data.status === 400) {
+
+                        return data.json().then((message) => {
+                            Swal.fire({
+                                text: message.message,
+                                icon: "error",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then(response=> {
+                            if(response.isConfirmed) {
+                                $("#assignBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                                $("#closeBTN").prop("disabled", false)
+                            }
+                        
+                            }
+                            )
+                        })
+
+                    } else if (data.status === 200) {
+                        Swal.fire({
+                            text: "Series Assigned Successfully",
+                            icon: "success",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((response) => {
+                            if (response.isConfirmed) {
+                                location.reload()
+                            }
+                        })
+                    } else if (data.status === 401) {
+                        Swal.fire({
+                            text: "You are not authorized to perform this action",
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then((data) => {
+                            if (data.isConfirmed) {
+                                $("#assignBTN").attr("data-kt-indicator", "off").prop("disabled", false)
+                                $("#closeBTN").prop("disabled", false)
+                            }
+                        })
+                    }
+                })
+        }
+    }
+    </script>
+
+
+
+
+    <%} %>

@@ -1,0 +1,80 @@
+<% if(pageName==="balanceSheet" ) {%>
+
+    <script>
+        $("#pdf").on("click", function () {
+          
+            if($("#pAndL").css("display") === "none") {
+                showError("Please generate the report first")
+                return
+            }
+
+
+            fetch("/reports/accounts/balance-sheet/export?type=pdf", {
+                method: 'GET',
+            }).then((res) => {
+                if(res.status === 200) {
+                    return res.json().then((data) => {
+                        
+                        window.open(data.message, '_blank');
+
+
+                    })
+                }
+            })
+        })
+    </script>
+
+    <script>
+        function setFinancialYearRange(financialYear) {
+            var financialYearParts = financialYear.split('-');
+            var startYear = parseInt(financialYearParts[0]);
+            var endYear = parseInt(financialYearParts[1]);
+
+            var startFinancialYear = moment().month(3).date(1).year(startYear); // April 1st of the specified financial year
+            var endFinancialYear = moment().month(2).date(31).year(endYear); // March 31st of the specified financial year
+
+            var today = moment();
+
+            function cb(start, end) {
+                $("#kt_daterangepicker_4").html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"));
+            }
+
+            $("#kt_daterangepicker_4").daterangepicker({
+                startDate: today,
+                endDate: today,
+                minDate: startFinancialYear,
+                maxDate: endFinancialYear,
+                ranges: {
+                    "Today": [moment(), moment()],
+                    "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
+                    "Last 7 Days": [moment().subtract(6, "days"), moment()],
+                    "Last 30 Days": [moment().subtract(29, "days"), moment()],
+                    "This Month": [moment().startOf("month"), moment().endOf("month")],
+                    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+                }, locale: {
+                    format: 'DD/MM/YYYY',
+                    separator: ' - ',
+                    applyLabel: 'Apply',
+                    cancelLabel: 'Cancel',
+                    fromLabel: 'From',
+                    toLabel: 'To',
+                    customRangeLabel: 'Custom',
+                    weekLabel: 'W',
+                    daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                    firstDay: 1
+                }
+            }, cb);
+
+            cb(today, today);
+        }
+
+        // Example usage:
+        setFinancialYearRange("<%=financialYear.fy%>");
+    </script>
+
+
+
+
+
+    <%} %>

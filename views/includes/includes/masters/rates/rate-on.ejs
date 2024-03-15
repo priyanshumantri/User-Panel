@@ -1,0 +1,109 @@
+<% if(pageName==="rateON" ) {%>
+    <script src="../../../assets/js/custom/apps/user-management/permissions/oldList.js"></script>
+    <script src="../../../assets/js/custom/masters/rates/rateON/new.js"></script>
+    <script src="../../../assets/js/custom/masters/rates/rateON/edit.js"></script>
+
+    <script>
+        function deleteRateON(id, name) {
+            Swal.fire({
+                text: "Are You Sure You Want To Delete " + name + " Rate ON",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, return",
+                customClass: {
+                    confirmButton: "btn btn-danger",
+                    cancelButton: "btn btn-active-light"
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = { id: id }; // Define the data to send in the request body
+
+                    fetch("/masters/rates/rate-on/delete", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json' // Set the content type to JSON
+                        },
+                        body: JSON.stringify(data) // Convert data to JSON format
+                    }).then((response) => {
+                        if (response.status === 400) {
+                            return response.json().then((data) => {
+                                Swal.fire({
+                                    text: data.message,
+                                    icon: "error",
+                                    buttonsStyling: !1,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                })
+                            })
+                        } else if (response.status === 200) {
+                            Swal.fire({
+                                text: "Rate ON Deleted",
+                                icon: "success",
+                                buttonsStyling: !1,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            }).then((data) => {
+                                if (data.isConfirmed) {
+                                    location.reload()
+                                }
+                            })
+                        } else if(response.status === 401) {
+                                    Swal.fire({
+                                        text: "You Are Not Authrized To Perform This Action",
+                                        icon: "success",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn btn-primary"
+                                        }
+                                    })
+                                } else if(response.status === 500) {
+                                    Swal.fire({
+                                        text: "Something Went Wrong",
+                                        icon: "success",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn btn-primary"
+                                        }
+                                    }).then(response=> {
+                                        if(response.isConfirmed) {
+                                            location.reload()
+                                        }
+                                    })
+                                }
+                    }).catch((error) => {
+                        console.error(error);
+                    });
+                } else {
+                    // Handle the cancel action here
+                }
+            });
+        }
+
+        function editRateON(id, rateON, unit) {
+
+            const rateONElement = $('#kt_modal_update_permission input[name="rateON"]');
+            const unitElement = $('#kt_modal_update_permission select[name="unit"]');
+            const idElement = $('#kt_modal_update_permission input[name="id"]');
+            unitElement.find('option').each(function () {
+                if ($(this).val() === unit) {
+                    $(this).prop('selected', true);
+                }
+            });
+            rateONElement.val(rateON)
+            idElement.val(id)
+            unitElement.select2()
+
+            $("#kt_modal_update_permission").modal("show");
+        }
+
+    </script>
+
+    <%} %>

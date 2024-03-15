@@ -1,0 +1,637 @@
+<%- include("../../includes/header", {pageName : "freightInvoice" }) %>
+    <%- include("../../includes/sidebar", {pageName : "freightInvoice" }) %>
+
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+        <div id="kt_app_content_container" class="app-container  container-xxl ">
+          
+   
+            <div style="padding: 30px;" class="card card-p-0 card-flush">
+              
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Branch</label>
+                            <% if (user.role.roleType === "ADMIN") { %>
+                            <select name="branch" id="branch" form="findLRForm" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Branch">
+                                <option></option>
+                       
+                            </select>
+                            <% } else { %>
+                            <input disabled type="text" id="branch" form="findLRForm" name="branch" class="form-control form-control-solid" value="<%=user.branch.name%>">
+                            <% } %>
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <label for="form-label">Select Date Range</label>
+                            <input class="form-control form-control-solid" name="dateRange" form="findLRForm" placeholder="Pick date range" id="searchRange" />
+                        </div>
+            
+                        <div class="col-xl-3">
+                            <button style="margin-top: 20px;" type="button" onclick="findLR()" class="btn btn-sm btn-primary">Find</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+         
+       
+        </div>
+    </div>
+
+
+    <form id="findLRForm"></form>
+ 
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+             
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                 
+                    <div style="padding: 30px;" class="card card-p-0 card-flush">
+                        <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <div class="d-flex align-items-center position-relative my-1">
+                                    <span class="svg-icon fs-1 position-absolute ms-4">
+                                        <i class="ki-duotone ki-magnifier fs-3">
+                                         <span class="path1"></span>
+                                         <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="Search Invoice" />
+                                </div>
+                                <!--end::Search-->
+                                <!--begin::Export buttons-->
+                                <div id="kt_datatable_example_1_export" class="d-none"></div>
+                                <!--end::Export buttons-->
+                            </div>
+                            <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                                <button onclick="addNewInvoice()" type="button" class="btn btn-primary btn-active-light-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_2">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Add New Invoice
+                                </button>
+                                <!--begin::Export dropdown-->
+                                <button type="button" class="btn btn-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    Export Report
+                                </button>
+                                <!--begin::Menu-->
+                                <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                        Copy to clipboard
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                        Export as Excel
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                        Export as CSV
+                                        </a>
+                                    </div>
+                                    <!--end::Menu item-->
+                                    <!--begin::Menu item-->
+                                  
+                                    <!--end::Menu item-->
+                                </div>
+                                <!--end::Menu-->
+                                <!--end::Export dropdown-->
+                    
+                                <!--begin::Hide default export buttons-->
+                                <div id="kt_datatable_example_buttons" class="d-none"></div>
+                                <!--end::Hide default export buttons-->
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table align-middle  rounded table-row-dashed fs-6 g-5" id="kt_datatable_example">
+                                <thead>
+                                    <!--begin::Table row-->
+                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase">
+                                        <th class="min-w-250px">Action</th>
+                                        
+                                        <th class="min-w-100px">Invoice No.</th>
+                                        
+                                        <th class="min-w-75px">Date</th>
+                                        <th class="min-w-100px">Billing Party</th>
+                                        <th class="min-w-100px">GST No.</th>
+                                        <th class="min-w-100px">No. of LR</th>
+                                        <th class="min-w-100px">Invoice Value</th>
+                                    
+                                    </tr>
+                                    <!--end::Table row-->
+                                </thead>
+                                <tbody id="lrDATA" class="fw-semibold text-gray-600">
+                                    <% if(typeof data !== "undefined") {%> 
+
+                                        <% data.forEach(data=> {%> 
+
+                                            <tr class="odd">
+                                                <td>
+
+                                                    <button onclick="viewChallan('<%=data._id%>')" class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-eye fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                        </i>
+                                                    </button>
+                                                    
+                                                    <button <% if(!data.paid) {%> onclick="editFreightInvoice('<%=data._id%>')" <% } else {%> disabled <%} %>  class="btn btn-sm btn-icon btn-primary btn-active-light-primary">
+                                                        <i class="ki-duotone ki-pencil fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button onclick="downloadFreightInvoice('<%=data._id%>')" class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-arrow-down fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                        </i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-icon btn-info btn-active-light-success">
+                                                        <i class="ki-duotone ki-printer fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                         <span class="path5"></span>
+                                                        </i>
+                                                    </button>
+                                                   
+                                                    <button <% if(!data.paid) {%> onclick="deleteFreightInvoice('<%=data._id%>')" <% } else {%> disabled <%} %> class="btn btn-sm btn-icon btn-danger btn-active-light-danger">
+                                                        <i class="ki-duotone ki-trash-square fs-2">
+                                                         <span class="path1"></span>
+                                                         <span class="path2"></span>
+                                                         <span class="path3"></span>
+                                                         <span class="path4"></span>
+                                                        </i>
+                                                    </button>
+
+                                                </td>
+                                            <td><%=data.billNumber%></td>
+                                            <td><%=data.date%></td>
+                                            <td><%=data.ledger.name%></td>
+                                            <td><%=data.ledger.taxation.GST%></td>
+                                            <td><%=data.lr.length%></td>
+                                                <% 
+                                                const totalFreight = data.lr.reduce((total, item) => total + item.freight, 0) + 
+                                                data.lr.reduce((total, item) => total + item.collectionCharges, 0) + 
+                                                data.lr.reduce((total, item) => total + item.delivery, 0) + 
+                                                data.lr.reduce((total, item) => total + item.labour, 0) + 
+                                                data.lr.reduce((total, item) => total + item.rebooking, 0) + 
+                                                data.lr.reduce((total, item) => total + item.loadingDetention, 0) + 
+                                                data.lr.reduce((total, item) => total + item.unloadingDetention, 0) + 
+                                                data.lr.reduce((total, item) => total + item.demmurage, 0) + 
+                                                data.lr.reduce((total, item) => total + item.unloading, 0) + 
+                                                data.lr.reduce((total, item) => total + item.exWeight, 0) + 
+                                                data.lr.reduce((total, item) => total + item.exHeight, 0) + 
+                                                data.lr.reduce((total, item) => total + item.st, 0) + 
+                                                data.lr.reduce((total, item) => total + item.others, 0) +
+                                                data.lr.reduce((total, item) => total + item.cgst, 0) +
+                                                data.lr.reduce((total, item) => total + item.sgst, 0) +
+                                                data.lr.reduce((total, item) => total + item.igst, 0)
+                                                %>
+
+                                            <td><%= totalFreight %></td>
+                                           
+                                            </tr>
+
+                                        <%}) %>
+
+                                    <%} %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                  
+                </div>
+           </div>
+           <%     function getCurrentFinancialYear() {
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+          
+            // Check if the current month is April (month index 3) or later
+            // If it's April or later, return the current year and the next year as the financial year
+            // Otherwise, return the previous year and the current year as the financial year
+            const startYear = currentDate.getMonth() >= 3 ? currentYear : currentYear - 1;
+            const endYear = startYear + 1;
+          
+            // Format the financial year as "2324", "2425", etc.
+            const formattedFinancialYear = `${String(startYear).slice(-2)}${String(endYear).slice(-2)}`;
+          
+            return formattedFinancialYear;
+          }
+          %>
+    <form id="freightInvoiceForm">
+           <div class="modal bg-body  fade" tabindex="-1" id="kt_modal_2" data-bs-focus="false">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content custom-modal shadow-none">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="title"></h5>
+        
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+        
+                    <div class="modal-body">
+                          <!--begin::Layout-->
+                    <div class="d-flex flex-column flex-lg-row">
+                        <!--begin::Content-->
+                        <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+                            <!--begin::Card-->
+                            <div class="card">
+                                <!--begin::Card body-->
+                                <div class="card-body p-12">
+                                    <!--begin::Form-->
+                                    
+                                        <!--begin::Wrapper-->
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row">
+                                            <div class="col-lg-4" style="margin-right: 10px;" id="addChallanNumberDiv">
+                                                <input type="hidden" name="editID" id="editID">
+                                            <label for="newChallan" class="form-label required">Bill No.</label>
+                                            <input oninput="validateWholeNumber(this)"  tabindex="1" checkindex="1" type="text" value="<%=billNumber%>" name="billNumber" id="billNumber" class="form-control form-control-solid">
+                                            </div>
+                               
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="invoiceDate" class="form-label required">Bill Date</label>
+                                                        <input tabindex="2" checkindex="2"
+                                                        class="form-control form-control-solid fw-bold pe-5 flatpickr-input"
+                                                        placeholder="Select Bill Date" name="invoiceDate" type="text"
+                                                        id="invoiceDate">
+                                            </div>
+
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="challanFor" class="form-label required">Billing Branch</label>
+                                                <input type="text" class="form-control form-control-solid" value="<%=user.branch.name%>" disabled>
+                                            </div>
+                                           
+
+                                            <!--end::Input group-->
+                                        </div>
+                                        <div class="d-flex flex-column align-items-start flex-xxl-row" style="padding-top: 20px;">
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="billingParty" class="form-label required">Billing Party</label>
+                                                <select checkindex="3" tabindex="3" data-dropdown-parent="#kt_modal_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Billing Party" name="billingParty" id="billingParty">
+                                                    <option></option>
+                                                    <% clientDATA.forEach(data=> {%> 
+                                                        <option value="<%=data.id%>"><%=data.name%></option>    
+                                                    <%}) %>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="to" class="form-label required">GST Number</label>
+                                               <input type="text" class="form-control form-control-solid" id="gstNumber">
+                                            </div>
+
+                                            <div class="col-lg-4" style="margin-right: 10px;">
+                                                <label for="selectLR" class="form-label required">Select LR Number</label>
+                                                <select disabled tabindex="6" checkindex="6" data-dropdown-parent="#kt_modal_2" class="form-select form-select-solid" data-control="select2" data-placeholder="Select LR" id="selectLR">
+                                                    <option></option>
+                                                 
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!--end::Top-->
+
+                                        <!--begin::Separator-->
+                                        <div class="separator separator-dashed my-10"></div>
+                                        <!--end::Separator-->
+
+                                        <!--begin::Wrapper-->
+                                        <div class="mb-0">
+                                            <!--begin::Table wrapper-->
+                                            <div class="table-responsive mb-10">
+                                                <!--begin::Table-->
+                                                <table class="table g-5 gs-0 mb-0 fw-bold text-gray-700"
+                                                    data-kt-element="items" id="freightInvoice">
+                                                    <!--begin::Table head-->
+                                                    <thead>
+                                                        <tr
+                                                            class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase">
+                                                           <th class="min-w-200px w-200px">Actions</th>
+                                                            <th class="min-w-100px w-100px">Sr No.</th>
+                                                            <th class="min-w-150px w-150px">LR Number</th>
+                                                            <th class="min-w-150px w-150px">Date</th>
+                                                            <th class="min-w-150px w-150px">From</th>
+                                                            <th class="min-w-150px w-150px">To</th>
+                                                            <th class="min-w-100px w-100px">PKGS</th>
+                                                            <th class="min-w-150px w-150px">Weight</th>
+                                                            <th class="min-w-150px w-150px">Freight</th>
+                                                            <th class="min-w-150px w-150px">Collection</th>
+                                                            <th class="min-w-150px w-150px">Delivery</th>
+                                                            <th class="min-w-150px w-150px">Labour</th>
+                                                            <th class="min-w-150px w-150px">Rebooking</th>
+                                                            <th class="min-w-150px w-150px">Loading Detention</th>
+                                                            <th class="min-w-150px w-150px">Unloading Detention</th>
+                                                            <th class="min-w-150px w-150px">Demmurage</th>
+                                                            <th class="min-w-150px w-150px">Unloading</th>
+                                                            <th class="min-w-150px w-150px">Extra Weight</th>
+                                                            <th class="min-w-150px w-150px">Extra Height</th>
+                                                            <th class="min-w-150px w-150px">ST</th>
+                                                            <th class="min-w-150px w-150px">Others</th>
+                                                            <th class="min-w-150px w-150px">CGST</th>
+                                                            <th class="min-w-150px w-150px">SGST</th>
+                                                            <th class="min-w-150px w-150px">IGST</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <!--end::Table head-->
+
+                                                    <!--begin::Table body-->
+                                                    <tbody id="itemTableBody">
+                                                    
+                                                    </tbody>
+                                                    <!--end::Table body-->
+
+                                                    <!--begin::Table foot-->
+                                                    <tfoot>
+                                                        <tr class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700">
+                                                           <th class="text-white"></th>
+                                                            <th class="text-white"></th>
+                                                            <th class="text-white"></th>
+                                                            <th class="text-white"></th>
+                                                            <th class="text-white"></th>
+                                                            <th class="text-white"></th>
+                                                            <th class="text-white"></th>
+                                                            <th class="text-white">Sub total</th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalFreight">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalCollection">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalDelivery">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalLabour">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalRebooking">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalLoadingDetention">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalUnloadingDetention">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalDemmurage">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalUnloading">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalExtraWeight">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalExtraHeight">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalSt">
+                                                            </th>
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalOthers">
+                                                            </th>
+
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalCGST">
+                                                            </th>
+
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalSGST">
+                                                            </th>
+
+                                                            <th class="text-white">
+                                                                <input type="number" disabled class="form-control form-control-transparent" id="totalIGST">
+                                                            </th>
+
+                                                        </tr>
+
+                                                        <tr class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700">
+                                                            <th class="text-white"></th>
+                                                             <th class="text-white"></th>
+                                                             <th class="text-white"></th>
+                                                             <th class="text-white"></th>
+                                                             <th class="text-white"></th>
+                                                             <th class="text-white"></th>
+                                                             <th class="text-white"></th>
+                                                             <th class="text-white">Total</th>
+                                                             <th class="text-white">
+                                                                 <input type="number" disabled class="form-control form-control-transparent" id="netBillValue">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+ 
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+ 
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+ 
+                                                             <th class="text-white">
+                                                                 <input type="text" disabled class="form-control form-control-transparent">
+                                                             </th>
+ 
+                                                         </tr>
+
+
+                                                    </tfoot>
+                                                    <!--end::Table foot-->
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!--end::Wrapper-->
+                                    </form>
+                                    <!--end::Form-->
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::Card-->
+                        </div>
+                        <!--end::Content-->
+
+            
+                    </div>
+                    <!--end::Layout-->
+                    </div>
+        
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="modalCloseBTN">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="createFreightInvoice()" id="invoiceSubmit">
+                            <span class="indicator-label">
+                                Create New Invoice
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="updateInvoice()" id="invoiceUpdate">
+                            <span class="indicator-label">
+                                Update Invoice
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </div>
+
+        <div class="modal fade" tabindex="-1" id="kt_modal_stacked_2">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="editFreightTitle"></h3>
+            
+                        <!--begin::Close-->
+                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Close-->
+                    </div>
+            
+                    <div class="modal-body">
+                        <div class="d-flex flex-column align-items-start flex-xxl-row">
+                            <div class="col-lg-4" style="margin-right: 10px;">
+                                <input type="hidden" id="trID">
+                                <input type="hidden" id="qty">
+                                <input type="hidden" id="actualWeight">
+                                <input type="hidden" id="chargedWeight">
+                                <label for="" class="form-label">Rate ON</label>
+                               <select data-dropdown-parent="#kt_modal_stacked_2" data-control="select2" data-placeholder="Select Rate ON" class="form-select form-select-solid" name="rateON" id="rateON">
+                                <option></option>
+                                <option value="actualWeight">Actual Weight</option>
+                                <option value="chargedWeight">Charged Weight</option>
+                                <option value="pkg">Package</option>
+                                <option value="ftl">FTL (Fix)</option>
+                               </select>
+                                
+                            </div>
+                            <div class="col-lg-4" style="margin-right: 10px;">
+                                <label for="rate" class="form-label">Rate</label>
+                                <input placeholder="Enter Rate" disabled type="number" class="form-control form-control-solid" name="rate" id="rate">
+                                
+                            </div>
+
+                            <div class="col-lg-4" style="margin-right: 10px;">
+                            <label for="freight" class="form-label">Freight</label>
+                            <input type="number" name="freight" id="freight" disabled class="form-control form-control-solid">
+                            </div>
+                           
+                        </div>
+                        <div class="d-flex flex-column align-items-start flex-xxl-row" style="margin-top: 20px;">
+                           <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                            <label for="" class="form-label">Collection</label>
+                            <input type="text" name="collection" id="collection" class="form-control form-control-solid">
+                           </div>
+                           <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                            <label for="" class="form-label">Delivery</label>
+                            <input type="text" name="delivery" id="delivery" class="form-control form-control-solid">
+                           </div>
+                           <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                            <label for="" class="form-label">Labour</label>
+                            <input type="text" name="labour" id="labour" class="form-control form-control-solid">
+                           </div>
+                        </div>
+                        <div class="d-flex flex-column align-items-start flex-xxl-row">
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Rebooking</label>
+                             <input type="text" name="rebooking" id="rebooking" class="form-control form-control-solid">
+                            </div>
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Loading Detention</label>
+                             <input type="text" name="loadingDetention" id="loadingDetention" class="form-control form-control-solid">
+                            </div>
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Unloading Detention</label>
+                             <input type="text" name="unloadingDetention" id="unloadingDetention" class="form-control form-control-solid">
+                            </div>
+                         </div>
+                         <div class="d-flex flex-column align-items-start flex-xxl-row">
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Demmurage</label>
+                             <input type="text" name="demmurage" id="demmurage" class="form-control form-control-solid">
+                            </div>
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Unloading</label>
+                             <input type="text" name="unloadingCharges" id="unloadingCharges" class="form-control form-control-solid">
+                            </div>
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Extra Weight</label>
+                             <input type="text" name="extraWeight" id="extraWeight" class="form-control form-control-solid">
+                            </div>
+                         </div>
+                         <div class="d-flex flex-column align-items-start flex-xxl-row">
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Extra Height</label>
+                             <input type="text" name="extraHeight" id="extraHeight" class="form-control form-control-solid">
+                            </div>
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Statistical</label>
+                             <input type="text" name="stCharges" id="stCharges" class="form-control form-control-solid">
+                            </div>
+                            <div class="col-lg-4" style="margin-right: 10px; margin-top: 10px">
+                             <label for="" class="form-label">Others</label>
+                             <input type="text" name="others" id="others" class="form-control form-control-solid">
+                            </div>
+                         </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                        <button type="button" onclick="saveLRFreight()" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+ 
+    <%- include("../../includes/footer", {pageName : "freightInvoice" }) %>

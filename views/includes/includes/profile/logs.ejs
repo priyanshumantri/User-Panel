@@ -1,0 +1,56 @@
+<% if(pageName==="logs" ) {%>
+    <script>
+        function remoteLogout(sessionToken) {
+            fetch(`/profile/logs/remote-logout/${sessionToken}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Other headers can be added here
+                },
+            })
+                .then(async (response) => {
+                    if (response.status === 400) {
+                        // Display an error notification using SweetAlert
+                       return response.json().then(data=> {
+                         Swal.fire({
+                            text: data.message,
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        })
+                       })
+                    } else if (response.status === 200) {
+                        // Display a success notification using SweetAlert
+                        await Swal.fire({
+                            text: "Sucessfully Logged Out From Remote Sessions",
+                            icon: "success",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        })
+                        // Reload the page after a successful logout
+                        location.reload();
+                    } else {
+                        // Display a generic error notification using SweetAlert
+                        await Swal.fire({
+                            text: "ERROR",
+                            icon: "error",
+                            buttonsStyling: !1,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        })
+                    }
+                })
+                .catch((error) => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+    </script>
+    <% } %>

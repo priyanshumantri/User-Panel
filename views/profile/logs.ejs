@@ -1,0 +1,285 @@
+<%- include("../includes/header", {pageName : "overview" }) %>
+    <%- include("../includes/sidebar", {pageName : "overview" }) %>
+        <%- include("../includes/toolbar", {pageName : "Overview" , pageHead : "My Profile" }) %>
+            <%- include("navbar", {pageName : "logs" }) %>
+                <div class="card mb-5 mb-lg-10">
+                    <!--begin::Card header-->
+                    <div class="card-header">
+                        <!--begin::Heading-->
+                        <div class="card-title">
+                            <h3>Active Sessions</h3>
+                        </div>
+                        <!--end::Heading-->
+
+                        <!--begin::Toolbar-->
+                        <div class="card-toolbar" data-select2-id="select2-data-125-bhy7">
+                            <div class="my-1 me-4" data-select2-id="select2-data-124-d0ir">
+                                <!--begin::Select-->
+                                <select
+                                    class="form-select form-select-sm form-select-solid w-125px select2-hidden-accessible"
+                                    data-control="select2" data-placeholder="Select Hours" data-hide-search="true"
+                                    data-select2-id="select2-data-9-hl7n" tabindex="-1" aria-hidden="true"
+                                    data-kt-initialized="1">
+                                    <option value="1" selected="" data-select2-id="select2-data-11-2zhg">1 Hours
+                                    </option>
+                                    <option value="2" data-select2-id="select2-data-127-8wlx">6 Hours</option>
+                                    <option value="3" data-select2-id="select2-data-128-gwmu">12 Hours</option>
+                                    <option value="4" data-select2-id="select2-data-129-ysf5">24 Hours</option>
+                                </select><span
+                                    class="select2 select2-container select2-container--bootstrap5 select2-container--below"
+                                    dir="ltr" data-select2-id="select2-data-10-4pq9" style="width: 100%;"><span
+                                        class="selection"><span
+                                            class="select2-selection select2-selection--single form-select form-select-sm form-select-solid w-125px"
+                                            role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="0"
+                                            aria-disabled="false" aria-labelledby="select2-hzqb-container"
+                                            aria-controls="select2-hzqb-container"><span
+                                                class="select2-selection__rendered" id="select2-hzqb-container"
+                                                role="textbox" aria-readonly="true" title="24 Hours">24
+                                                Hours</span><span class="select2-selection__arrow"
+                                                role="presentation"><b
+                                                    role="presentation"></b></span></span></span><span
+                                        class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                <!--end::Select-->
+                            </div>
+
+                            <a href="#" class="btn btn-sm btn-primary my-1">
+                                View All
+                            </a>
+                        </div>
+                        <!--end::Toolbar-->
+                    </div>
+                    <!--end::Card header-->
+
+                    <!--begin::Card body-->
+                    <div class="card-body p-0">
+                        <!--begin::Table wrapper-->
+                        <div class="table-responsive">
+                            <!--begin::Table-->
+                            <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9">
+                                <!--begin::Thead-->
+                                <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
+                                    <tr>
+                                        <th class="min-w-250px">Location</th>
+                                        <th class="min-w-100px">Device</th>
+                                        <th class="min-w-150px">Browser</th>
+                                        <th class="min-w-150px">IP Address</th>
+                                        <th>Proxy</th>
+                                        <th class="min-w-150px">Time</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <!--end::Thead-->
+
+                                <!--begin::Tbody-->
+                                <tbody class="fw-6 fw-semibold text-gray-600">
+                                  
+                                    <tr>
+                                        <% var sessions = [] %>
+                                        <% user.loginSessions.forEach((element) => {
+                                            if (element.isActiveSession === true) {
+                                                sessions.push(element);
+                                            }
+                                        }) %>
+                                        
+                                        
+                                        
+                                        <% sessions.forEach((data) => { %>
+
+                                        <td>
+                                            <span class="badge badge-light-success fs-7 fw-bold"><%=data.location%></span>
+                                        </td>
+
+                                        <td>
+                                            <span ><%=data.device%> </span><%if(sessionToken === data.sessionToken){%>(Current Device)<%}%>
+                                        </td>
+
+                                        <td><%=data.browser%></td>
+
+                                        
+                                        <%if(data.proxy === false){%>
+                                            <td><span class="badge badge-light-success fs-7 fw-bold"><%=data.ipAddress%></span></td>
+                                        <td><span style="text-transform: uppercase;" class="badge badge-light-success fs-7 fw-bold"> N/A </span></td>
+                                        <%} else {%>
+                                            <td><span class="badge badge-light-warning fs-7 fw-bold"><%=data.ipAddress%></span></td>
+                                            <td><span style="text-transform: uppercase;" class="badge badge-light-warning fs-7 fw-bold"> Yes </span></td>
+                                            <% } %>  
+                                        <% 
+                                        const timestamp = data.timestamp;
+                                        const currentTime = new Date();
+                                        const timeDifference = currentTime - new Date(timestamp);
+                                        const minutes = Math.floor(timeDifference / (1000 * 60));
+                                        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+                                        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                                        const months = Math.floor(timeDifference / (1000 * 60 * 60 * 24 * 30));
+                                        const years = Math.floor(timeDifference / (1000 * 60 * 60 * 24 * 30 * 12));
+                                     
+                                        let timeAgo;
+                                     
+                                        if (minutes < 60) {
+                                            timeAgo = `${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
+                                        } else if (hours < 24) {
+                                            timeAgo = `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+                                        } else if (days < 30) {
+                                            timeAgo = `${days} ${days === 1 ? 'day' : 'days'} ago`;
+                                        } else if (months < 12) {
+                                            timeAgo = `${months} ${months === 1 ? 'month' : 'months'} ago`;
+                                        } else {
+                                            timeAgo = `${years} ${years === 1 ? 'year' : 'years'} ago`;
+                                        }
+                                     %>
+                                     
+                                     
+                                        <td><%= timeAgo %></td>
+                                        <td><button class="btn btn-danger" onclick="remoteLogout('<%=data.sessionToken%>')">Log Out</button></td>
+                                    </tr>
+
+                                        <%}) %>
+                                    
+                                </tbody>
+                                <!--end::Tbody-->
+                            </table>
+                            <!--end::Table-->
+                        </div>
+                        <!--end::Table wrapper-->
+                    </div>
+                    <!--end::Card body-->
+                </div>
+                <div class="card mb-5 mb-lg-10">
+                    <!--begin::Card header-->
+                    <div class="card-header">
+                        <!--begin::Heading-->
+                        <div class="card-title">
+                            <h3>Inactive Sessions (Last 5)</h3>
+                        </div>
+                        <!--end::Heading-->
+
+                        <!--begin::Toolbar-->
+                        <div class="card-toolbar" data-select2-id="select2-data-125-bhy7">
+                            <div class="my-1 me-4" data-select2-id="select2-data-124-d0ir">
+                                <!--begin::Select-->
+                                <select
+                                    class="form-select form-select-sm form-select-solid w-125px select2-hidden-accessible"
+                                    data-control="select2" data-placeholder="Select Hours" data-hide-search="true"
+                                    data-select2-id="select2-data-9-hl7n" tabindex="-1" aria-hidden="true"
+                                    data-kt-initialized="1">
+                                    <option value="1" selected="" data-select2-id="select2-data-11-2zhg">1 Hours
+                                    </option>
+                                    <option value="2" data-select2-id="select2-data-127-8wlx">6 Hours</option>
+                                    <option value="3" data-select2-id="select2-data-128-gwmu">12 Hours</option>
+                                    <option value="4" data-select2-id="select2-data-129-ysf5">24 Hours</option>
+                                </select><span
+                                    class="select2 select2-container select2-container--bootstrap5 select2-container--below"
+                                    dir="ltr" data-select2-id="select2-data-10-4pq9" style="width: 100%;"><span
+                                        class="selection"><span
+                                            class="select2-selection select2-selection--single form-select form-select-sm form-select-solid w-125px"
+                                            role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="0"
+                                            aria-disabled="false" aria-labelledby="select2-hzqb-container"
+                                            aria-controls="select2-hzqb-container"><span
+                                                class="select2-selection__rendered" id="select2-hzqb-container"
+                                                role="textbox" aria-readonly="true" title="24 Hours">24
+                                                Hours</span><span class="select2-selection__arrow"
+                                                role="presentation"><b
+                                                    role="presentation"></b></span></span></span><span
+                                        class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                <!--end::Select-->
+                            </div>
+
+                            <a href="#" class="btn btn-sm btn-primary my-1">
+                                View All
+                            </a>
+                        </div>
+                        <!--end::Toolbar-->
+                    </div>
+                    <!--end::Card header-->
+
+                    <!--begin::Card body-->
+                    <div class="card-body p-0">
+                        <!--begin::Table wrapper-->
+                        <div class="table-responsive">
+                            <!--begin::Table-->
+                            <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9">
+                                <!--begin::Thead-->
+                                <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
+                                    <tr>
+                                        <th class="min-w-250px">Location</th>
+                                        <th class="min-w-100px">Device</th>
+                                        <th class="min-w-150px">Browser</th>
+                                        <th class="min-w-150px">IP Address</th>
+                                        <th>Proxy</th>
+                                        <th class="min-w-150px">Time</th>
+                                    </tr>
+                                </thead>
+                                <!--end::Thead-->
+
+                                <!--begin::Tbody-->
+                                <tbody class="fw-6 fw-semibold text-gray-600">
+                                  
+                                    <tr>
+                                        <% var inActiveSessions = [] %>
+                                       <% user.loginSessions.find((element)=> { if(element.isActiveSession === false){inActiveSessions.push(element)}}) %>
+                                        
+                                       <% var last10InactiveSessions = inActiveSessions.slice(-5).reverse() %>
+                                        
+                                        <% last10InactiveSessions.forEach((data) => { %>
+
+                                        <td>
+                                            <span class="badge badge-light-success fs-7 fw-bold"><%=data.location%></span>
+                                        </td>
+
+                                        <td>
+                                            <span ><%=data.device%> </span><%if(sessionToken === data.sessionToken){%>(Current Device)<%}%>
+                                        </td>
+
+                                        <td><%=data.browser%></td>
+
+                                        
+                                        <%if(data.proxy === false){%>
+                                            <td><span class="badge badge-light-success fs-7 fw-bold"><%=data.ipAddress%></span></td>
+                                        <td><span style="text-transform: uppercase;" class="badge badge-light-success fs-7 fw-bold"> N/A </span></td>
+                                        <%} else {%>
+                                            <td><span class="badge badge-light-warning fs-7 fw-bold"><%=data.ipAddress%></span></td>
+                                            <td><span style="text-transform: uppercase;" class="badge badge-light-warning fs-7 fw-bold"> Yes </span></td>
+                                            <% } %>  
+                                        <% 
+                                        const timestamp = data.timestamp;
+                                        const currentTime = new Date();
+                                        const timeDifference = currentTime - new Date(timestamp);
+                                        const minutes = Math.floor(timeDifference / (1000 * 60));
+                                        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+                                        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                                        const months = Math.floor(timeDifference / (1000 * 60 * 60 * 24 * 30));
+                                        const years = Math.floor(timeDifference / (1000 * 60 * 60 * 24 * 30 * 12));
+                                     
+                                        let timeAgo;
+                                     
+                                        if (minutes < 60) {
+                                            timeAgo = `${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
+                                        } else if (hours < 24) {
+                                            timeAgo = `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+                                        } else if (days < 30) {
+                                            timeAgo = `${days} ${days === 1 ? 'day' : 'days'} ago`;
+                                        } else if (months < 12) {
+                                            timeAgo = `${months} ${months === 1 ? 'month' : 'months'} ago`;
+                                        } else {
+                                            timeAgo = `${years} ${years === 1 ? 'year' : 'years'} ago`;
+                                        }
+                                     %>
+                                     
+                                     
+                                        <td><%= timeAgo %></td>
+                                       
+                                    </tr>
+
+                                        <%}) %>
+                                    
+                                </tbody>
+                                <!--end::Tbody-->
+                            </table>
+                            <!--end::Table-->
+                        </div>
+                        <!--end::Table wrapper-->
+                    </div>
+                    <!--end::Card body-->
+                </div>
+
+                <%- include("../includes/footer", {pageName : "logs" }) %>

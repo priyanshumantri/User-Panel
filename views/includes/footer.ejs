@@ -1,0 +1,385 @@
+<!--begin::Javascript-->
+<script>
+    var hostUrl = "/../../../assets/";        </script>
+
+<!--begin::Global Javascript Bundle(mandatory for all pages)-->
+<script src="/../../../assets/plugins/global/plugins.bundle.js"></script>
+<script src="/../../../assets/js/scripts.bundle.js"></script>
+<script src="/../../../assets/js/custom.js"></script>
+<script src="https://preview.keenthemes.com/metronic8/demo1/assets/plugins/custom/datatables/datatables.bundle.js"></script>
+  
+
+<!--end::Global Javascript Bundle-->
+
+<!--page loader-->
+
+
+
+<!--MASTERS-->
+<%- include("includes/masters/editBranch") %>
+<%- include("includes/masters/states")%>
+<%- include("includes/masters/cities")%>
+<%- include("includes/masters/country") %>
+<%- include("includes/masters/zones") %>
+<%- include("includes/masters/branches") %>
+<%- include("includes/masters/godowns") %>
+<%- include("includes/masters/editGodowns") %>
+<%- include("includes/masters/goodsDescription") %>
+<%- include("includes/masters/ledgers") %>
+<%- include("includes/masters/vehicles/brokers") %>
+<%- include("includes/masters/vehicles/owners") %>
+<%- include("includes/masters/vehicles/drivers") %>
+<%- include("includes/masters/vehicles/vehicles") %>
+<%- include("includes/masters/vehicles/edit-vehicles") %>
+<%- include("includes/masters/method-of-packaging") %>
+<%- include("includes/masters/rates/rate-on") %>
+<%- include("includes/masters/rates/rate-master") %>
+<%- include("includes/masters/groups") %>
+<%- include("includes/masters/sub-ledgers") %>
+
+<!--Transactions-->
+<!--Booking-->
+<%- include("includes/transactions/booking/lorry-reciept") %>
+<%- include("includes/transactions/booking/local-collection-challan") %>
+<%- include("includes/transactions/booking/challan") %>
+<%- include("includes/transactions/delivery/lorry-arrival") %>
+<%- include("includes/transactions/delivery/delivery-challan") %>
+<%- include("includes/transactions/delivery/crossing-challan") %>
+<%- include("includes/transactions/delivery/excess") %>
+
+<%- include("includes/transactions/accounts/freight-invoice") %>
+<%- include("includes/transactions/accounts/freight-memo") %>
+
+<!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$------Accounts-----$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
+<%- include("includes/accounts/reciepts") %>
+<%- include("includes/accounts/contra") %>
+<%- include("includes/accounts/journal") %>
+<%- include("includes/accounts/payment") %>
+<!--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$------End Accounts-----$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-----REPORTS----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+<%- include("includes/reports/booking/bookingRegister") %>
+<%- include("includes/reports/accounts/ledgers") %>
+<%- include("includes/reports/accounts/pAndL") %>
+<%- include("includes/reports/accounts/balanceSheet") %>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-----END REPORTS----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
+
+<%- include("includes/profile/activityLogs") %>
+<%- include("includes/profile/logs") %>
+<%- include("includes/profile/security") %>
+
+<%- include("includes/settings/communications") %>
+
+<%- include("includes/settings/settings") %>
+<%- include("includes/settings/overview") %>
+
+
+
+
+<%- include("includes/settings/seriesAssign") %>
+<%- include("includes/userManagement/editUsers") %>
+
+
+<%- include("includes/userManagement/manageUsers") %>
+<%- include("includes/userManagement/permissions") %>
+<%- include("includes/userManagement/role") %>
+<%- include("includes/actions") %>
+
+<script>
+    const changeBranchElement = $("#switchBranch")
+    changeBranchElement.select2()
+
+    changeBranchElement.on("change", function(){
+        const branchID = changeBranchElement.val()
+        fetch(`/settings/series-assign/get-godown?id=${branchID}`, {
+            method : "GET"
+        }).then((response)=> {
+            if(response.status === 200) {
+               return response.json().then(data=> {
+                $("#switchGodown").empty()
+                const emptyOption = `<option></option>`
+                $("#switchGodown").append(emptyOption)
+                data.forEach(godown=> {
+                    const option = `<option value="${godown._id}">${godown.name}</option>`
+                    $("#switchGodown").append(option)
+                })
+               })
+            } else {
+                alert("Something Went Wrong")
+            }
+        })
+    })
+
+</script>
+<script>
+    function switchBranch() {
+        const switchBranchElement = $("#switchBranch")
+        const switchGodownElement = $("#switchGodown")
+        if(switchBranchElement.val() === "") {
+            showError("Please Select Branch")
+        } else if(switchGodownElement.val() === "") {
+            showError("Please Select Godown")
+        } else {
+            fetch(`/change-branch?branchId=${switchBranchElement.val()}&godownId=${switchGodownElement.val()}`, {
+                method: "GET"
+            }).then(response=> {
+                if(response.status === 200) {
+                    Swal.fire({
+                text:"Switched Branch & Godown Successfully",
+                icon: "success",
+                buttonsStyling: !1,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            }).then(response=> {
+                if(response.isConfirmed) {
+                    location.reload()
+                }
+            })
+           
+                } else {
+                    showError("Something Went Wrong")
+                }
+            })
+        }
+    }
+</script>
+<script>
+     function showError(message) {
+            Swal.fire({
+                text: message,
+                icon: "error",
+                buttonsStyling: !1,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            })
+        }
+</script>
+<script>
+function validateWholeNumber(input) {
+    // Remove all characters other than 0-9
+    input.value = input.value.replace(/[^0-9]+/g, '');
+}
+
+
+
+function validateNumberWithDecimals(input) {
+    // Remove all non-numeric and non-decimal characters except the first decimal point
+    input.value = input.value.replace(/[^0-9.]+/g, '');
+
+    // Ensure only one decimal point is present
+    const decimalCount = (input.value.match(/\./g) || []).length;
+    if (decimalCount > 1) {
+        input.value = input.value.replace(/(\..*)\./g, '$1');
+    }
+}
+
+
+
+</script>
+
+<script>
+    function customRound(number) {
+    // Extract the decimal part of the number
+    const decimalPart = number - Math.floor(number);
+
+    // Determine the rounding direction based on the decimal part
+    let roundedNumber;
+    if (decimalPart <= 0.5) {
+        roundedNumber = Math.floor(number); // Round down
+    } else {
+        roundedNumber = Math.ceil(number); // Round up
+    }
+
+    return roundedNumber;
+}
+</script>
+
+<script>
+//     document.onkeydown = function (e) {
+//     if (e.keyCode === 123) { // F12 key code
+//         return false;
+//     }
+// };
+
+// document.addEventListener('contextmenu', function (e) {
+//             e.preventDefault(); // Prevent the default context menu
+//         });
+</script>
+
+<script>
+    function resetPage() {
+        window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth' // Optional: This provides a smooth scroll effect
+        });
+        location.reload()
+    }
+</script>
+<script>
+
+$(document).on('focus', '.select2-selection.select2-selection--single', function (e) {
+  $(this).closest(".select2-container").siblings('select:enabled').select2('open');
+
+});
+
+$('select.select2').on('select2:closing', function (e) {
+   
+  $(e.target).data("select2").$selection.one('focus focusin', function (e) {
+    e.stopPropagation();
+    
+  });
+});
+
+
+
+$(document).on('select2:select', '.form-select', function (e) {
+    if (event.keyCode === 9) {
+        var currentTabIndex = $(this).attr('checkindex');
+        var nextTabIndex = parseInt(currentTabIndex) + 1;
+        
+        var nextElement = $('[checkindex="' + nextTabIndex + '"]');
+        
+        while (nextElement.length > 0 && nextElement.prop('disabled')) {
+            nextTabIndex++;
+            nextElement = $('[checkindex="' + nextTabIndex + '"]');
+        }
+
+        if (nextElement.length > 0) {
+            nextElement.focus.select2('open')
+        }
+    }
+});
+
+
+
+       
+
+</script>
+
+
+    <% if(pageName === "lrOK") {%> 
+        <script>
+        function transactionDate(id) {
+            const dateInput = id
+
+            const flatpickrInstance = flatpickr(dateInput, {
+                dateFormat: "d-m-Y",
+                minDate: new Date(new Date().getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+                maxDate: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000), // 1 day in the future
+                defaultDate: "today",
+                allowInput: true, // Set today's date as the default
+                onReady: function (selectedDates, dateStr, instance) {
+                    // When the calendar is ready, apply the input mask
+                    const inputMask = new Inputmask("99-99-9999", {placeholder : "dd-mm-yyyy", insertMode: false });
+                    inputMask.mask(dateInput);
+                },
+            });
+
+            let userInput = ""; // Store the user's input
+
+            dateInput.addEventListener("focus", function () {
+                // Automatically select "dd" part when the input receives focus
+                dateInput.setSelectionRange(0, 2);
+            });
+            dateInput.addEventListener("input", function () {
+                // Get the current cursor position
+                const cursorPosition = dateInput.selectionStart;
+
+                // Check if the input matches the expected date format
+                const regex = /^(\d{0,2}-\d{0,2}-\d{0,4}).*$/;
+                const match = dateInput.value.match(regex);
+
+                if (match) {
+                    const parts = match[1].split("-");
+
+                    // Validate and format day section
+                    let day = parts[0];
+                    if (day.length > 0) {
+                        day = day.padStart(2, "0");
+                    }
+
+                    // Validate and format month section
+                    let month = parts[1];
+                    if (month.length > 0) {
+                        month = month.padStart(2, "0");
+                    }
+
+                    // Validate and format year section
+                    let year = parts[2] || "";
+                    if (year.length === 2) {
+                        const currentYear = new Date().getFullYear();
+                        const currentCentury = Math.floor(currentYear / 100) * 100;
+                        year = (currentCentury + parseInt(year)).toString();
+                    }
+
+                    userInput = `${day}-${month}-${year}`;
+                    flatpickrInstance.setDate(userInput, true, "d-m-Y");
+
+                    // Restore the cursor position
+                    dateInput.setSelectionRange(cursorPosition, cursorPosition);
+                }
+            });
+
+        }
+    </script>
+    <%} %>
+<script>
+    function setFinancialYearRangeForReport(financialYear) {
+            var financialYearParts = financialYear.split('-');
+            var startYear = parseInt(financialYearParts[0]);
+            var endYear = parseInt(financialYearParts[1]);
+
+            var startFinancialYear = moment().month(3).date(1).year(startYear); // April 1st of the specified financial year
+            var endFinancialYear = moment().month(2).date(31).year(endYear); // March 31st of the specified financial year
+
+            var today = moment();
+
+            function cb(start, end) {
+                $("#date").html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"));
+            }
+
+            $("#date").daterangepicker({
+                startDate: today,
+                endDate: today,
+                minDate: startFinancialYear,
+                maxDate: endFinancialYear,
+                ranges: {
+                    "Today": [moment(), moment()],
+                    "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
+                    "Last 7 Days": [moment().subtract(6, "days"), moment()],
+                    "Last 30 Days": [moment().subtract(29, "days"), moment()],
+                    "This Month": [moment().startOf("month"), moment().endOf("month")],
+                    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")],
+                    "Entire Year": [startFinancialYear, endFinancialYear]
+                }, locale: {
+                    format: 'DD/MM/YYYY',
+                    separator: ' - ',
+                    applyLabel: 'Apply',
+                    cancelLabel: 'Cancel',
+                    fromLabel: 'From',
+                    toLabel: 'To',
+                    customRangeLabel: 'Custom',
+                    weekLabel: 'W',
+                    daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                    firstDay: 1
+                }
+            }, cb);
+
+            cb(today, today);
+        }
+        function convertToUpper(inputElement) {
+            inputElement.value = inputElement.value.toUpperCase();
+        }
+        
+</script>
+
+
+</body>
+<!--end::Body-->
+
+</html>

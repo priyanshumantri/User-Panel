@@ -1,0 +1,46 @@
+<%- include("../includes/header", {pageName : "settings" , pageHead : "Manage Communication Emails"}) %>
+    <%- include("../includes/sidebar", {pageName : "communications", pageHead : "Manage Communication Emails" }) %>
+        <%- include("../includes/toolbar", {pageName : "settings", pageHead : "Manage Communication Emails" }) %>
+
+
+
+
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                    
+                    <div class="card" style="padding: 30px;">
+                        <!--begin::Card header-->
+                       
+                        <form action="/settings/communication" method="POST" id="communicationsForm">
+
+                            <div class="card-header border-0 pt-6">
+
+
+                                <div class="col-md-12">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                         <label class="required fw-semibold fs-6 mb-2">Authentication Email</label>
+                                         <input type="text" name="authProcess" id="authProcess"
+                                            class="form-control form-control-solid mb-3 mb-lg-0" placeholder=""
+                                            value="<%= emailData.authProcess %>">
+                                        </div>
+                                </div>
+                               
+
+                                <div style="margin-top: 10px">
+                                    <button onclick="communications()" type="button" class="btn btn-primary btn-active-light-primary my-1">UPDATE</button>
+                                </div>
+
+                                <!--end::Card header-->
+                            </div>
+                        </form>
+                        <!--end::Card-->
+                    </div>
+                </div>
+                <!--end::Content container-->
+            </div>
+
+
+            <%- include("../includes/footer", {pageName : "communications" }) %>

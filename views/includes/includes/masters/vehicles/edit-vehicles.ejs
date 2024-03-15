@@ -1,0 +1,91 @@
+<% if(pageName === "vehicles") {%> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6/inputmask.min.js"></script>
+    <script>
+        $("#insuranceValidity").flatpickr({
+            dateFormat : "d-m-Y",
+            minDate : "today"
+        });
+
+        $("#permitValidity").flatpickr({
+            dateFormat : "d-m-Y",
+            minDate : "today"
+        });
+    </script>
+
+    <script>
+        function editVehicle() {
+            
+            const editVehicle = document.getElementById("editVehicleForm")
+               const data = new URLSearchParams();
+               for (const pair of new FormData(editVehicle)) {
+                   data.append(pair[0], pair[1]);
+               }
+
+               fetch("/masters/vehicles/edit", {
+                   method: "POST",
+                   headers: {
+                       'Content-Type': 'application/x-www-form-urlencoded'
+                   },
+                   body: data
+               }).then((data)=> {
+                   if(data.status === 400) {
+                       return data.json().then((message)=> {
+                           Swal.fire({
+                               text: message.message,
+                               icon: "error",
+                               buttonsStyling: !1,
+                               confirmButtonText: "Ok, got it!",
+                               customClass: {
+                                   confirmButton: "btn btn-primary"
+                               }
+                           })
+                       })
+                   }if (data.status === 200) {
+                       Swal.fire({
+                           text: "Vehicle Details Updated Successfully",
+                           icon: "success",
+                           buttonsStyling: !1,
+                           confirmButtonText: "Ok, got it!",
+                           customClass: {
+                               confirmButton: "btn btn-primary"
+                           }
+                       }).then((response) => {
+                           if (response.isConfirmed) {
+                               location.reload()
+                           }
+                       })
+                   } else if (data.status === 500) {
+                       Swal.fire({
+                           text: "Something Went Wrong",
+                           icon: "error",
+                           buttonsStyling: !1,
+                           confirmButtonText: "Ok, got it!",
+                           customClass: {
+                               confirmButton: "btn btn-primary"
+                           }
+                       }).then((data) => {
+                           if (data.isConfirmed) {
+                               location.reload()
+                           }
+                       })
+                   } else if (data.status === 401) {
+
+                       Swal.fire({
+                           text: "You are not authorized to perform this action",
+                           icon: "error",
+                           buttonsStyling: !1,
+                           confirmButtonText: "Ok, got it!",
+                           customClass: {
+                               confirmButton: "btn btn-primary"
+                           }
+                       }).then((data) => {
+                           if (data.isConfirmed) {
+                               location.reload()
+                           }
+                       })
+
+                   }
+               })
+   }
+    </script>
+    <%} %>

@@ -1,0 +1,132 @@
+<%- include("../../includes/header", {pageName : "clients" }) %>
+    <%- include("../../includes/sidebar", {pageName : "clients" }) %>
+    <%- include("../../includes/toolbar", { pageName: "Edit Client - " + data.name, pageHead: "Masters" }) %>
+
+
+
+
+            <div id="kt_app_content" class="app-content  flex-column-fluid ">
+
+
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container  container-xxl ">
+                    <div class="card" style="padding: 30px;">
+                        <form id = "editClientForm">
+                            <div class="card-header border-0 pt-6">
+                               
+
+                                <input type="hidden" name="id" value="<%=data.id%>">
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Client Name</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.name%>" placeholder="Enter new Branch Name" type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Client Mobile</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.mobile%>" type="text" placeholder="Enter Branch Mobile Number" name="mobile" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="fw-semibold fs-6 mb-2">Client Email</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.email%>" type="text" placeholder="Enter Branch Email" name="email" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                               
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">GST</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.taxation.GST%>" placeholder="Enter Branch Manager Email" type="text" name="GST" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="fw-semibold fs-6 mb-2">PAN Number</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.taxation.PAN%>" type="text" placeholder="Enter Branch Address" name="PAN" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="fw-semibold fs-6 mb-2">CIN</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.taxation.CIN%>" placeholder="Enter Client CIN (If Applicable)" type="text" name="CIN" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="fv-row mb-10 fv-plugins-icon-container">
+                                        <!--begin::Label-->
+                                        <label class="required fw-semibold fs-6 mb-2">Client Address</label>
+                                        <!--end::Label-->
+
+                                        <!--begin::Input-->
+                                
+                                        <input value="<%=data.address%>" placeholder="Enter Branch Manger Name" type="text" name="address" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            
+                                        <!--end::Input-->
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <button onclick="editClient()" type="button" class="btn btn-primary">Update</button>
+                        </form>
+                        <!--end::Card-->
+                    </div>
+                </div>
+                <!--end::Content container-->
+            </div>
+
+          
+
+            <%- include("../../includes/footer", {pageName : "clients" }) %>
